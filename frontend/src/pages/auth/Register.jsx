@@ -3,13 +3,64 @@ import { useState } from "react";
 
 import {
   Mail,
-  Lock,
-  ShieldCheck,
-  Flag,
-  LockKeyhole
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  User2
 } from "lucide-react";
 
-const Register = ({switchMode, email, setEmail}) => {
+const Register = ({ switchMode, email, setEmail }) => {
+
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    if (!checked) {
+      alert("Please accept the terms and conditions")
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      })
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      const sendOtp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/send-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: user.email }),
+      })
+      const otpData = await sendOtp.json();
+      if (!otpData.success) {
+        throw new Error(otpData.message);
+      }
+
+      setEmail(user.email);
+      switchMode("otp");
+
+    } catch (error) {
+      console.log("Error in register", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
 
   return (
@@ -28,7 +79,25 @@ const Register = ({switchMode, email, setEmail}) => {
         </div>
 
         {/* Form */}
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleRegister}>
+
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              Name
+            </label>
+            <div className="relative">
+
+              <User2 className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg" />
+              <input
+                type="text"
+                placeholder="Himashu Prushty"
+                value={user.name}
+                onChange={(e) => setUser({ ...user, name: e.target.value })}
+                className="form-input w-full pl-12 pr-4 py-3 bg-app border-1  border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
+                focus:border-bright"
+              />
+            </div>
+          </div>
 
           {/* Email / Phone */}
           <div>
@@ -41,8 +110,8 @@ const Register = ({switchMode, email, setEmail}) => {
               <input
                 type="email"
                 placeholder="name@example.com"
-                value={email}
-                onChange={(e)=>setEmail(e.target.value)}
+                value={user.email}
+                onChange={(e) => setUser({ ...user, email: e.target.value })}
                 className="form-input w-full pl-12 pr-4 py-3 bg-app border-1  border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
                 focus:border-bright"
               />
@@ -50,7 +119,7 @@ const Register = ({switchMode, email, setEmail}) => {
           </div>
 
           {/* Password + Confirm */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label className="text-sm font-medium text-text-primary">
@@ -61,33 +130,20 @@ const Register = ({switchMode, email, setEmail}) => {
               <div className="relative">
                 <LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
+                  value={user.password}
+                  onChange={(e) => setUser({ ...user, password: e.target.value })}
                   className="form-input w-full pl-12 pr-4 py-3 bg-app border-1 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg"
+                >
+                  {showPassword ? <EyeOff /> : <Eye />}
+                </button>
               </div>
-
-
-            </div>
-
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-medium text-text-primary">
-                  Confirm
-                </label>
-              </div>
-
-              <div className="relative">
-                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg" />
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  className="form-input w-full pl-12 pr-4 py-3 bg-app border-1 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
-                />
-              </div>
-
-
             </div>
           </div>
 
@@ -95,6 +151,8 @@ const Register = ({switchMode, email, setEmail}) => {
           <div className="flex items-start gap-3 py-2">
             <input
               type="checkbox"
+              value={checked}
+              onChange={(e) => { setChecked(true) }}
               className="mt-1 rounded border-border-muted bg-background-dark 
                          text-accent focus:ring-accent"
             />
@@ -113,12 +171,11 @@ const Register = ({switchMode, email, setEmail}) => {
           {/* CTA */}
           <button
             type="submit"
-            className="w-full bg-bright hover:bg-bright/90 text-card font-extrabold 
+            className="w-full cursor-pointer bg-bright hover:bg-bright/90 text-card font-extrabold 
                        py-3 px-6 rounded-2xl text-base shadow-lg transition-all 
                        active:scale-[0.98] mt-2 border border-accent/20"
-            onClick={(e) => { e.preventDefault(); switchMode("otp"); }}
           >
-            Create Account
+            {loading ? "Creating Account..." : "Create Account"}
           </button>
         </form>
 

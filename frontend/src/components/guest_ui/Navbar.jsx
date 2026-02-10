@@ -6,13 +6,13 @@ const Navbar = () => {
   const [authMode, setAuthMode] = useState("login");
 
   const navItemClass = ({ isActive }) =>
-  [
-    "flex items-center gap-3 px-5 py-3 rounded-2xl transition-all duration-200",
-    "text-sm font-medium",
-    isActive
-      ? "bg-bright text-white"
-      : "text-text-secondary hover:text-text-primary hover:bg-white/5",
-  ].join(" ");
+    [
+      "flex items-center gap-3 px-5 py-3 rounded-2xl transition-all duration-200",
+      "text-sm font-medium",
+      isActive
+        ? "bg-bright text-white"
+        : "text-text-secondary hover:text-text-primary hover:bg-white/5",
+    ].join(" ");
 
 
   return (
@@ -47,14 +47,14 @@ const Navbar = () => {
         </div>
 
         <div className="flex items-center gap-6">
-          <button className="text-sm text-text-secondary hover:text-text-primary"
+          <button className="text-sm cursor-pointer text-text-secondary hover:text-text-primary"
             onClick={() => {
               setAuthMode("login");
               setAuthOpen(true);
             }}>
             Login
           </button>
-          <button className="bg-accent text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-accent-hover" onClick={() => {
+          <button className="bg-accent cursor-pointer text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-accent-hover" onClick={() => {
             setAuthMode("register");
             setAuthOpen(true);
           }}

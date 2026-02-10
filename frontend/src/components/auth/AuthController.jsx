@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import AuthModal from "./AuthModal";
 
 import Login from "../../pages/auth/Login";
@@ -16,10 +16,10 @@ export default function AuthController({ open, onClose, defaultMode = "login" })
   const switchMode = (next) => setMode(next);
 
   const screens = {
-    login: <Login switchMode={switchMode} />,
-    register: <Register switchMode={switchMode} email={email} setEmail={setEmail}/>,
-    otp: <VerifyOtp switchMode={switchMode} email={email} />,
-    success: <Success />
+    login: <Login switchMode={switchMode} onClose={onClose} />,
+    register: <Register switchMode={switchMode} email={email} setEmail={setEmail} onClose={onClose} />,
+    otp: <VerifyOtp switchMode={switchMode} email={email} onClose={onClose} />,
+    success: <Success onClose={onClose} />
   };
 
   return (

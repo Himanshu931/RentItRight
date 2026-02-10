@@ -1,0 +1,44 @@
+# Dependencies
+/node_modules
+.npm
+.eslintcache
+.stylelintcache
+
+# Build artifacts (TypeScript output)
+/dist
+/build
+/coverage
+*.tsbuildinfo
+
+# Environment variables and sensitive files
+.env
+.env.test
+.env.*.local
+.env.local
+# keep a copy of the example file in the repo
+!.env.example
+
+# Logs and temporary files
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+testem.json
+*.pid
+*.seed
+*.log.lock*
+
+# OS-specific and editor files
+.DS_Store
+.idea/
+.vs/
+*.save
+*.save.*
+
+# Optional: if you are using Next.js or other frameworks
+.next/
+out/
+.nuxt/
+.output/
+.cache/
