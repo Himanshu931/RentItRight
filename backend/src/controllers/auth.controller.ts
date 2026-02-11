@@ -8,7 +8,7 @@ import { loginSchema, registerSchema } from "../validatior/auth.schema";
 import { OTPValidator } from "../validatior/OTP.validator";
 import { sendOTPService, verifyOTPService } from "../service/auth.service";
 import logger from "../config/logger";
-import { VerifyUser } from "../utils/verifyUser";
+import { VerifyUser } from "../middleware/verifyUser";
 
 export interface userInterface {
   id: string;

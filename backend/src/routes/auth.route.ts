@@ -7,7 +7,7 @@ import {
   sendOTP,
   verifyOTP,
 } from "../controllers/auth.controller";
-import { VerifyUser } from "../utils/verifyUser";
+import { VerifyUser } from "../middleware/verifyUser";
 
 const router = Router();
 
