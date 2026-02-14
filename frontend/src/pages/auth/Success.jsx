@@ -1,23 +1,24 @@
 import AuthLayout from "../../components/auth/AuthLayout";
 import { CheckCircle, ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Success = () => {
   const navigate = useNavigate();
-
-  let timer = 5;
+  const [timer, setTimer] = useState(5);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      timer--;
-      if (timer === 0) {
-        navigate("/renter");
-      }
+    if (timer === 0) {
+      navigate("/renter");
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
     }, 1000);
 
-    return () => clearTimeout(timer);
-  }, [navigate]);
+    return () => clearInterval(interval);
+  }, [timer, navigate]);
 
   return (
     <AuthLayout>
