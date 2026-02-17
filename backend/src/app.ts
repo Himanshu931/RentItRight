@@ -20,6 +20,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
+
 app.use(RATE_LIMITER);
 
 //routes

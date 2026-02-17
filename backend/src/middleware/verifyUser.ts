@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 export interface DecodedToken {
     userId: string,
+    token: string,
 }
 
 declare module "express" {
@@ -19,9 +20,12 @@ export const VerifyUser = async (req: Request, res: Response, next: NextFunction
 
     try {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
+        if (token != decodedToken.token) {
+            return res.status(401).json({ success: false, message: "Unauthorized", status: 401 });
+        }
         req.userId = decodedToken.userId;
         next();
     } catch (error) {
-        res.status(500).json({ success: false, message: "Internal server error", error });
+        return res.status(401).json({ message: "Invalid token" });
     }
 }

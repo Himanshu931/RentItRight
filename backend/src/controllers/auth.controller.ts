@@ -129,9 +129,20 @@ export const me = async (req: Request, res: Response) => {
 
     const user: userInterface = await MeService(userId);
 
+    if (!user) {
+      return res.status(500).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     res
       .status(200)
-      .json({ success: true, message: "User fetched successfully", user });
+      .json({
+        success: true,
+        message: "User fetched successfully",
+        user: user,
+      });
   } catch (err) {
     res
       .status(500)
