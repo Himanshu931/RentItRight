@@ -20,10 +20,10 @@ import RoleRedirect from "./pages/auth/roleBasedRedirection";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter> 
       <Routes>
 
-        {/* Guest pages with Navbar + Footer */}
+        {/* Guest pages */}
         <Route element={<GuestLayout />}>
           <Route path="/" element={<GuestHome />} />
           <Route path="/role-redirect" element={<RoleRedirect />} />
@@ -31,8 +31,7 @@ function App() {
           <Route path="/item/:id" element={<ItemDetail />} />
         </Route>
 
-
-        {/* Renter pages with Navbar + Footer */}
+        {/* Renter pages */}
         <Route element={<RenterLayout />}>
           <Route path="/renter" element={<RenterDashboard />} />
           <Route path="/rentals" element={<Rentals />} />
@@ -45,7 +44,7 @@ function App() {
 
         </Route>
 
-        {/* Owner pages with Navbar + Footer */}
+        {/* Owner pages */}
         <Route element={<OwnerLayout />}>
           <Route path="/owner" element={<OwnerDashboard />} />
         </Route>

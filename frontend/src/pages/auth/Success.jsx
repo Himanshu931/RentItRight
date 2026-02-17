@@ -1,12 +1,11 @@
 import AuthLayout from "../../components/auth/AuthLayout";
 import { CheckCircle, ArrowRight } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Success = () => {
   const navigate = useNavigate();
-
-  let timer = 5;
+  const [timer, setTimer] = useState(5);
 
   // useEffect(() => {
   //   const timer = setInterval(() => {

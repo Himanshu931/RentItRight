@@ -17,10 +17,10 @@ const RenterNavbar = ({ user }) => {
 
                 {/* Left: Brand + Nav */}
                 <div className="flex items-center gap-10">
-                    <Link to="/renter" className="flex items-center gap-3">
-                
+                    <Link to="/renter" className="flex items-center gap-2">
+                        <img src="./src/assets/logo.png" alt="logo" width="35px" />
                         <h2 className="text-2xl font-bold text-text-primary">
-                            Rent It <span className="text-bright">Right</span>
+                            RentIt<span className="text-bright">Right</span>
                         </h2>
                     </Link>
 

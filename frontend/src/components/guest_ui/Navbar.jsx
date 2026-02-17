@@ -1,6 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import AuthController from "../auth/AuthController";
+import { Icon } from "lucide-react";
 const Navbar = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
@@ -22,9 +23,10 @@ const Navbar = () => {
       <div className="max-w-[1450px] mx-auto px-6 h-20 flex items-center justify-between">
 
         <div className="flex items-center gap-10">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2">
+            <img src="./src/assets/logo.png" alt="logo" width="35px" />
             <h2 className="text-2xl font-bold text-text-primary">
-              Rent It <span className="text-bright">Right</span>
+              RentIt<span className="text-bright">Right</span>
             </h2>
           </Link>
 
