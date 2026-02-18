@@ -3,8 +3,9 @@ import User from "../models/user.model";
 import logger from "../config/logger";
 import jwt from "jsonwebtoken";
 import { OTP } from "../models/OTP.mnodel";
-import { sendOTP } from "../utils/sendOTP";
 import { userInterface } from "../controllers/auth.controller";
+import { sendOTP } from "../utils/sendOTP";
+import { error } from "node:console";
 
 export const registerService = async (userData: {
   name: string;
@@ -32,19 +33,19 @@ export const registerService = async (userData: {
 
 export const sendOTPService = async (email: string) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const isCreated = await OTP.create({
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+  const hashedOtp = await bcrypt.hash(otp, 10);
+
+  await OTP.create({
     email,
-    otp,
-    expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+    otp: hashedOtp,
+    expiresAt,
   });
 
-  if (!isCreated) {
-    logger.info("Unable to create otp");
-  }
-
-  await sendOTP(email, otp);
-  logger.info(`OTP sent to ${email}`);
+  await sendOTP(email, otp)
 };
+
 
 export const verifyOTPService = async (otpData: {
   email: string;
@@ -53,13 +54,14 @@ export const verifyOTPService = async (otpData: {
   const isExist = await OTP.findOne({ email: otpData.email }).sort({
     createdAt: -1,
   });
-  console.log("backend otp", isExist);
+
   if (!isExist) {
     logger.info("OTP not found");
     throw new Error("OTP not found");
   }
 
-  if (isExist.otp !== otpData.otp) {
+  const isOtpValid = await bcrypt.compare(otpData.otp, isExist.otp);
+  if (!isOtpValid) {
     logger.info("Invalid OTP");
     throw new Error("Invalid OTP");
   }

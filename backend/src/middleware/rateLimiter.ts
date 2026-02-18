@@ -40,11 +40,26 @@ export const AUTH_LIMITER = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    skipSuccessfulRequests: true,
     handler: (req: Request, res: Response) => {
         res.status(429).json({
+            success: false,
             error: 'Rate limit exceeded',
             message: 'Too many authentication attempts, please try again later',
+            retryAfter: Math.round(req.rateLimit.resetTime.getTime() / 1000)
+        });
+    }
+});
+
+export const OTP_LIMITER = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    max: 3,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req: Request, res: Response) => {
+        res.status(429).json({
+            success: false,
+            error: 'Rate limit exceeded',
+            message: 'Too many OTP requests. Please wait 10 minutes before trying again.',
             retryAfter: Math.round(req.rateLimit.resetTime.getTime() / 1000)
         });
     }

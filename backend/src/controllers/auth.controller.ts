@@ -9,6 +9,7 @@ import { OTPValidator } from "../validatior/OTP.validator";
 import { sendOTPService, verifyOTPService } from "../service/auth.service";
 import logger from "../config/logger";
 import { VerifyUser } from "../middleware/verifyUser";
+import { error } from "node:console";
 
 export interface userInterface {
   id: string;
@@ -47,7 +48,7 @@ export const sendOTP = async (req: Request, res: Response) => {
     //     return res.status(400).json({ success: false, message: "Invalid data", error: validate.error });
     // }
 
-    await sendOTPService(email);
+    await sendOTPService(email)
 
     res
       .status(200)
@@ -55,7 +56,7 @@ export const sendOTP = async (req: Request, res: Response) => {
   } catch (error) {
     res
       .status(500)
-      .json({ success: false, message: "Internal server error", error });
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
