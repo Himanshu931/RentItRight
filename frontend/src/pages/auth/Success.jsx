@@ -7,18 +7,16 @@ const Success = () => {
   const navigate = useNavigate();
   const [timer, setTimer] = useState(5);
 
-  useEffect(() => {
-    if (timer === 0) {
-      navigate("/renter");
-      return;
-    }
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     timer--;
+  //     if (timer === 0) {
+  //       navigate("/renter");
+  //     }
+  //   }, 1000);
 
-    const interval = setInterval(() => {
-      setTimer((prev) => prev - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [timer, navigate]);
+  //   return () => clearTimeout(timer);
+  // }, [navigate]);
 
   return (
     <AuthLayout>

@@ -2,21 +2,23 @@ import nodemailer from "nodemailer";
 
 
 export const sendOTP = async (email: string, otp: string) => {
+
     const transporter = nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
-        secure: true,
+        secure: false,
         auth: {
             user: process.env.SMTP_USER,
             pass: process.env.SMTP_PASS,
         }
     })
 
-    await transporter.sendMail({
-        from: `"RentItRight" <${process.env.MAIL_USER}>`,
-        to: email,
-        subject: `${otp} is your RentItRight verification code`,
-        html: `
+    try {
+        await transporter.sendMail({
+            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            to: email,
+            subject: `${otp} is your RentItRight verification code`,
+            html: `
 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
     <div style="text-align: center; margin-bottom: 20px;">
         <h1 style="color: #2D3436; margin: 0; font-size: 24px;">RentItRight</h1>
@@ -35,5 +37,8 @@ export const sendOTP = async (email: string, otp: string) => {
     </p>
 </div>
 `,
-    });
+        });
+    } catch (error) {
+        throw error;
+    }
 }

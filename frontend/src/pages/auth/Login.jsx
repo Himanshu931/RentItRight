@@ -35,7 +35,9 @@ const Login = ({ switchMode, onClose }) => {
         throw new Error(data.message);
       }
 
-      navigate("/renter");
+      navigate("/role-redirect");
+      onClose()
+
     } catch (error) {
       console.log(error);
     } finally {

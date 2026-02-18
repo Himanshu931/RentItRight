@@ -16,6 +16,7 @@ import RenterExplore from "./pages/renter/RenterExplore";
 import RenterItemDetails from "./pages/renter/RenterItemDetails"
 import RenterWishlist from "./pages/renter/RenterWishlist";
 import RentCheckout from "./pages/renter/RentCheckout";
+import RoleRedirect from "./pages/auth/roleBasedRedirection";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         {/* Guest pages */}
         <Route element={<GuestLayout />}>
           <Route path="/" element={<GuestHome />} />
+          <Route path="/role-redirect" element={<RoleRedirect />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/item/:id" element={<ItemDetail />} />
         </Route>

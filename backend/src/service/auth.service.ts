@@ -3,95 +3,139 @@ import User from "../models/user.model";
 import logger from "../config/logger";
 import jwt from "jsonwebtoken";
 import { OTP } from "../models/OTP.mnodel";
+import { userInterface } from "../controllers/auth.controller";
 import { sendOTP } from "../utils/sendOTP";
+import { error } from "node:console";
 
+export const registerService = async (userData: {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}) => {
+  const isExist = await User.findOne({ email: userData.email });
+  if (isExist) {
+    logger.info(`User already exists`);
+    throw new Error("User already exists");
+  }
 
-export const registerService = async (userData: { name: string, email: string, password: string, role: string }) => {
+  const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-    const isExist = await User.findOne({ email: userData.email });
-    if (isExist) {
-        logger.info(`User already exists`);
-        throw new Error("User already exists");
-    }
+  await User.create({
+    name: userData.name,
+    email: userData.email,
+    password: hashedPassword,
+    role: userData.role,
+  });
 
-    const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-    await User.create({
-        name: userData.name,
-        email: userData.email,
-        password: hashedPassword,
-        role: userData.role
-    })
-
-    logger.info(`User registered successfully with email ${userData.email}`);
-}
+  logger.info(`User registered successfully with email ${userData.email}`);
+};
 
 export const sendOTPService = async (email: string) => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const isCreated = await OTP.create({
-        email,
-        otp,
-        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
-    })
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
-    if (!isCreated) {
-        logger.info("Unable to create otp")
-    }
+  const hashedOtp = await bcrypt.hash(otp, 10);
 
-    await sendOTP(email, otp);
-    logger.info(`OTP sent to ${email}`);
-}
+  await OTP.create({
+    email,
+    otp: hashedOtp,
+    expiresAt,
+  });
 
-export const verifyOTPService = async (otpData: { email: string, otp: string }) => {
-    const isExist = await OTP.findOne({ email: otpData.email }).sort({ createdAt: -1 });
-    console.log("backend otp", isExist)
-    if (!isExist) {
-        logger.info("OTP not found");
-        throw new Error("OTP not found");
-    }
+  await sendOTP(email, otp)
+};
 
-    if (isExist.otp !== otpData.otp) {
-        logger.info("Invalid OTP");
-        throw new Error("Invalid OTP");
-    }
 
-    if (isExist.expiresAt < new Date()) {
-        logger.info("OTP expired");
-        throw new Error("OTP expired");
-    }
+export const verifyOTPService = async (otpData: {
+  email: string;
+  otp: string;
+}) => {
+  const isExist = await OTP.findOne({ email: otpData.email }).sort({
+    createdAt: -1,
+  });
 
-    await OTP.deleteOne({ email: otpData.email });
+  if (!isExist) {
+    logger.info("OTP not found");
+    throw new Error("OTP not found");
+  }
 
-    await User.updateOne({ email: otpData.email }, { isVerified: true });
+  const isOtpValid = await bcrypt.compare(otpData.otp, isExist.otp);
+  if (!isOtpValid) {
+    logger.info("Invalid OTP");
+    throw new Error("Invalid OTP");
+  }
 
-    const token = await jwt.sign({ userId: otpData.email }, process.env.JWT_SECRET!, { expiresIn: "24h" });
+  if (isExist.expiresAt < new Date()) {
+    logger.info("OTP expired");
+    throw new Error("OTP expired");
+  }
 
-    logger.info(`OTP verified for ${otpData.email}`);
-    return token;
-}
+  await OTP.deleteOne({ email: otpData.email });
 
-export const loginService = async (userData: { email: string, password: string }) => {
-    logger.info(`User login attempt with email ${userData.email}`);
+  await User.updateOne({ email: otpData.email }, { isVerified: true });
 
-    const user = await User.findOne({ email: userData.email });
-    if (!user) {
-        logger.info("User not found");
-        throw new Error("User Doesn't exists")
-    }
+  const token = await jwt.sign(
+    { userId: otpData.email },
+    process.env.JWT_SECRET!,
+    { expiresIn: "24h" },
+  );
 
-    if (user && !user.isVerified) {
-        logger.info("User not verified");
-        throw new Error("User not verified");
-    }
+  logger.info(`OTP verified for ${otpData.email}`);
+  return token;
+};
 
-    const isPasswordValid = await bcrypt.compare(userData.password, user.password);
-    if (!isPasswordValid) {
-        logger.info("Invalid password");
-        throw new Error("Invalid password");
-    }
+export const loginService = async (userData: {
+  email: string;
+  password: string;
+}) => {
+  logger.info(`User login attempt with email ${userData.email}`);
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: "24h" });
+  const user = await User.findOne({ email: userData.email });
+  if (!user) {
+    logger.info("User not found");
+    throw new Error("User Doesn't exists");
+  }
 
-    logger.info(`User logged in successfully with email ${userData.email}`);
-    return token;
-}
+  if (user && !user.isVerified) {
+    logger.info("User not verified");
+    throw new Error("User not verified");
+  }
+
+  const isPasswordValid = await bcrypt.compare(
+    userData.password,
+    user.password,
+  );
+  if (!isPasswordValid) {
+    logger.info("Invalid password");
+    throw new Error("Invalid password");
+  }
+
+  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+    expiresIn: "24h",
+  });
+
+  logger.info(`User logged in successfully with email ${userData.email}`);
+  return token;
+};
+
+export const MeService = async (id: string | undefined) => {
+  if (id === undefined) {
+    logger.info("Id should be defined in Me controler");
+    throw new Error("Id is not defined");
+  }
+  const user = await User.findById(id);
+  if (!user) {
+    logger.info("User not found");
+    throw new Error("User Doesn't exists");
+  }
+
+  const userResponse: userInterface = {
+    id: user._id.toString(),
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+
+  return userResponse;
+};
