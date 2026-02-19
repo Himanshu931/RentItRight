@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import { RATE_LIMITER, AUTH_LIMITER } from "./middleware/rateLimiter";
 import csrf from "csurf";
 import mongoSanitize from "express-mongo-sanitize";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
 
 dotenv.config();
 
@@ -24,7 +26,7 @@ app.use(
 // -------------------- SECURITY MIDDLEWARES --------------------
 app.use(helmet());
 app.use(morgan("dev"));
-app.use(mongoSanitize())
+// app.use(mongoSanitize())
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -47,7 +49,10 @@ app.get("/api/v1/csrf-token", csrfProtection, (req, res) => {
 });
 
 // -------------------- ROUTES --------------------
-app.use("/api/v1/auth", AUTH_LIMITER, csrfProtection, authRoute);
+app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
+
+// -------------------- API DOCUMENTATION--------------------
+app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // -------------------- HEALTH CHECK --------------------
 app.get("/", (req, res) => {
