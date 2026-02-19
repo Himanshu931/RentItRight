@@ -5,31 +5,61 @@ import authRoute from "./routes/auth.route";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import { RATE_LIMITER } from "./middleware/rateLimiter";
-import { AUTH_LIMITER } from "./middleware/rateLimiter";
+import { RATE_LIMITER, AUTH_LIMITER } from "./middleware/rateLimiter";
+import csrf from "csurf";
+import mongoSanitize from "express-mongo-sanitize";
+
 dotenv.config();
 
 const app = express();
 
-//middleware
-app.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true
-}));
+// -------------------- CORS --------------------
+app.use(
+    cors({
+        origin: "http://localhost:5173",
+        credentials: true,
+    })
+);
+
+// -------------------- SECURITY MIDDLEWARES --------------------
 app.use(helmet());
 app.use(morgan("dev"));
+app.use(mongoSanitize())
+app.use(express.json({ limit: "10kb" }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.json());
 
+// -------------------- RATE LIMITING --------------------
 app.use(RATE_LIMITER);
 
-//routes
-app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
+// -------------------- CSRF SETUP --------------------
+const csrfProtection = csrf({
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    },
+});
 
-//healthcheck
+// CSRF token endpoint
+app.get("/api/v1/csrf-token", csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
+
+// -------------------- ROUTES --------------------
+app.use("/api/v1/auth", AUTH_LIMITER, csrfProtection, authRoute);
+
+// -------------------- HEALTH CHECK --------------------
 app.get("/", (req, res) => {
-    res.send("API is running...")
-})
+    res.send("API is running...");
+});
 
+// -------------------- CSRF ERROR HANDLER --------------------
+app.use((err: any, req: any, res: any, next: any) => {
+    if (err.code === "EBADCSRFTOKEN") {
+        return res.status(403).json({ message: "Invalid CSRF token" });
+    }
+    next(err);
+});
 
 export default app;

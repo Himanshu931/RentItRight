@@ -8,8 +8,6 @@ import { loginSchema, registerSchema } from "../validatior/auth.schema";
 import { OTPValidator } from "../validatior/OTP.validator";
 import { sendOTPService, verifyOTPService } from "../service/auth.service";
 import logger from "../config/logger";
-import { VerifyUser } from "../middleware/verifyUser";
-import { error } from "node:console";
 
 export interface userInterface {
   id: string;
