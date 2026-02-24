@@ -1,5 +1,6 @@
 import { success } from "zod";
 import { User } from "../models/user.model"
+import { AppError } from "../utils/AppError";
 interface userData {
     name: string;
     phone: string;
@@ -35,12 +36,12 @@ export const userProfileService = async (userId: string, userData: userData) => 
 
     const isMobileExists = await User.findOne({ phone: userData.phone });
     if (isMobileExists) {
-        throw new Error("Mobile number already exists");
+        throw new AppError("Mobile number already exists", 400);
     }
 
     const user = await User.findByIdAndUpdate(userId, userData, { new: true });
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
     }
 
     return { success: true, user }
@@ -50,7 +51,7 @@ export const getUserProfileService = async (userId: string) => {
 
     const user = await User.findById(userId).select("-password");
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
     }
 
     const profile: any = {
@@ -87,7 +88,7 @@ export const updateProfileService = async (userId: string, userData: updateUserD
 
     const user = await User.findByIdAndUpdate(userId, { $set: filteredData }, { new: true, revalidate: true })
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
     }
 
     return { success: true }
@@ -97,7 +98,7 @@ export const updateProfileImageService = async (userId: string, profileImage: st
 
     const user = await User.findByIdAndUpdate(userId, { $set: { profileImage } }, { new: true, revalidate: true })
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
     }
 
     return { success: true }
@@ -106,7 +107,7 @@ export const updateProfileImageService = async (userId: string, profileImage: st
 export const updateAddressService = async (userId: string, address: addressData) => {
     const user = await User.findByIdAndUpdate(userId, { $set: { address } }, { new: true, revalidate: true })
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
     }
 
     return { success: true }
@@ -114,7 +115,7 @@ export const updateAddressService = async (userId: string, address: addressData)
 export const deleteProfileService = async (userId: string) => {
     const user = await User.findByIdAndDelete(userId, { new: true })
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError("User not found", 404);
     }
 
     return { success: true }

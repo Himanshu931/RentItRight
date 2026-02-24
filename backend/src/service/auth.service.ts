@@ -5,6 +5,7 @@ import { userInterface } from "../controllers/auth.controller";
 import jwt from "jsonwebtoken";
 import { OTP } from "../models/OTP.model";
 import { sendOTP } from "../utils/sendOTP";
+import { AppError } from "../utils/AppError";
 
 export const registerService = async (userData: {
   email: string;
@@ -14,7 +15,7 @@ export const registerService = async (userData: {
   const isExist = await User.findOne({ email: userData.email });
   if (isExist) {
     logger.info(`User already exists`);
-    throw new Error("User already exists");
+    throw new AppError("User already exists", 400);
   }
 
   const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -53,18 +54,18 @@ export const verifyOTPService = async (otpData: {
 
   if (!isExist) {
     logger.info("OTP not found");
-    throw new Error("OTP not found");
+    throw new AppError("OTP not found", 400);
   }
 
   const isOtpValid = await bcrypt.compare(otpData.otp, isExist.otp);
   if (!isOtpValid) {
     logger.info("Invalid OTP");
-    throw new Error("Invalid OTP");
+    throw new AppError("Invalid OTP", 400);
   }
 
   if (isExist.expiresAt < new Date()) {
     logger.info("OTP expired");
-    throw new Error("OTP expired");
+    throw new AppError("OTP expired", 410);
   }
 
   await OTP.deleteOne({ email: otpData.email });
@@ -74,7 +75,7 @@ export const verifyOTPService = async (otpData: {
   const user = await User.findOne({ email: otpData.email });
   if (!user) {
     logger.info("User not found after OTP verification");
-    throw new Error("User not found");
+    throw new AppError("User not found", 400);
   }
 
   const token = jwt.sign(
@@ -96,12 +97,12 @@ export const loginService = async (userData: {
   const user = await User.findOne({ email: userData.email });
   if (!user) {
     logger.info("User not found");
-    throw new Error("User Doesn't exists");
+    throw new AppError("User Not Found", 400);
   }
 
   if (user && !user.isVerified) {
     logger.info("User not verified");
-    throw new Error("User not verified");
+    throw new AppError("User Not Verified", 403);
   }
 
   const isPasswordValid = await bcrypt.compare(
@@ -110,7 +111,7 @@ export const loginService = async (userData: {
   );
   if (!isPasswordValid) {
     logger.info("Invalid password");
-    throw new Error("Invalid password");
+    throw new AppError("Invalid Password", 400);
   }
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
@@ -124,12 +125,12 @@ export const loginService = async (userData: {
 export const MeService = async (id: string | undefined) => {
   if (id === undefined) {
     logger.info("Id should be defined in Me controler");
-    throw new Error("Id is not defined");
+    throw new AppError("Id is not defined", 400);
   }
   const user = await User.findById(id);
   if (!user) {
     logger.info("User not found");
-    throw new Error("User Doesn't exists");
+    throw new AppError("User Not Found", 400);
   }
 
   const userResponse: userInterface = {

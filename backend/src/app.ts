@@ -11,6 +11,7 @@ import csrf from "csurf";
 import mongoSanitize from "express-mongo-sanitize";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
+import { globalErrorHandler } from "./middleware/error.middleware";
 
 dotenv.config();
 
@@ -68,5 +69,8 @@ app.use((err: any, req: any, res: any, next: any) => {
     }
     next(err);
 });
+
+// -------------------- GLOBAL ERROR HANDLER --------------------
+app.use(globalErrorHandler);
 
 export default app;
