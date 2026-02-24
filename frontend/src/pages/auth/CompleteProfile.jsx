@@ -1,150 +1,225 @@
 import { useState } from "react";
+import {
+  Camera,
+  ShoppingBasket,
+  TrendingUp,
+  User,
+  MapPin,
+  Phone,
+  ArrowRight
+} from "lucide-react";
 
-export default function CompleteProfile() {
+export default function CompleteProfile({switchMode}) {
+
   const [intent, setIntent] = useState("rent");
+  const [formData, setFormData] = useState({
+    fullName: "",
+    pincode: "",
+    phone: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/auth/complete-profile`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...formData,
+            role: intent
+          })
+        }
+      );
+      
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+      switchMode("success");
+      alert("Profile Completed Successfully 🚀");
+
+    } catch (error) {
+      console.error(error.message);
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-app px-4 text-white">
-      
-      {/* CARD */}
-      <div className="w-full max-w-4xl rounded-2xl bg-card shadow-2xl">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-8">
+    <form onSubmit={handleSubmit}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-0 overflow-hidden">
 
-          {/* LEFT */}
-          <div className="flex flex-col items-center justify-center space-y-10">
-            
-            {/* Avatar */}
-            <div className="relative">
-              <div className="flex h-36 w-36 items-center justify-center rounded-full bg-zinc-800">
-                <span className="text-4xl">👤</span>
-              </div>
-              <button className="absolute bottom-3 right-3 rounded-full bg-emerald-500 p-2">
-                📷
-              </button>
+        {/* LEFT */}
+        <div className="bg-app/80 p-8 flex flex-col items-center justify-center space-y-8 border-r border-white/5">
+
+          <div className="relative group cursor-pointer">
+            <div className="flex h-32 w-32 items-center justify-center rounded-full bg-zinc-800 border-2 border-dashed border-zinc-700 group-hover:border-emerald-500/50 transition-colors overflow-hidden">
+              <User className="w-16 h-16 text-zinc-600 group-hover:scale-110 group-hover:text-emerald-500/50 transition-all" />
             </div>
-
-            <p className="text-xs tracking-widest text-zinc-400">
-              UPLOAD PROFILE PHOTO
-            </p>
-
-            {/* Usage Intent */}
-            <div className="w-full space-y-4">
-              <IntentCard
-                active={intent === "rent"}
-                title="I want to Rent"
-                subtitle="Browse and rent items locally"
-                onClick={() => setIntent("rent")}
-              />
-
-              <IntentCard
-                active={intent === "list"}
-                title="I want to List"
-                subtitle="Earn money by listing your assets"
-                onClick={() => setIntent("list")}
-              />
-            </div>
-
-            <p className="pt-6 text-xs text-zinc-500">
-              🔒 YOUR DATA IS ENCRYPTED AND SECURELY STORED
-            </p>
-          </div>
-
-          {/* RIGHT */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-3xl font-semibold">
-                Complete Your Profile
-              </h2>
-              <p className="text-zinc-400">
-                Set up your identity in the community
-              </p>
-            </div>
-
-            <Input label="FULL NAME" placeholder="e.g. Alexander Bennett" />
-            <Input label="LOCATION" placeholder="City / Area / Pincode" />
-
-            {/* Phone */}
-            <div>
-              <label className="text-xs text-zinc-400">PHONE NUMBER</label>
-              <div className="mt-1 flex gap-3">
-                <input
-                  className="flex-1 rounded-full bg-zinc-800 px-4 py-3"
-                  placeholder="+91 XXXXX XXXXX"
-                />
-                <button className="font-medium text-emerald-400">
-                  Verify
-                </button>
-              </div>
-            </div>
-
-            {/* OTP */}
-            <div>
-              <label className="text-xs text-zinc-400">OTP VERIFICATION</label>
-              <div className="mt-1 flex gap-3">
-                <input
-                  className="flex-1 rounded-full bg-zinc-800 px-4 py-3"
-                  placeholder="••••••"
-                />
-                <button className="text-sm text-zinc-400">
-                  Resend
-                </button>
-              </div>
-            </div>
-
-            {/* ID Upload */}
-            <div className="rounded-xl border border-dashed border-zinc-700 p-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Upload ID Document</p>
-                  <p className="text-xs text-zinc-400">
-                    REQUIRED FOR HIGH-VALUE RENTALS
-                  </p>
-                </div>
-                <button className="text-emerald-400 text-xl">⬆</button>
-              </div>
-            </div>
-
-            {/* CTA */}
-            <button className="mt-4 w-full rounded-full bg-indigo-600 py-4 font-semibold">
-              Complete Setup
+            <button type="button" className="absolute bottom-1 right-1 rounded-full bg-emerald-500 p-2.5 shadow-lg hover:bg-emerald-400 transition-colors">
+              <Camera className="w-4 h-4 text-white" />
             </button>
           </div>
 
+          <div className="text-center space-y-1">
+            <p className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase">
+              Profile Identity
+            </p>
+            <p className="text-xs text-zinc-400">Upload a professional photo</p>
+          </div>
+
+          <div className="w-full space-y-3 pt-4">
+            <p className="text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase ml-1 mb-2">
+              I am here to...
+            </p>
+
+            <IntentCard
+              active={intent === "rent"}
+              title="Rent Items"
+              subtitle="Browse and rent assets locally"
+              icon={<ShoppingBasket className="w-5 h-5" />}
+              onClick={() => setIntent("rent")}
+            />
+
+            <IntentCard
+              active={intent === "list"}
+              title="List Assets"
+              subtitle="Earn money by sharing your items"
+              icon={<TrendingUp className="w-5 h-5" />}
+              onClick={() => setIntent("list")}
+            />
+          </div>
+        </div>
+
+        {/* RIGHT */}
+        <div className="p-8 space-y-6 bg-card">
+
+          <div>
+            <h2 className="text-3xl font-extrabold text-white tracking-tight">
+              Complete Profile
+            </h2>
+            <p className="text-text-secondary text-sm mt-1">
+              Fill in your details to join the community
+            </p>
+          </div>
+
+          <div className="space-y-2">
+
+            <Input
+              label="FULL NAME"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="Enter your full name"
+              icon={<User className="w-4 h-4" />}
+            />
+
+            <Input
+              label="LOCATION"
+              name="pincode"
+              value={formData.pincode}
+              onChange={handleChange}
+              placeholder="Pincode"
+              icon={<MapPin className="w-4 h-4" />}
+            />
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold tracking-wider text-text-secondary uppercase ml-1">
+                PHONE NUMBER
+              </label>
+              <div className="relative group">
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                <input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="w-full rounded-2xl bg-app border-2 border-card px-11 py-3.5 text-white placeholder:text-text-secondary focus:outline-none focus:border-bright transition-all font-medium"
+                  placeholder="+91 XXXXX XXXXX"
+                />
+              </div>
+            </div>
+          </div>
+
+          
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-2xl bg-bright hover:bg-bright/80 py-4 font-bold text-app shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-10"
+          >
+            <span>{loading ? "Processing..." : "Complete Setup"}</span>
+            <ArrowRight className="w-5 h-5" />
+          </button>
+
         </div>
       </div>
-    </div>
+    </form>
   );
 }
 
-/* ----------------- Reusable Bits ----------------- */
+/* ----------------- Components ----------------- */
 
-function IntentCard({ active, title, subtitle, onClick }) {
+function IntentCard({ active, title, subtitle, icon, onClick }) {
   return (
     <button
+      type="button"
       onClick={onClick}
-      className={`w-full rounded-xl p-4 text-left transition ${
+      className={`w-full rounded-2xl p-4 text-left transition-all ${
         active
-          ? "border border-emerald-400 bg-emerald-400/10"
-          : "bg-zinc-800 hover:bg-zinc-700"
-      }`}
+          ? "border-2 border-bright bg-bright/10"
+          : "bg-app border border-zinc-700/50 hover:bg-zinc-800"
+      } flex items-center gap-4`}
     >
-      <p className="font-medium">{title}</p>
-      <p className="text-sm text-zinc-400">{subtitle}</p>
+      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+        active ? "bg-bright text-white" : "bg-zinc-700 text-zinc-500"
+      }`}>
+        {icon}
+      </div>
+      <div>
+        <p className="font-bold text-sm text-white">{title}</p>
+        <p className="text-[11px] text-zinc-500 font-medium">{subtitle}</p>
+      </div>
     </button>
   );
 }
 
-function Input({ label, placeholder }) {
+function Input({ label, placeholder, icon, name, value, onChange }) {
   return (
-    <div>
-      <label className="text-xs text-zinc-400">{label}</label>
-      <input
-        placeholder={placeholder}
-        className="mt-1 w-full rounded-full bg-zinc-800 px-4 py-3"
-      />
+    <div className="space-y-1.5">
+      <label className="text-[10px] font-bold tracking-wider text-text-secondary uppercase ml-1">
+        {label}
+      </label>
+      <div className="relative group">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary">
+          {icon}
+        </div>
+        <input
+          name={name}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          className="w-full rounded-2xl bg-app border-2 border-card px-11 py-3.5 text-white placeholder:text-text-secondary focus:outline-none focus:border-bright"
+        />
+      </div>
     </div>
   );
 }
-
-
-// Fix it later

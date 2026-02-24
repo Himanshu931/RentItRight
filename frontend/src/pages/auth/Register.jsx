@@ -12,7 +12,6 @@ import {
 const Register = ({ switchMode, email, setEmail }) => {
 
   const [user, setUser] = useState({
-    name: "",
     email: "",
     password: "",
   });
@@ -80,24 +79,6 @@ const Register = ({ switchMode, email, setEmail }) => {
 
         {/* Form */}
         <form className="space-y-5" onSubmit={handleRegister}>
-
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              Name
-            </label>
-            <div className="relative">
-
-              <User2 className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg" />
-              <input
-                type="text"
-                placeholder="Himashu Prushty"
-                value={user.name}
-                onChange={(e) => setUser({ ...user, name: e.target.value })}
-                className="form-input w-full pl-12 pr-4 py-3 bg-app border-1  border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
-                focus:border-bright"
-              />
-            </div>
-          </div>
 
           {/* Email / Phone */}
           <div>
@@ -185,7 +166,7 @@ const Register = ({ switchMode, email, setEmail }) => {
             <span className="w-full border-t border-border-muted" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-surface px-4 text-text-secondary/40 font-medium tracking-widest">
+            <span className="bg-card px-4 text-text-secondary font-medium tracking-widest">
               OR CONTINUE WITH
             </span>
           </div>
@@ -222,3 +203,5 @@ const Register = ({ switchMode, email, setEmail }) => {
 };
 
 export default Register;
+
+
