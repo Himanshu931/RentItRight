@@ -41,7 +41,7 @@ const VerifyOtp = ({ email, switchMode }) => {
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
 
-      switchMode("success");
+      switchMode("complete-profile");
     } catch (error) {
       console.error("Error in verify otp", error);
       alert(error.message || "Invalid OTP");
@@ -63,7 +63,7 @@ const VerifyOtp = ({ email, switchMode }) => {
         </div>
 
         {/* Fixed OTP Field */}
-        <div className="mb-10">
+        <div className="mb-14">
           <fieldset className="flex justify-between gap-2 sm:gap-4">
             {otp.map((digit, index) => (
               <input

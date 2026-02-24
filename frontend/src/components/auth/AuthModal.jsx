@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 
-export default function AuthModal({ open, onClose, children }) {
+export default function AuthModal({ open, onClose, children, maxWidth = "max-w-[440px]" }) {
   // Lock body scroll
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
@@ -21,7 +21,7 @@ export default function AuthModal({ open, onClose, children }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center px-4 py-8">
-      
+
       {/* Backdrop */}
       <div
         onClick={onClose}
@@ -29,8 +29,8 @@ export default function AuthModal({ open, onClose, children }) {
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-[440px] bg-card rounded-2xl shadow-auth z-10 animate-scale-in">
-        
+      <div className={`relative w-full ${maxWidth} bg-card rounded-3xl shadow-auth z-10 animate-scale-in overflow-hidden`}>
+
         {/* Close */}
         <button
           onClick={onClose}
