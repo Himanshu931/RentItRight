@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import authRoute from "./routes/auth.route";
+import userRouter from "./routes/user.route";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -50,6 +51,7 @@ app.get("/api/v1/csrf-token", csrfProtection, (req, res) => {
 
 // -------------------- ROUTES --------------------
 app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
+app.use("/api/v1/user", csrfProtection, userRouter);
 
 // -------------------- API DOCUMENTATION--------------------
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

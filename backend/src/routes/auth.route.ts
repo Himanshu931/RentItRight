@@ -2,7 +2,7 @@ import { Router } from "express";
 import {
   login,
   logout,
-  me,
+  // me,
   register,
   sendOTP,
   verifyOTP,
@@ -25,13 +25,9 @@ const router = Router();
  *           schema:
  *             type: object
  *             properties:
- *               name:
- *                 type: string
  *               email:
  *                 type: string
  *               password:
- *                 type: string
- *               role:
  *                 type: string
  *     responses:
  *       201:
@@ -116,7 +112,7 @@ router.post("/login", login);
  *       200:
  *         description: User fetched successfully
  */
-router.get("/me", VerifyUser, me);
+// router.get("/me", VerifyUser, me);
 
 /**
  * @swagger

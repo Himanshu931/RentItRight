@@ -1,18 +1,15 @@
 import bcrypt from "bcrypt";
-import User from "../models/user.model";
+import { User } from "../models/user.model"
 import logger from "../config/logger";
 import jwt from "jsonwebtoken";
-import { OTP } from "../models/OTP.mnodel";
-import { userInterface } from "../controllers/auth.controller";
+import { OTP } from "../models/OTP.model";
 import { sendOTP } from "../utils/sendOTP";
-import { error } from "node:console";
 
 export const registerService = async (userData: {
-  name: string;
   email: string;
   password: string;
-  role: string;
 }) => {
+  logger.info("Registering user");
   const isExist = await User.findOne({ email: userData.email });
   if (isExist) {
     logger.info(`User already exists`);
@@ -22,10 +19,8 @@ export const registerService = async (userData: {
   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
   await User.create({
-    name: userData.name,
     email: userData.email,
     password: hashedPassword,
-    role: userData.role,
   });
 
   logger.info(`User registered successfully with email ${userData.email}`);
@@ -75,8 +70,14 @@ export const verifyOTPService = async (otpData: {
 
   await User.updateOne({ email: otpData.email }, { isVerified: true });
 
-  const token = await jwt.sign(
-    { userId: otpData.email },
+  const user = await User.findOne({ email: otpData.email });
+  if (!user) {
+    logger.info("User not found after OTP verification");
+    throw new Error("User not found");
+  }
+
+  const token = jwt.sign(
+    { userId: user._id },
     process.env.JWT_SECRET!,
     { expiresIn: "24h" },
   );
@@ -119,23 +120,23 @@ export const loginService = async (userData: {
   return token;
 };
 
-export const MeService = async (id: string | undefined) => {
-  if (id === undefined) {
-    logger.info("Id should be defined in Me controler");
-    throw new Error("Id is not defined");
-  }
-  const user = await User.findById(id);
-  if (!user) {
-    logger.info("User not found");
-    throw new Error("User Doesn't exists");
-  }
+// export const MeService = async (id: string | undefined) => {
+//   if (id === undefined) {
+//     logger.info("Id should be defined in Me controler");
+//     throw new Error("Id is not defined");
+//   }
+//   const user = await User.findById(id);
+//   if (!user) {
+//     logger.info("User not found");
+//     throw new Error("User Doesn't exists");
+//   }
 
-  const userResponse: userInterface = {
-    id: user._id.toString(),
-    email: user.email,
-    name: user.name,
-    role: user.role,
-  };
+//   const userResponse: userInterface = {
+//     id: user._id.toString(),
+//     email: user.email,
+//     name: user.name,
+//     role: user.roles,
+//   };
 
-  return userResponse;
-};
+//   return userResponse;
+// };

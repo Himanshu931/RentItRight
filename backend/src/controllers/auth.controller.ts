@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import {
   loginService,
-  MeService,
+  // MeService,
   registerService,
 } from "../service/auth.service";
 import { loginSchema, registerSchema } from "../validatior/auth.schema";
@@ -18,23 +18,24 @@ export interface userInterface {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, role } = req.body;
-    const validate = registerSchema.safeParse({ name, email, password, role });
+    const { email, password } = req.body;
+    const validate = registerSchema.safeParse({ email, password });
     if (!validate.success) {
       return res.status(400).json({
         success: false,
         message: "Invalid data",
-        error: validate.error,
+        error: validate.error.flatten().fieldErrors,
       });
     }
 
     await registerService(validate.data);
 
     res.status(201).json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    logger.info("Error in register controller", error.message);
     res
       .status(500)
-      .json({ success: false, message: "Internal server error", error });
+      .json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -122,32 +123,32 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const me = async (req: Request, res: Response) => {
-  try {
-    const userId = req.userId;
+// export const me = async (req: Request, res: Response) => {
+//   try {
+//     const userId = req.userId;
 
-    const user: userInterface = await MeService(userId);
+//     const user: userInterface = await MeService(userId);
 
-    if (!user) {
-      return res.status(500).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+//     if (!user) {
+//       return res.status(500).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "User fetched successfully",
-        user: user,
-      });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ success: false, message: "Internal server error", error: err });
-  }
-};
+//     res
+//       .status(200)
+//       .json({
+//         success: true,
+//         message: "User fetched successfully",
+//         user: user,
+//       });
+//   } catch (err) {
+//     res
+//       .status(500)
+//       .json({ success: false, message: "Internal server error", error: err });
+//   }
+// };
 
 export const logout = (req: Request, res: Response) => {
   res.clearCookie("token", {

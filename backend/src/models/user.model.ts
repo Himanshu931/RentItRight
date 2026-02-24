@@ -1,35 +1,161 @@
 import mongoose, { Schema, Document } from "mongoose";
 
+
 export interface IUser extends Document {
-    name: string;
-    email: string;
-    password: string;
-    role: string;
-    isVerified: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+  email: string;
+  password: string;
+  name?: string;
+  phone?: string;
+  profileImage?: string;
+  isVerified: boolean;
+
+  roles?: "renter" | "owner" | "admin";
+
+  address?: {
+    city?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
+  };
+
+  renter?: {
+    totalSpent: number;
+    totalBookings: number;
+    wishlist: mongoose.Types.ObjectId[];
+    rating: {
+      average: number;
+      count: number;
+    };
+  };
+
+  owner?: {
+    totalEarnings: number;
+    totalListings: number;
+    totalBookings: number;
+    rating: {
+      average: number;
+      count: number;
+    };
+  };
+
+  walletBalance: number;
+  isActive: boolean;
+  isBlocked: boolean;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const UserSchema: Schema = new Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-    isVerified: { type: Boolean, default: false },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
-})
+/* =======================
+   Schema Definition
+======================= */
 
-// Delete unverified users after 1 hour
-UserSchema.index(
-    { createdAt: 1 },
-    {
-        expireAfterSeconds: 3600, // 1 hour
-        partialFilterExpression: { isVerified: false },
-    }
+const UserSchema: Schema<IUser> = new Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+
+    name: {
+      type: String,
+      required: false,
+      trim: true,
+    },
+
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    profileImage: {
+      type: String,
+      default: "",
+    },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    roles: {
+      type: [String],
+      enum: ["renter", "owner", "admin"],
+      default: ["renter"],
+    },
+
+    address: {
+      city: String,
+      state: String,
+      country: String,
+      pincode: String,
+    },
+
+    renter: {
+      totalSpent: { type: Number, default: 0 },
+      totalBookings: { type: Number, default: 0 },
+
+      wishlist: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Item",
+        },
+      ],
+
+      rating: {
+        average: { type: Number, default: 0, min: 0, max: 5 },
+        count: { type: Number, default: 0 },
+      },
+    },
+
+    owner: {
+      totalEarnings: { type: Number, default: 0 },
+      totalListings: { type: Number, default: 0 },
+      totalBookings: { type: Number, default: 0 },
+
+      rating: {
+        average: { type: Number, default: 0, min: 0, max: 5 },
+        count: { type: Number, default: 0 },
+      },
+    },
+
+    walletBalance: {
+      type: Number,
+      default: 0,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
 );
 
 
-export default mongoose.model<IUser>("User", UserSchema);
+// Delete unverified users after 1 hour
+UserSchema.index(
+  { createdAt: 1 },
+  {
+    expireAfterSeconds: 3600, // 1 hour
+    partialFilterExpression: { isVerified: false },
+  }
+)
 
 
+export const User = mongoose.model<IUser>("User", UserSchema);
