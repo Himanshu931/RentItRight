@@ -6,7 +6,7 @@ import {
 } from "../service/auth.service";
 import { loginSchema, registerSchema } from "../validatior/auth.schema";
 import { OTPValidator } from "../validatior/OTP.validator";
-import { sendOTPService, verifyOTPService } from "../service/auth.service";
+import { sendOTPService, verifyOTPService, MeService } from "../service/auth.service";
 import logger from "../config/logger";
 
 export interface userInterface {
@@ -123,32 +123,32 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// export const me = async (req: Request, res: Response) => {
-//   try {
-//     const userId = req.userId;
+export const me = async (req: Request, res: Response) => {
+  try {
+    const userId = req.userId;
 
-//     const user: userInterface = await MeService(userId);
+    const user: userInterface = await MeService(userId);
 
-//     if (!user) {
-//       return res.status(500).json({
-//         success: false,
-//         message: "User not found",
-//       });
-//     }
+    if (!user) {
+      return res.status(500).json({
+        success: false,
+        message: "User not found",
+      });
+    }
 
-//     res
-//       .status(200)
-//       .json({
-//         success: true,
-//         message: "User fetched successfully",
-//         user: user,
-//       });
-//   } catch (err) {
-//     res
-//       .status(500)
-//       .json({ success: false, message: "Internal server error", error: err });
-//   }
-// };
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "User fetched successfully",
+        user: user,
+      });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ success: false, message: "Internal server error", error: err });
+  }
+};
 
 export const logout = (req: Request, res: Response) => {
   res.clearCookie("token", {
