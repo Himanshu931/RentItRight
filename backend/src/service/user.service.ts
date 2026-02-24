@@ -1,3 +1,4 @@
+import { success } from "zod";
 import { User } from "../models/user.model"
 interface userData {
     name: string;
@@ -10,6 +11,24 @@ interface userData {
     };
     roles: "renter" | "owner" | "admin";
     profileImage?: string;
+}
+
+interface updateUserData {
+    name?: string;
+    phone?: string;
+    address?: {
+        pincode?: string;
+        city?: string;
+        state?: string;
+        country?: string;
+    };
+}
+
+interface addressData {
+    pincode?: string;
+    city?: string;
+    state?: string;
+    country?: string;
 }
 
 export const userProfileService = async (userId: string, userData: userData) => {
@@ -57,4 +76,46 @@ export const getUserProfileService = async (userId: string) => {
     }
 
     return profile;
+}
+
+export const updateProfileService = async (userId: string, userData: updateUserData) => {
+
+    const allowedFields = ["name", "phone", "address"]
+    const filteredData = Object.fromEntries(
+        Object.entries(userData).filter(([key]) => allowedFields.includes(key))
+    );
+
+    const user = await User.findByIdAndUpdate(userId, { $set: filteredData }, { new: true, revalidate: true })
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return { success: true }
+}
+
+export const updateProfileImageService = async (userId: string, profileImage: string) => {
+
+    const user = await User.findByIdAndUpdate(userId, { $set: { profileImage } }, { new: true, revalidate: true })
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return { success: true }
+}
+
+export const updateAddressService = async (userId: string, address: addressData) => {
+    const user = await User.findByIdAndUpdate(userId, { $set: { address } }, { new: true, revalidate: true })
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return { success: true }
+}
+export const deleteProfileService = async (userId: string) => {
+    const user = await User.findByIdAndDelete(userId, { new: true })
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    return { success: true }
 }

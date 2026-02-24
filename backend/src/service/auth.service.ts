@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import { User } from "../models/user.model"
 import logger from "../config/logger";
+import { userInterface } from "../controllers/auth.controller";
 import jwt from "jsonwebtoken";
 import { OTP } from "../models/OTP.model";
 import { sendOTP } from "../utils/sendOTP";
@@ -120,23 +121,23 @@ export const loginService = async (userData: {
   return token;
 };
 
-// export const MeService = async (id: string | undefined) => {
-//   if (id === undefined) {
-//     logger.info("Id should be defined in Me controler");
-//     throw new Error("Id is not defined");
-//   }
-//   const user = await User.findById(id);
-//   if (!user) {
-//     logger.info("User not found");
-//     throw new Error("User Doesn't exists");
-//   }
+export const MeService = async (id: string | undefined) => {
+  if (id === undefined) {
+    logger.info("Id should be defined in Me controler");
+    throw new Error("Id is not defined");
+  }
+  const user = await User.findById(id);
+  if (!user) {
+    logger.info("User not found");
+    throw new Error("User Doesn't exists");
+  }
 
-//   const userResponse: userInterface = {
-//     id: user._id.toString(),
-//     email: user.email,
-//     name: user.name,
-//     role: user.roles,
-//   };
+  const userResponse: userInterface = {
+    id: user._id.toString(),
+    email: user.email,
+    name: user.name!,
+    role: user.roles!,
+  };
 
-//   return userResponse;
-// };
+  return userResponse;
+};
