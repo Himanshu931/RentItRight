@@ -9,14 +9,14 @@ import {
   ArrowRight
 } from "lucide-react";
 
-export default function CompleteProfile({switchMode}) {
+export default function CompleteProfile({ switchMode }) {
 
-  const [intent, setIntent] = useState("rent");
+  const [intent, setIntent] = useState("renter");
   const [formData, setFormData] = useState({
     fullName: "",
-    pincode: "",
     phone: "",
   });
+  const [pincode, setPincode] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -35,30 +35,48 @@ export default function CompleteProfile({switchMode}) {
       setLoading(true);
 
       // Fetching info from pincode
-      const pinRes=await fetch(`https://api.postalpincode.in/pincode/${formData.pincode}`)
-      const pinData=await pinRes.json();
-      const district=pinData[0].PostOffice[0].District;
-      const state=pinData[0].PostOffice[0].State;
+      const pinRes = await fetch(`https://api.postalpincode.in/pincode/${pincode}`)
+      const pinData = await pinRes.json();
+
+      if (!pinData || pinData[0].Status !== "Success") {
+        throw new Error("Invalid Pincode or service unavailable");
+      }
+
+      const district = pinData[0].PostOffice[0].District;
+      const state = pinData[0].PostOffice[0].State;
 
 
-      // Send Data to backend
+      // CSRF Token
+      const csrftoken = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+        method: "GET",
+        credentials: "include"
+      })
+      const csrfData = await csrftoken.json();
+
+      
+
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/v1/auth/complete-profile`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/me/profile`,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfData.csrfToken
           },
           credentials: "include",
           body: JSON.stringify({
-            ...formData,
-            role: intent,
-            district: district,
-            state: state
+            name: formData.fullName,
+            phone: formData.phone,
+            roles: intent,
+            address: {
+              district: district,
+              state: state,
+              pincode: pincode
+            }
           })
         }
       );
-      
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -104,19 +122,19 @@ export default function CompleteProfile({switchMode}) {
             </p>
 
             <IntentCard
-              active={intent === "rent"}
+              active={intent === "renter"}
               title="Rent Items"
               subtitle="Browse and rent assets locally"
               icon={<ShoppingBasket className="w-5 h-5" />}
-              onClick={() => setIntent("rent")}
+              onClick={() => setIntent("renter")}
             />
 
             <IntentCard
-              active={intent === "list"}
+              active={intent === "owner"}
               title="List Assets"
               subtitle="Earn money by sharing your items"
               icon={<TrendingUp className="w-5 h-5" />}
-              onClick={() => setIntent("list")}
+              onClick={() => setIntent("owner")}
             />
           </div>
         </div>
@@ -147,8 +165,8 @@ export default function CompleteProfile({switchMode}) {
             <Input
               label="LOCATION"
               name="pincode"
-              value={formData.pincode}
-              onChange={handleChange}
+              value={pincode}
+              onChange={(e) => setPincode(e.target.value)}
               placeholder="Pincode"
               icon={<MapPin className="w-4 h-4" />}
             />
@@ -170,7 +188,7 @@ export default function CompleteProfile({switchMode}) {
             </div>
           </div>
 
-          
+
 
           <button
             type="submit"
@@ -194,15 +212,13 @@ function IntentCard({ active, title, subtitle, icon, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full rounded-2xl p-4 text-left transition-all ${
-        active
-          ? "border-2 border-bright bg-bright/10"
-          : "bg-app border border-zinc-700/50 hover:bg-zinc-800"
-      } flex items-center gap-4`}
+      className={`w-full rounded-2xl p-4 text-left transition-all ${active
+        ? "border-2 border-bright bg-bright/10"
+        : "bg-app border border-zinc-700/50 hover:bg-zinc-800"
+        } flex items-center gap-4`}
     >
-      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
-        active ? "bg-bright text-white" : "bg-zinc-700 text-zinc-500"
-      }`}>
+      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${active ? "bg-bright text-white" : "bg-zinc-700 text-zinc-500"
+        }`}>
         {icon}
       </div>
       <div>
