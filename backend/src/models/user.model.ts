@@ -12,9 +12,8 @@ export interface IUser extends Document {
   roles?: "renter" | "owner" | "admin";
 
   address?: {
-    city?: string;
+    district?: string;
     state?: string;
-    country?: string;
     pincode?: string;
   };
 
@@ -95,9 +94,8 @@ const UserSchema: Schema<IUser> = new Schema(
     },
 
     address: {
-      city: String,
+      district: String,
       state: String,
-      country: String,
       pincode: String,
     },
 
