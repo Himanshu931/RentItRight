@@ -1,5 +1,6 @@
-import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
+import express from "express";
 import cors from "cors";
 import authRoute from "./routes/auth.route";
 import userRouter from "./routes/user.route";
@@ -14,7 +15,6 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
 import { globalErrorHandler } from "./middleware/error.middleware";
 
-dotenv.config();
 
 const app = express();
 
