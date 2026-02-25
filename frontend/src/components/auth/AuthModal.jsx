@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 
-export default function AuthModal({ open, onClose, children, maxWidth = "max-w-[440px]" }) {
+export default function AuthModal({ open, onClose, children, maxWidth = "max-w-[440px]",staticModal=false }) {
   // Lock body scroll
   useEffect(() => {
     if (open) document.body.style.overflow = "hidden";
@@ -10,12 +10,18 @@ export default function AuthModal({ open, onClose, children, maxWidth = "max-w-[
     return () => (document.body.style.overflow = "auto");
   }, [open]);
 
-  // ESC close
+
+  //ESC Close
   useEffect(() => {
-    const handleEsc = (e) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
+  const handleKeyDown = (e) => {
+    if (!staticModal && e.key === "Escape") {
+      onClose();
+    }
+  };
+
+  document.addEventListener("keydown", handleKeyDown);
+  return () => document.removeEventListener("keydown", handleKeyDown);
+}, [onClose, staticModal]);
 
   if (!open) return null;
 
@@ -33,7 +39,7 @@ export default function AuthModal({ open, onClose, children, maxWidth = "max-w-[
 
         {/* Close */}
         <button
-          onClick={onClose}
+          onClick={staticModal ? undefined : onClose}
           className="absolute right-4 top-4 text-text-secondary hover:text-text-primary"
         >
           <X size={20} />

@@ -33,6 +33,15 @@ export default function CompleteProfile({switchMode}) {
 
     try {
       setLoading(true);
+
+      // Fetching info from pincode
+      const pinRes=await fetch(`https://api.postalpincode.in/pincode/${formData.pincode}`)
+      const pinData=await pinRes.json();
+      const district=pinData[0].PostOffice[0].District;
+      const state=pinData[0].PostOffice[0].State;
+
+
+      // Send Data to backend
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/auth/complete-profile`,
         {
@@ -43,7 +52,9 @@ export default function CompleteProfile({switchMode}) {
           credentials: "include",
           body: JSON.stringify({
             ...formData,
-            role: intent
+            role: intent,
+            district: district,
+            state: state
           })
         }
       );
