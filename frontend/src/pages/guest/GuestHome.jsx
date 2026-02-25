@@ -6,7 +6,7 @@ import Categories from "../../components/guest_ui/guest_dashboard/Categories";
 const GuestHome=()=> {
   return (
     <>
-      <main className="pt-20">
+      <main>
         <Hero/>
         <Steps />
         <Categories/>

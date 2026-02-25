@@ -3,11 +3,16 @@ import RentalCard from "./RentalCard";
 const RentalSection = ({ rentals }) => {
   return (
     <div>
-      <h2 className="text-2xl font-semibold text-text-primary mb-8">
-        Active & Upcoming Rentals
-      </h2>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-2xl font-bold text-text-primary">
+          Active & Upcoming Rentals
+        </h2>
+        <button className="text-bright text-sm font-bold hover:underline">
+          View All History
+        </button>
+      </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div className="flex flex-col gap-4">
         {rentals?.map((rental) => (
           <RentalCard key={rental.id} rental={rental} />
         ))}

@@ -7,9 +7,9 @@ import AvailabilityCalendar from "../../components/guest_ui/item_detail/Availabi
 export default function ItemDetail() {
     
     return (
-        <main className="max-w-[1400px] mx-auto px-6 lg:px-20 pt-30 ">
+        <main className="max-w-[1400px] mx-auto px-6 lg:px-20 pt-5">
             {/* Breadcrumb */}
-            <nav className="text-xs text-text-secondary uppercase tracking-widest mb-8">
+            <nav className="text-xs text-text-secondary uppercase tracking-widest mb-5">
                 Marketplace › Electronics ›{" "}
                 <span className="text-text-primary">Photography</span>
             </nav>

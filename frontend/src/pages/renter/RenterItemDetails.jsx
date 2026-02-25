@@ -44,7 +44,7 @@ const RenterItemDetails = ()=>{
   const item = renterExploreDummy.find((i) => i.id === id);
   
   return (
-    <div className="mx-auto max-w-7xl px-6 lg:px-20 py-10 grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-10 pt-30">
+    <div className="mx-auto max-w-7xl px-6 lg:px-20 py-10 grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-10">
 
       {/* LEFT */}
       <div>

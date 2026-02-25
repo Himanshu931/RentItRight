@@ -1,23 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { inventoryItemsDummy,completedRentalsDummy } from "./data/ownerListingDummy";
 
 import GuestLayout from "./layouts/GuestLayout";
-
 import GuestHome from "./pages/guest/GuestHome";
 import Explore from "./pages/guest/Explore";
 import ItemDetail from "./pages/guest/ItemDetail";
 
-import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import RenterDashboard from "./pages/renter/RenterDashboard";
-import OwnerLayout from "./layouts/OwnerLayout";
 import RenterLayout from "./layouts/RenterLayout";
 import Rentals from "./pages/renter/Rentals";
 import RentalDetails from "./pages/renter/RentalDetails";
-import RenterExplore from "./pages/renter/RenterExplore";
+import RenterExplore from "./pages/renter/RenterExplore"; 
 import RenterItemDetails from "./pages/renter/RenterItemDetails"
 import RenterWishlist from "./pages/renter/RenterWishlist";
 import RentCheckout from "./pages/renter/RentCheckout";
 import RoleRedirect from "./pages/auth/roleBasedRedirection";
 
+import OwnerLayout from "./layouts/OwnerLayout";
+import OwnerDashboard from "./pages/owner/OwnerDashboard";
+import OwnerListings from "./pages/owner/OwnerListings";
 function App() {
   return (
     <BrowserRouter> 
@@ -47,6 +48,11 @@ function App() {
         {/* Owner pages */}
         <Route element={<OwnerLayout />}>
           <Route path="/owner" element={<OwnerDashboard />} />
+          <Route path="/listings" element={
+            <OwnerListings  
+              inventoryItems={inventoryItemsDummy}
+              completedRentals={completedRentalsDummy}/>} 
+            />
         </Route>
 
       </Routes>

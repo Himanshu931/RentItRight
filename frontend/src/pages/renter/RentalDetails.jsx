@@ -66,7 +66,7 @@ export default function RentalDetails() {
   };
 
   return (
-    <main className="flex-1 px-6 py-10 pt-25 max-w-[900px] mx-auto space-y-6">
+    <main className="flex-1 px-6 py-10 max-w-[900px] mx-auto space-y-6">
       <Breadcrumbs rentalId={rental.id} />
       <RentalHero rental={rental} />
       <RentalProgress rental={rental} />

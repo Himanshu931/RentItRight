@@ -50,7 +50,7 @@ export default function Rentals() {
   );
 
   return (
-    <main className="px-8 lg:px-40 py-10 max-w-[1440px] mx-auto w-full pt-25">
+    <main className="px-8 lg:px-40 py-10 max-w-[1440px] mx-auto w-full">
       <RentalsHeader />
 
       <RentalsTabs

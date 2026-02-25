@@ -1,25 +1,16 @@
-const StatCard = ({ label, value }) => {
+const StatsCard = ({ title, value }) => {
   return (
-    <div className="bg-card border border-divider rounded-2xl p-8 w-full">
-      <p className="text-text-secondary text-sm uppercase tracking-wide mb-3">
-        {label}
+    <div className="bg-surface border border-app/80 rounded-2xl p-8 hover:border-bright/60 transition-all">
+      <p className="text-text-secondary text-xs tracking-wider uppercase ">
+        {title}
       </p>
-      <h3 className="text-3xl font-semibold text-text-primary">
+      <h3 className="text-4xl font-black">
         {value}
       </h3>
     </div>
   );
 };
 
-const StatsCards = ({ stats }) => {
-  return (
-    <div className="grid md:grid-cols-4 gap-6">
-      <StatCard label="Total Listings" value={stats?.totalListings} />
-      <StatCard label="Active Rentals" value={stats?.activeRentals} />
-      <StatCard label="Upcoming Returns" value={stats?.upcomingReturns} />
-      <StatCard label="Total Earnings" value={`$${stats?.totalEarnings}`} />
-    </div>
-  );
-};
 
-export default StatsCards;
+
+export default StatsCard;

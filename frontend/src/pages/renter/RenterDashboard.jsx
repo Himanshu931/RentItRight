@@ -69,14 +69,14 @@ export default function RenterDashboard() {
   ];
 
   const quickActions = [
-    { id: 1, icon: "search_insights", label: "Discover New Gear" },
-    { id: 2, icon: "receipt_long", label: "Manage Payments" },
-    { id: 3, icon: "forum", label: "Contact Support" },
+    { id: 1, icon: "search_insights", label: "Discover New Gear", to: "/renter_explore" },
+    { id: 2, icon: "receipt_long", label: "Manage Payments", to: "/payments" },
+    { id: 3, icon: "forum", label: "Contact Support", to: "/support" },
   ];
 
   return (
     <main className="flex-1 overflow-y-auto bg-background-dark">
-      <div className="max-w-[1400px] mx-auto px-8 py-10 pt-25">
+      <div className="max-w-[1400px] mx-auto px-8 py-10">
 
         <DashboardHeader userName={user.name} />
 

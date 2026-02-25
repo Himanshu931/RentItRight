@@ -11,8 +11,8 @@ export default function BookingCard({ booking }) {
 
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className={`w-2 h-2 rounded-full ${isActive ? "bg-accent" : "bg-blue-500"}`} />
-            <p className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? "text-accent" : "text-blue-500"}`}>
+            <span className={`w-2 h-2 rounded-full ${isActive ? "bg-bright" : "bg-blue-500"}`} />
+            <p className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? "text-bright" : "text-blue-500"}`}>
               {isActive ? "Active Now" : "Upcoming"}
             </p>
           </div>
@@ -26,7 +26,7 @@ export default function BookingCard({ booking }) {
 
       <div className="text-right">
         <p className="font-black text-lg">${booking.price}</p>
-        <button className="mt-3 px-4 py-2 text-white text-xs font-bold rounded-xl flex items-center gap-2 hover:scale-104 bg-bright/80">
+        <button className="mt-3 px-4 py-2 text-app text-xs font-bold rounded-xl flex items-center gap-2 hover:scale-104 bg-bright hover:cursor-pointer">
           View Details
           <span className="material-symbols-outlined text-sm">arrow_forward</span>
         </button>

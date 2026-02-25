@@ -36,7 +36,7 @@ const RenterExplore = () => {
     page * ITEMS_PER_PAGE
   );  
   return (
-    <div className="mx-auto max-w-7xl px-6 lg:px-20 py-8 pt-30">
+    <div className="mx-auto max-w-7xl px-6 lg:px-20 py-8">
       <ExploreSearchBar value={search} onChange={setSearch} />
 
       {/* <ExploreFilters filters={filters} onChange={setFilters} /> */}

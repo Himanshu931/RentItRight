@@ -1,11 +1,11 @@
 const WelcomeSection = ({ user }) => {
   return (
-    <div>
-      <h1 className="text-4xl font-bold text-text-primary mb-3">
+    <div className="mb-10">
+      <h2 className="text-4xl font-black tracking-tight ">
         Welcome back, {user?.name || "Owner"}
-      </h1>
+      </h2>
 
-      <p className="text-text-secondary">
+      <p className="text-text-secondary text-lg">
         Here's how your listed items are performing today
       </p>
     </div>

@@ -12,7 +12,7 @@ const RenterNavbar = ({ user }) => {
         ].join(" ");
 
     return (
-        <header className="fixed top-0 w-full z-50 border-b border-divider bg-app">
+        <header className="sticky top-0 w-full z-50 border-b border-divider bg-app">
             <div className="max-w-[1450px] mx-auto px-6 h-20 flex items-center justify-between">
 
                 {/* Left: Brand + Nav */}

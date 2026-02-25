@@ -1,5 +1,5 @@
 import WelcomeSection from "../../components/owner_ui/dashboard/WelcomeSection";
-import StatsCards from "../../components/owner_ui/dashboard/StatsCard";
+import StatsCard from "../../components/owner_ui/dashboard/StatsCard";
 import RentalsSection from "../../components/owner_ui/dashboard/RentalSection";
 import QuickActions from "../../components/owner_ui/dashboard/QuickActions";
 
@@ -14,12 +14,32 @@ const OwnerDashboard = () => {
     name: "Himanshu",
   };
 
-  const stats = {
-    totalListings: 25,
-    activeRentals: 8,
-    upcomingReturns: 3,
-    totalEarnings: 12500,
-  };
+  const stats = [
+    {
+      id: 1,
+      title: "Total Listings",
+      value: 25,
+      icon: ""
+    },
+    {
+      id: 2,
+      title: "Active Rentals",
+      value: 8,
+      icon: ""
+    },
+    {
+      id: 3,
+      title: "Upcoming Returns",
+      value: 3,
+      icon: ""
+    },
+    {
+      id: 4,
+      title: "Total Earnings",
+      value: 12500,
+      icon: ""
+    }
+  ];
 
   const rentals = [
     {
@@ -66,21 +86,34 @@ const OwnerDashboard = () => {
   const handleManageListings = () => {
     console.log("Navigate to Listings Page");
   };
+  const quickActions = [
+    { id: 1, icon: "add_circle", label: "Add New Item", onClick: handleAddItem },
+    { id: 2, icon: "receipt_long", label: "View Bookings", onClick: handleViewBookings },
+    { id: 3, icon: "inventory_2", label: "Manage Listings", onClick: handleManageListings },
+  ];
+
   return (
-    <div className="bg-app min-h-screen pt-28 pb-20 px-6">
-      <div className="max-w-[1400px] mx-auto space-y-14">
+    <div className="flex-1 overflow-y-auto">
+      <div className="max-w-[1400px] mx-auto px-8 py-10">
 
         <WelcomeSection user={user} />
 
-        <StatsCards stats={stats} />
 
-        <RentalsSection rentals={rentals} />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+          {stats.map((stat) => (
+            <StatsCard key={stat.id} {...stat} />
+          ))}
+        </div>
 
-        <QuickActions
-          onAddItem={handleAddItem}
-          onViewBookings={handleViewBookings}
-          onManageListings={handleManageListings}
-        />
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-12 lg:col-span-8">
+            <RentalsSection rentals={rentals} />
+          </div>
+
+          <div className="col-span-12 lg:col-span-4">
+            <QuickActions actions={quickActions} />
+          </div>
+        </div>
 
       </div>
     </div>
