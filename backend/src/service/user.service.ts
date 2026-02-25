@@ -1,4 +1,4 @@
-import { success } from "zod";
+
 import { User } from "../models/user.model"
 import { AppError } from "../utils/AppError";
 interface userData {
@@ -6,9 +6,8 @@ interface userData {
     phone: string;
     address: {
         pincode: string;
-        city: string;
+        district: string;
         state: string;
-        country: string;
     };
     roles: "renter" | "owner" | "admin";
     profileImage?: string;
@@ -19,17 +18,15 @@ interface updateUserData {
     phone?: string;
     address?: {
         pincode?: string;
-        city?: string;
+        district?: string;
         state?: string;
-        country?: string;
     };
 }
 
 interface addressData {
     pincode?: string;
-    city?: string;
+    district?: string;
     state?: string;
-    country?: string;
 }
 
 export const userProfileService = async (userId: string, userData: userData) => {
@@ -61,9 +58,8 @@ export const getUserProfileService = async (userId: string) => {
         phone: user.phone!,
         address: {
             pincode: user.address?.pincode!,
-            city: user.address?.city!,
+            district: user.address?.district!,
             state: user.address?.state!,
-            country: user.address?.country!,
         },
         profileImage: user.profileImage!,
     }
@@ -73,7 +69,7 @@ export const getUserProfileService = async (userId: string) => {
     }
 
     if (user.roles?.includes("owner")) {
-        profile.owner! = user.owner;
+        profile.owner = user.owner;
     }
 
     return profile;
@@ -86,7 +82,7 @@ export const updateProfileService = async (userId: string, userData: updateUserD
         Object.entries(userData).filter(([key]) => allowedFields.includes(key))
     );
 
-    const user = await User.findByIdAndUpdate(userId, { $set: filteredData }, { new: true, revalidate: true })
+    const user = await User.findByIdAndUpdate(userId, { $set: filteredData }, { new: true, runValidators: true })
     if (!user) {
         throw new AppError("User not found", 404);
     }
@@ -96,7 +92,7 @@ export const updateProfileService = async (userId: string, userData: updateUserD
 
 export const updateProfileImageService = async (userId: string, profileImage: string) => {
 
-    const user = await User.findByIdAndUpdate(userId, { $set: { profileImage } }, { new: true, revalidate: true })
+    const user = await User.findByIdAndUpdate(userId, { $set: { profileImage } }, { new: true, runValidators: true })
     if (!user) {
         throw new AppError("User not found", 404);
     }
@@ -105,7 +101,7 @@ export const updateProfileImageService = async (userId: string, profileImage: st
 }
 
 export const updateAddressService = async (userId: string, address: addressData) => {
-    const user = await User.findByIdAndUpdate(userId, { $set: { address } }, { new: true, revalidate: true })
+    const user = await User.findByIdAndUpdate(userId, { $set: { address } }, { new: true, runValidators: true })
     if (!user) {
         throw new AppError("User not found", 404);
     }

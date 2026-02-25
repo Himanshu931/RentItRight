@@ -8,7 +8,7 @@ const router = Router();
  * @swagger
  * /user/me/profile:
  *   post:
- *     summary: Create the Profile
+ *     summary: Create the User's Profile
  *     tags: [User]
  *     requestBody:
  *       required: true
@@ -21,23 +21,25 @@ const router = Router();
  *                 type: string
  *               phone:
  *                 type: string
- *              profileImage:
+ *               profileImage:
  *                 type: string
- *              address:{
- *                street: string,
- *                city: string,
- *                state: string,
- *                zip: string,
- *                country: string,
- *              }
- *              roles: 
- *                type: string
- *              
+ *               address:
+ *                 type: object
+ *                 properties:
+ *                   district:
+ *                     type: string
+ *                   state:
+ *                     type: string
+ *                   pincode:
+ *                     type: string
+ *               roles:
+ *                 type: string
+ *                 enum: [renter, owner, admin]
  *     responses:
  *       201:
  *         description: Profile created successfully
  */
-router.post("/me/profile", VerifyUser, createProfile)
+router.post("/me/profile", VerifyUser, createProfile);
 
 
 /**
@@ -46,13 +48,12 @@ router.post("/me/profile", VerifyUser, createProfile)
  *   get:
  *     summary: Get the User's Profile
  *     tags: [User]
- *     requestBody:
- *       required: true
  *     responses:
  *       200:
- *         description: Profile Fetched successfully
+ *         description: Profile fetched successfully
  */
-router.get("/me/profile", VerifyUser, getProfile)
+router.get("/me/profile", VerifyUser, getProfile);
+
 
 /**
  * @swagger
@@ -70,12 +71,13 @@ router.get("/me/profile", VerifyUser, getProfile)
  *               name:
  *                 type: string
  *               phone:
- *                 type: string              
+ *                 type: string
  *     responses:
  *       200:
- *         description: Profile Updated successfully
+ *         description: Profile updated successfully
  */
-router.patch("/me/profile", VerifyUser, updateProfile)
+router.patch("/me/profile", VerifyUser, updateProfile);
+
 
 /**
  * @swagger
@@ -94,9 +96,10 @@ router.patch("/me/profile", VerifyUser, updateProfile)
  *                 type: string
  *     responses:
  *       200:
- *         description: Profile Image Updated successfully
+ *         description: Profile image updated successfully
  */
-router.patch("/me/avatar", VerifyUser, updateProfileImage)
+router.patch("/me/avatar", VerifyUser, updateProfileImage);
+
 
 /**
  * @swagger
@@ -104,13 +107,12 @@ router.patch("/me/avatar", VerifyUser, updateProfileImage)
  *   delete:
  *     summary: Delete the User's Profile
  *     tags: [User]
- *     requestBody:
- *       required: true
  *     responses:
  *       200:
- *         description: Profile Deleted successfully
+ *         description: Profile deleted successfully
  */
-router.delete("/me/profile", VerifyUser, deleteProfile)
+router.delete("/me/profile", VerifyUser, deleteProfile);
+
 
 /**
  * @swagger
@@ -125,18 +127,16 @@ router.delete("/me/profile", VerifyUser, deleteProfile)
  *           schema:
  *             type: object
  *             properties:
- *               address: {
- *                 street: string,
- *                 city: string,
- *                 state: string,
- *                 zip: string,
- *                 country: string,
- *               }
+ *               pincode:
+ *                 type: string
+ *               district:
+ *                 type: string
+ *               state:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Address Updated successfully
+ *         description: Address updated successfully
  */
-router.patch("/me/address", VerifyUser, updateAddress)
-
+router.patch("/me/address", VerifyUser, updateAddress);
 
 export default router;
