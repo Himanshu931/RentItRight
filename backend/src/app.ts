@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import authRoute from "./routes/auth.route";
 import userRouter from "./routes/user.route";
+import exploreRoute from "./routes/explore.route";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -53,6 +54,7 @@ app.get("/api/v1/csrf-token", csrfProtection, (req, res) => {
 // -------------------- ROUTES --------------------
 app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
 app.use("/api/v1/user", csrfProtection, userRouter);
+app.use("/api/v1/explore", exploreRoute);
 
 // -------------------- API DOCUMENTATION--------------------
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
