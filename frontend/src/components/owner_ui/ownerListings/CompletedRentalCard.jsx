@@ -2,10 +2,10 @@ import { ChevronRight, Star } from "lucide-react";
 
 export default function CompletedRentalCard({ rental }) {
     return (
-        <div className="bg-[#0f172a]/40 border border-gray-800/60 rounded-2xl p-5 hover:border-gray-700 transition-all group">
-            <div className="flex items-center gap-6">
+        <div className="bg-surface border border-gray-800/60 rounded-2xl p-4 hover:border-gray-700 transition-all group">
+            <div className="flex items-center gap-4">
                 {/* Thumbnail */}
-                <div className="h-14 w-14 rounded-xl overflow-hidden border border-gray-800 shrink-0">
+                <div className="h-12 w-12 rounded-xl overflow-hidden border border-gray-800 shrink-0">
                     <img
                         src={rental.image}
                         alt={rental.itemTitle}
@@ -15,7 +15,7 @@ export default function CompletedRentalCard({ rental }) {
 
                 {/* Title & Info */}
                 <div className="flex-1">
-                    <h4 className="text-lg font-bold text-white mb-0.5">
+                    <h4 className="text-base font-bold text-text-primary mb-0.5">
                         {rental.itemTitle}
                     </h4>
                     <div className="flex items-center gap-3">
@@ -28,9 +28,9 @@ export default function CompletedRentalCard({ rental }) {
                 </div>
 
                 {/* Earnings & Link */}
-                <div className="flex items-center gap-12 text-right">
+                <div className="flex items-center gap-8 text-right">
                     <div>
-                        <p className="text-lg font-black text-white">
+                        <p className="text-base font-black text-white">
                             ${rental.amount.toFixed(2)}
                         </p>
                         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">

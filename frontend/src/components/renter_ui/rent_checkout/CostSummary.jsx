@@ -39,7 +39,7 @@ export default function CostSummary({ item, startDate, endDate }) {
     appliedDiscount;
 
   return (
-    <div className="bg-surface border-1 border-app/80 rounded-xl p-6 space-y-4">
+    <div className="bg-surface border border-app/80 rounded-xl p-6 space-y-4">
       <h4 className="font-extrabold text-lg ">{item.title}</h4>
 
       <Row label={`Rental (${pricingLabel})`} value={`₹${rentalFee}`} />

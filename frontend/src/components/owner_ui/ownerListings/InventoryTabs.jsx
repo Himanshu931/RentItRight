@@ -1,8 +1,8 @@
 export default function InventoryTabs({ activeTab, onTabChange }) {
-    const tabs = ["Active Items", "Rented Items", "Completed", "Paused"];
+    const tabs = ["All Items", "Active Items", "Rented Items", "Paused"];
 
     return (
-        <div className="flex items-center gap-8 border-b border-gray-800/50">
+        <div className="flex items-center gap-8 border-b border-gray-800/50 ">
             {tabs.map((tab) => {
                 const id = tab.toLowerCase().replace(" ", "-");
                 const isActive = activeTab === id;
@@ -10,7 +10,7 @@ export default function InventoryTabs({ activeTab, onTabChange }) {
                     <button
                         key={tab}
                         onClick={() => onTabChange(id)}
-                        className={`pb-4 text-sm font-bold transition-all relative ${isActive ? "text-white" : "text-gray-500 hover:text-gray-300"
+                        className={`pb-4 text-sm font-bold transition-all relative ${isActive ? "text-text-primary" : "text-text-secondary hover:text-bright hover:cursor-pointer"
                             }`}
                     >
                         {tab}

@@ -54,7 +54,7 @@ export default function CompleteProfile({ switchMode }) {
       const csrfData = await csrftoken.json();
 
       
-
+      //POST the details 
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/user/me/profile`,
         {

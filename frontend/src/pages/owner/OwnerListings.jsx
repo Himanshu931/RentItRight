@@ -1,35 +1,55 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import CompletedRentalCard from "../../components/owner_ui/ownerListings/CompletedRentalCard";
 import SearchBar from "../../components/owner_ui/ownerListings/SearchBar";
 import InventoryCard from "../../components/owner_ui/ownerListings/InventoryCard";
 import InventoryTabs from "../../components/owner_ui/ownerListings/InventoryTabs";
+import { inventoryItemsDummy } from "../../data/ownerListingDummy";
+import AddItemModal from "../../modals/AddItemModal";
 
-export default function OwnerListings({
-    inventoryItems = [],
-    completedRentals = [],
-    onEditItem,
-    onPauseItem,
-    onDeleteItem
-}) {
+export default function OwnerListings() {
     const [search, setSearch] = useState("");
-    const [activeTab, setActiveTab] = useState("active-items");
+    const [activeTab, setActiveTab] = useState("all-items");
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
-    const filteredItems = inventoryItems.filter((item) =>
-        item.title.toLowerCase().includes(search.toLowerCase())
-    );
+    const handleAddItem = (itemData) => {
+        // 🔥 This is where backend API will be called later
+        console.log("New Item Data:", itemData);
+        // Example:
+        // await axios.post("/api/items", itemData)
+
+        setIsAddModalOpen(false);
+    };
+
+    const filteredItems = inventoryItemsDummy
+        .filter((item) => {
+            switch (activeTab) {
+                case "all-items":
+                    return true;
+                case "active-items":
+                    return item.status === "active" || item.status === "rented";
+                case "rented-items":
+                    return item.status === "rented";
+                case "paused":
+                    return item.status === "paused";
+                default:
+                    return true;
+            }
+        })
+        .filter((item) =>
+            item.title.toLowerCase().includes(search.toLowerCase())
+        );
 
     return (
         <main className="min-h-screen bg-app">
-            <div className="max-w-[1400px] px-12 py-12 mx-auto space-y-12">
+            <div className="max-w-[1400px] px-6 py-6 mx-auto space-y-8">
 
                 {/* Header Row */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                     <div>
-                        <h1 className="text-5xl font-black tracking-tighter text-white mb-2">
+                        <h1 className="text-4xl font-black tracking-tighter text-white mb-1">
                             Inventory
                         </h1>
-                        <p className="text-gray-400 font-medium text-lg">
+                        <p className="text-text-secondary font-medium text-lg">
                             Manage and track your equipment
                         </p>
                     </div>
@@ -40,8 +60,9 @@ export default function OwnerListings({
                 <div className="flex justify-between items-center bg-transparent">
                     <InventoryTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-                    <button className="bg-bright hover:bg-bright/80 active:scale-95 text-app px-6 py-3 rounded-2xl font-bold text-md flex items-center gap-3 transition-all ">
-                        <Plus size={20} strokeWidth={3} />
+                    <button className="bg-bright hover:bg-bright/80 active:scale-95 text-app px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all " 
+                    onClick={() => setIsAddModalOpen(true)}>
+                        <Plus size={16} strokeWidth={3} />
                         New Item
                     </button>
                 </div>
@@ -52,32 +73,18 @@ export default function OwnerListings({
                         <InventoryCard
                             key={item.id}
                             item={item}
-                            onEdit={onEditItem}
-                            onPause={onPauseItem}
-                            onDelete={onDeleteItem}
                         />
                     ))}
                 </div>
 
-                {/* Completed Section Detail */}
-                <div className="pt-10">
-                    <div className="flex items-center gap-6 mb-8">
-                        <h2 className="text-xs font-black text-gray-400 uppercase tracking-[0.25em] whitespace-nowrap">
-                            Recent Completed Rentals
-                        </h2>
-                        <div className="h-px bg-gray-800 w-full" />
-                    </div>
-
-                    <div className="space-y-4">
-                        {completedRentals.map((rental) => (
-                            <CompletedRentalCard
-                                key={rental.id}
-                                rental={rental}
-                            />
-                        ))}
-                    </div>
-                </div>
             </div>
+
+            {isAddModalOpen && (
+                <AddItemModal
+                    onClose={() => setIsAddModalOpen(false)}
+                    onSubmit={handleAddItem}
+                />
+            )}
         </main>
     );
 }

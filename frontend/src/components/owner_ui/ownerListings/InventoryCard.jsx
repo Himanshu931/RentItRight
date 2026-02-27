@@ -9,11 +9,11 @@ export default function InventoryCard({
     const isRented = item.status === "rented";
 
     return (
-        <div className="bg-[#0f172a]/40 border border-gray-800/60 rounded-2xl overflow-hidden hover:border-gray-700 transition-all group">
+        <div className="bg-surface border border-app/80 rounded-2xl overflow-hidden hover:border-bright transition-all group hover:cursor-pointer">
             <div className="flex flex-col md:flex-row">
                 {/* Left: Info Section */}
-                <div className="flex-1 p-5 flex items-center gap-6">
-                    <div className="relative h-24 w-24 shrink-0 rounded-xl overflow-hidden border border-gray-800">
+                <div className="flex-1 p-4 flex items-center gap-4">
+                    <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden border border-gray-800">
                         <img
                             src={item.image}
                             alt={item.title}
@@ -23,12 +23,12 @@ export default function InventoryCard({
 
                     <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-xl font-bold text-white tracking-tight">
+                            <h3 className="text-base font-bold text-white tracking-tight">
                                 {item.title}
                             </h3>
                             <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest border ${isRented
-                                    ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                                    : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
+                                : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                                 }`}>
                                 {item.status}
                             </span>
@@ -39,7 +39,7 @@ export default function InventoryCard({
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <span className="px-2 py-0.5 bg-gray-800/50 rounded text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                            <span className="px-2 py-0.5 bg-[#1E4E49] rounded text-[10px] font-bold text-[#99F6E4] uppercase tracking-wider">
                                 {item.category}
                             </span>
                             <div className="flex items-baseline gap-1">
@@ -51,8 +51,8 @@ export default function InventoryCard({
                 </div>
 
                 {/* Right: Actions Section */}
-                <div className="border-t md:border-t-0 md:border-l border-gray-800/60 flex items-center px-8 py-5 md:py-0 bg-white/[0.01]">
-                    <div className="flex items-center justify-center gap-10 w-full">
+                <div className="border-t md:border-t-0 md:border-l border-gray-800/60 flex items-center px-5 py-4 md:py-0 bg-white/[0.01]">
+                    <div className="flex items-center justify-center gap-6 w-full">
                         <ActionButton
                             icon={<Edit2 size={18} />}
                             label="EDIT"
@@ -83,8 +83,8 @@ function ActionButton({ icon, label, onClick, variant = "default" }) {
             className="flex flex-col items-center gap-2 group/btn"
         >
             <div className={`p-2.5 rounded-xl transition-all duration-200 ${variant === "danger"
-                    ? "text-gray-500 group-hover/btn:bg-red-500/10 group-hover/btn:text-red-500"
-                    : "text-gray-500 group-hover/btn:bg-white/5 group-hover/btn:text-white"
+                ? "text-gray-500 group-hover/btn:bg-red-500/10 group-hover/btn:text-red-500"
+                : "text-gray-500 group-hover/btn:bg-white/5 group-hover/btn:text-white"
                 }`}>
                 {icon}
             </div>

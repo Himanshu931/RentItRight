@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { inventoryItemsDummy,completedRentalsDummy } from "./data/ownerListingDummy";
 
 import GuestLayout from "./layouts/GuestLayout";
 import GuestHome from "./pages/guest/GuestHome";
@@ -10,7 +9,7 @@ import RenterDashboard from "./pages/renter/RenterDashboard";
 import RenterLayout from "./layouts/RenterLayout";
 import Rentals from "./pages/renter/Rentals";
 import RentalDetails from "./pages/renter/RentalDetails";
-import RenterExplore from "./pages/renter/RenterExplore"; 
+import RenterExplore from "./pages/renter/RenterExplore";
 import RenterItemDetails from "./pages/renter/RenterItemDetails"
 import RenterWishlist from "./pages/renter/RenterWishlist";
 import RentCheckout from "./pages/renter/RentCheckout";
@@ -21,7 +20,7 @@ import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import OwnerListings from "./pages/owner/OwnerListings";
 function App() {
   return (
-    <BrowserRouter> 
+    <BrowserRouter>
       <Routes>
 
         {/* Guest pages */}
@@ -48,11 +47,7 @@ function App() {
         {/* Owner pages */}
         <Route element={<OwnerLayout />}>
           <Route path="/owner" element={<OwnerDashboard />} />
-          <Route path="/listings" element={
-            <OwnerListings  
-              inventoryItems={inventoryItemsDummy}
-              completedRentals={completedRentalsDummy}/>} 
-            />
+          <Route path="/listings" element={<OwnerListings />} />
         </Route>
 
       </Routes>
