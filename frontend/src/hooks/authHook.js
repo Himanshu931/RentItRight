@@ -7,7 +7,7 @@ const useAuth = () => {
 
     const fetchUser = async () => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/me`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/me`, {
                 method: "GET",
                 credentials: "include"
             });

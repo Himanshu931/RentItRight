@@ -32,16 +32,17 @@ const VerifyOtp = ({ email, switchMode }) => {
     setLoading(true);
     try {
       const otpString = otp.join("");
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/verify-otp`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp: otpString }),
+        credentials: "include"
       });
 
       const data = await res.json();
       if (!data.success) throw new Error(data.message);
 
-      switchMode("complete-profile");
+      switchMode("completeProfile");
     } catch (error) {
       console.error("Error in verify otp", error);
       alert(error.message || "Invalid OTP");

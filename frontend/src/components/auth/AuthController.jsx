@@ -8,12 +8,12 @@ import Success from "../../pages/auth/Success";
 import CompleteProfile from "../../pages/auth/CompleteProfile";
 
 export default function AuthController({ open, onClose, defaultMode = "login" }) {
-  const [mode, setMode] = useState("completeProfile");
+  const [mode, setMode] = useState(defaultMode);
   const [email, setEmail] = useState("");
 
-  // useEffect(() => {
-  //   setMode(defaultMode);
-  // }, [defaultMode]);
+  useEffect(() => {
+    setMode(defaultMode);
+  }, [defaultMode]);
   const switchMode = (next) => setMode(next);
 
   const screens = {

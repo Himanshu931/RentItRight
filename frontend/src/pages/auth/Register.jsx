@@ -27,7 +27,7 @@ const Register = ({ switchMode, email, setEmail }) => {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/register`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,7 +39,7 @@ const Register = ({ switchMode, email, setEmail }) => {
         throw new Error(data.message);
       }
 
-      const sendOtp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/send-otp`, {
+      const sendOtp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/send-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,7 @@ const Register = ({ switchMode, email, setEmail }) => {
                   placeholder="••••••••"
                   value={user.password}
                   onChange={(e) => setUser({ ...user, password: e.target.value })}
-                  className="form-input w-full pl-12 pr-4 py-3 bg-app border-1 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
+                  className="form-input w-full pl-12 pr-4 py-3 bg-app border rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
                 />
                 <button
                   type="button"

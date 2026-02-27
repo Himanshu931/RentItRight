@@ -52,8 +52,11 @@ export default function CompleteProfile({ switchMode }) {
         credentials: "include"
       })
       const csrfData = await csrftoken.json();
+      if (!csrfData || !csrfData.csrfToken) {
+        throw new Error("CSRF Token not found");
+      }
 
-      
+
       //POST the details 
       const response = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}/user/me/profile`,

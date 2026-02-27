@@ -18,6 +18,8 @@ import RoleRedirect from "./pages/auth/roleBasedRedirection";
 import OwnerLayout from "./layouts/OwnerLayout";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import OwnerListings from "./pages/owner/OwnerListings";
+
+import { NotFound } from "./pages/NotFound";
 function App() {
   return (
     <BrowserRouter>
@@ -50,6 +52,7 @@ function App() {
           <Route path="/listings" element={<OwnerListings />} />
         </Route>
 
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   );

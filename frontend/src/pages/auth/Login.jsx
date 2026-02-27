@@ -22,7 +22,7 @@ const Login = ({ switchMode, onClose }) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/v1/auth/login`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
