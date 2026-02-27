@@ -7,22 +7,42 @@ export default function RoleRedirect() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    useEffect(() => {
-        if (loading)
-            if (!user) return;
+    // useEffect(() => {
+    //     if (loading)
+    //         if (!user) return;
 
-        if (location.pathname.startsWith("/owner") || location.pathname.startsWith("/renter")) {
+    //     if (location.pathname.startsWith("/owner") || location.pathname.startsWith("/renter")) {
+    //         return;
+    //     }
+
+    //     if (user.role === "user") {
+    //         navigate("/renter", { replace: true });
+    //     }
+
+    //     if (user.role === "admin") {
+    //         navigate("/owner", { replace: true });
+    //     }
+    // }, [user, loading]);
+
+    useEffect(() => {
+        if (loading) return;
+
+        if (!user) {
+            navigate("/", { replace: true });
             return;
         }
 
-        if (user.role === "user") {
-            navigate("/renter", { replace: true });
+        const roleValue = user.role ?? user.roles ?? [];
+        const roles = Array.isArray(roleValue) ? roleValue : [roleValue];
+
+        if (roles.includes("owner") || roles.includes("admin")) {
+            navigate("/owner", { replace: true });
+            return;
         }
 
-        if (user.role === "admin") {
-            navigate("/owner", { replace: true });
-        }
-    }, [user, loading]);
+        navigate("/renter", { replace: true });
+    }, [loading, user, navigate]);
+
 
     return <div className="flex items-center justify-center h-screen">
         <div className="flex items-center gap-2">

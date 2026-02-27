@@ -8,7 +8,10 @@ import { useState } from "react";
 
 const Login = ({ switchMode, onClose }) => {
   const navigate = useNavigate();
-
+  const [error, setError] = useState({
+    email: "",
+    password: "",
+  });
   const [user, setUser] = useState({
     email: "",
     password: ""
@@ -20,6 +23,8 @@ const Login = ({ switchMode, onClose }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    setError({ email: "", password: "" });
     try {
       setLoading(true);
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
@@ -32,6 +37,11 @@ const Login = ({ switchMode, onClose }) => {
       })
       const data = await res.json();
       if (!data.success) {
+        setError({
+          email: data.message.toLowerCase().includes("not found") || data.message.toLowerCase().includes("email") ? data.message : "",
+          password: data.message.toLowerCase().includes("password") ? data.message : ""
+        });
+        console.log(data.message)
         throw new Error(data.message);
       }
 
@@ -42,10 +52,6 @@ const Login = ({ switchMode, onClose }) => {
       console.log(error);
     } finally {
       setLoading(false);
-      setUser({
-        email: "",
-        password: ""
-      })
     }
   }
 
@@ -79,11 +85,18 @@ const Login = ({ switchMode, onClose }) => {
                 type="email"
                 placeholder="name@example.com"
                 value={user.email}
-                onChange={(e) => setUser({ ...user, email: e.target.value })}
-                className="form-input w-full pl-12 pr-4 py-3 bg-app border-1  border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
-                focus:border-bright"
+                onChange={(e) => {
+                  setUser({ ...user, email: e.target.value });
+                  setError((prev) => ({ ...prev, email: "" }));
+                }}
+                className="form-input w-full pl-12 pr-4 py-3 bg-app border border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
+              focus:border-bright"
+                required
               />
             </div>
+            {error.email && (
+              <p className="text-white font-bold text-sm mt-2 bg-error/15 p-2 rounded-lg text-center border border-error/80">{error.email}</p>
+            )}
           </div>
 
           {/* Password */}
@@ -100,14 +113,19 @@ const Login = ({ switchMode, onClose }) => {
               </button>
             </div>
 
+
             <div className="relative">
               <LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg" />
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={user.password}
-                onChange={(e) => setUser({ ...user, password: e.target.value })}
-                className="form-input w-full pl-12 pr-4 py-3 bg-app border-1 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
+                onChange={(e) => {
+                  setUser({ ...user, password: e.target.value });
+                  setError((prev) => ({ ...prev, password: "" }));
+                }}
+                className="form-input w-full pl-12 pr-4 py-3 bg-app border rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
+                required
               />
               <button
                 type="button"
@@ -117,6 +135,9 @@ const Login = ({ switchMode, onClose }) => {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
+            {error.password && (
+              <p className="text-white font-bold text-sm mt-2 bg-error/15 p-2 rounded-lg text-center border border-error/80">{error.password}</p>
+            )}
           </div>
 
           {/* Login Button */}
@@ -156,7 +177,7 @@ const Login = ({ switchMode, onClose }) => {
         {/* Google */}
         <button
           type="button"
-          className="w-full flex items-center justify-center gap-3 py-3 border-1 border-text-secondary/40 rounded-2xl hover:bg-background-dark transition text-text-primary text-sm font-medium"
+          className="w-full flex items-center justify-center gap-3 py-3 border border-text-secondary/40 rounded-2xl hover:bg-background-dark transition text-text-primary text-sm font-medium"
         >
           <FaGoogle />
           Continue with Google

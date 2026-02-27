@@ -52,7 +52,8 @@ app.get("/api/v1/csrf-token", csrfProtection, (req, res) => {
 });
 
 // -------------------- ROUTES --------------------
-app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
+// app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
+app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", csrfProtection, userRouter);
 app.use("/api/v1/explore", exploreRoute);
 
