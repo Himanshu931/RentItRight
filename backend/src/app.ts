@@ -5,6 +5,7 @@ import cors from "cors";
 import authRoute from "./routes/auth.route";
 import userRouter from "./routes/user.route";
 import exploreRoute from "./routes/explore.route";
+import bookingRoute from "./routes/booking.route";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -56,6 +57,7 @@ app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
 // app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", csrfProtection, userRouter);
 app.use("/api/v1/explore", exploreRoute);
+app.use("/api/v1/booking", csrfProtection, bookingRoute);
 
 // -------------------- API DOCUMENTATION--------------------
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

@@ -1,6 +1,9 @@
 
 import { User } from "../models/user.model"
+import { Item } from "../models/item.model"
+import { Booking } from "../models/booking.model";
 import { AppError } from "../utils/AppError";
+
 interface userData {
     name: string;
     phone: string;
@@ -108,6 +111,7 @@ export const updateAddressService = async (userId: string, address: addressData)
 
     return { success: true }
 }
+
 export const deleteProfileService = async (userId: string) => {
     const user = await User.findByIdAndDelete(userId, { new: true })
     if (!user) {
@@ -116,3 +120,45 @@ export const deleteProfileService = async (userId: string) => {
 
     return { success: true }
 }
+
+export const dashboardDataService = async (userId: string) => {
+    const user = await User.findById(userId).lean();
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    if (user.roles === "owner") {
+        const activeOwnerRentals = await Item.countDocuments({
+            owner: userId,
+            status: "active",
+        });
+
+        return {
+            totalListings: user.owner?.totalListings ?? 0,
+            activeRentals: activeOwnerRentals,
+            totalEarnings: user.owner?.totalEarnings ?? 0,
+        };
+    }
+
+    if (user.roles === "renter") {
+        const activeRenterRentals = await Booking.countDocuments({
+            renter_id: userId,
+            booking_status: "ongoing",
+        });
+
+        const upcomingRentals = await Booking.countDocuments({
+            renter_id: userId,
+            booking_status: "confirmed",
+            start_date: { $gt: new Date() },
+        });
+
+        return {
+            activeRentals: activeRenterRentals,
+            upcomingRentals,
+            wishlist: user.renter?.wishlist?.length ?? 0,
+        };
+    }
+
+    throw new AppError("Invalid user role", 400);
+};
