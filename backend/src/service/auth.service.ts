@@ -4,7 +4,7 @@ import logger from "../config/logger";
 import { userInterface } from "../controllers/auth.controller";
 import jwt from "jsonwebtoken";
 import { OTP } from "../models/OTP.model";
-import { sendOTP } from "../utils/sendOTP";
+import { sendOTP } from "../utils/sendEmails";
 import { AppError } from "../utils/AppError";
 
 export const registerService = async (userData: {
@@ -114,7 +114,7 @@ export const loginService = async (userData: {
     throw new AppError("Invalid Password", 400);
   }
 
-  const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, {
+  const token = jwt.sign({ userId: user._id, userRole: user.roles }, process.env.JWT_SECRET!, {
     expiresIn: "24h",
   });
 
