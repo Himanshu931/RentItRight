@@ -140,6 +140,42 @@ router.delete("/me/profile", VerifyUser, deleteProfile);
 router.patch("/me/address", VerifyUser, updateAddress);
 
 
+/**
+ * @swagger
+ * /user/dashboard:
+ *   get:
+ *     summary: Get the User's Dashboard
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard fetched successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               oneOf:
+ *                 - type: object
+ *                   properties:
+ *                     totalListings:
+ *                       type: integer
+ *                     activeRentals:
+ *                       type: integer
+ *                     totalEarnings:
+ *                       type: number
+ *                 - type: object
+ *                   properties:
+ *                     activeRentals:
+ *                       type: integer
+ *                     upcomingRentals:
+ *                       type: integer
+ *                     wishlist:
+ *                       type: integer
+ *       400:
+ *         description: Invalid user role
+ *       404:
+ *         description: User not found
+ */
 router.get("/dashboard", VerifyUser, dashboard);
 
 export default router;
