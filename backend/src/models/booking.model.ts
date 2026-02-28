@@ -29,11 +29,12 @@ export interface IBooking extends Document {
   payment_status: "pending" | "paid" | "failed" | "refunded";
 
   booking_status:
-    | "pending"
-    | "confirmed"
-    | "ongoing"
-    | "completed"
-    | "cancelled";
+  | "pending"
+  | "confirmed"
+  | "ongoing"
+  | "completed"
+  | "cancelled"
+  | "rejected";
 
   cancellationReason?: string;
   cancelledBy?: "renter" | "owner";
@@ -99,7 +100,7 @@ const BookingSchema: Schema<IBooking> = new Schema(
       serviceFee: { type: Number, default: 0 },
       tax: { type: Number, default: 0 },
 
-      platformFee: { type: Number, default: 0 },
+      platformFee: { type: Number, default: 49 },
       ownerEarning: { type: Number, required: true },
 
       totalAmount: { type: Number, required: true },
@@ -152,6 +153,13 @@ BookingSchema.index({ owner_id: 1 });
 
 // Auto-expire unpaid bookings (optional if you use TTL)
 BookingSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+BookingSchema.index({
+  item_id: 1,
+  booking_status: 1,
+  start_date: 1,
+  end_date: 1,
+});
 
 
 export const Booking = mongoose.model<IBooking>("Booking", BookingSchema);
