@@ -5,6 +5,7 @@ import { AppError } from "../utils/AppError";
 
 export interface DecodedToken {
     userId: string,
+    userRole: string,
 }
 
 export const VerifyUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -17,5 +18,6 @@ export const VerifyUser = catchAsync(async (req: Request, res: Response, next: N
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as DecodedToken;
 
     req.userId = decoded.userId;
+    req.userRole = decoded.userRole;
     next();
 });

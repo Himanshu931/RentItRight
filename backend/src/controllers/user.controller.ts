@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import logger from "../config/logger";
 import { updateProfileSchema, updateAddressSchema, profileSchema } from "../validatior/user.schema";
-import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService } from "../service/user.service";
+import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService, dashboardDataService } from "../service/user.service";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 
@@ -46,10 +46,7 @@ export const updateProfileImage = catchAsync(async (req: Request, res: Response)
     const { profileImage } = req.body;
     if (!profileImage) {
         logger.info("Error in updating profile image", "Profile image is required")
-        return res.status(400).json({
-            success: false,
-            errors: "Profile image is required",
-        });
+        throw new AppError("Profile Image is required", 400)
     }
 
     await updateProfileImageService(req.userId!, profileImage);
@@ -79,4 +76,13 @@ export const deleteProfile = catchAsync(async (req: Request, res: Response) => {
 
     logger.info("Profile deleted successfully");
     res.status(200).json({ success: true, message: "Profile deleted successfully" });
+})
+
+export const dashboard = catchAsync(async (req: Request, res: Response) => {
+    logger.info("Fetching dashboard data for user", req.userId);
+
+    const data = await dashboardDataService(req.userId!);
+
+    logger.info("Dashboard data fetched successfully");
+    res.status(200).json({ success: true, data });
 })

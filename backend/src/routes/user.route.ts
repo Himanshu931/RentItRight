@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { VerifyUser } from "../middleware/verifyUser";
-import { createProfile, getProfile, updateProfile, updateProfileImage, deleteProfile, updateAddress } from "../controllers/user.controller"
+import { createProfile, getProfile, updateProfile, updateProfileImage, deleteProfile, updateAddress, dashboard } from "../controllers/user.controller"
 
 const router = Router();
 
@@ -138,5 +138,8 @@ router.delete("/me/profile", VerifyUser, deleteProfile);
  *         description: Address updated successfully
  */
 router.patch("/me/address", VerifyUser, updateAddress);
+
+
+router.get("/dashboard", VerifyUser, dashboard);
 
 export default router;

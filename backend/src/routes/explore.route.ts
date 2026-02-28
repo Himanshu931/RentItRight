@@ -162,7 +162,7 @@ router.get("/", exploreItems);
  *                 hasNextPage:
  *                   type: boolean
  */
-// ⚠️  /search MUST be declared before /:id — otherwise Express treats "search" as an id
+//search MUST be declared before /:id — otherwise Express treats "search" as an id
 router.get("/search", searchItems);
 
 
