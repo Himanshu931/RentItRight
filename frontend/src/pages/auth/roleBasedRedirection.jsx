@@ -7,23 +7,6 @@ export default function RoleRedirect() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // useEffect(() => {
-    //     if (loading)
-    //         if (!user) return;
-
-    //     if (location.pathname.startsWith("/owner") || location.pathname.startsWith("/renter")) {
-    //         return;
-    //     }
-
-    //     if (user.role === "user") {
-    //         navigate("/renter", { replace: true });
-    //     }
-
-    //     if (user.role === "admin") {
-    //         navigate("/owner", { replace: true });
-    //     }
-    // }, [user, loading]);
-
     useEffect(() => {
         if (loading) return;
 

@@ -17,7 +17,7 @@ export const inventoryItemsDummy = [
     rating: 4.7,
     status: "rented",
     image:
-      "https://images.unsplash.com/photo-1511994298241-608e28f14fde"
+      "https://images.unsplash.com/photo-1511994298241-608e28f14fde?w=200&q=80"
   },
   {
     id: "3",
@@ -38,28 +38,5 @@ export const inventoryItemsDummy = [
     status: "paused",
     image:
       "https://images.unsplash.com/photo-1510915361894-db8b60106cb1"
-  }
-];
-
-export const completedRentalsDummy = [
-  {
-    id: "c1",
-    itemTitle: "Camping Tent Pro",
-    renterName: "Alex Johnson",
-    rating: 4.0,
-    amount: 120,
-    days: 3,
-    image:
-      "https://images.unsplash.com/photo-1504280390368-3971f4aa3b6b"
-  },
-  {
-    id: "c2",
-    itemTitle: "Canon EOS R5",
-    renterName: "Sarah Miller",
-    rating: 5.0,
-    amount: 255,
-    days: 3,
-    image:
-      "https://images.unsplash.com/photo-1516035069371-29a1b244cc32"
   }
 ];

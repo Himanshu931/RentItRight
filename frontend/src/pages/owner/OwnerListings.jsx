@@ -1,43 +1,54 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Plus } from "lucide-react";
 import SearchBar from "../../components/owner_ui/ownerListings/SearchBar";
 import InventoryCard from "../../components/owner_ui/ownerListings/InventoryCard";
 import InventoryTabs from "../../components/owner_ui/ownerListings/InventoryTabs";
 import { inventoryItemsDummy } from "../../data/ownerListingDummy";
 import AddItemModal from "../../modals/AddItemModal";
+import EditItemModal from "../../modals/EditItemModal";
 
 export default function OwnerListings() {
     const [search, setSearch] = useState("");
     const [activeTab, setActiveTab] = useState("all-items");
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [editingItem, setEditingItem] = useState(null);
 
     const handleAddItem = (itemData) => {
         // 🔥 This is where backend API will be called later
         console.log("New Item Data:", itemData);
-        // Example:
-        // await axios.post("/api/items", itemData)
-
         setIsAddModalOpen(false);
     };
 
-    const filteredItems = inventoryItemsDummy
-        .filter((item) => {
-            switch (activeTab) {
-                case "all-items":
-                    return true;
-                case "active-items":
-                    return item.status === "active" || item.status === "rented";
-                case "rented-items":
-                    return item.status === "rented";
-                case "paused":
-                    return item.status === "paused";
-                default:
-                    return true;
-            }
-        })
-        .filter((item) =>
-            item.title.toLowerCase().includes(search.toLowerCase())
-        );
+    const handleEditItem = (item) => {
+        setEditingItem(item);
+    };
+
+    const handleUpdateItem = (updatedItemData) => {
+        // 🔥 This is where backend API will be called later
+        console.log("Updated Item Data:", updatedItemData);
+        setEditingItem(null);
+    };
+
+    const filteredItems = useMemo(() => {
+        return inventoryItemsDummy
+            .filter((item) => {
+                switch (activeTab) {
+                    case "all-items":
+                        return true;
+                    case "active-items":
+                        return item.status === "active" || item.status === "rented";
+                    case "rented-items":
+                        return item.status === "rented";
+                    case "paused":
+                        return item.status === "paused";
+                    default:
+                        return true;
+                }
+            })
+            .filter((item) =>
+                item.title.toLowerCase().includes(search.toLowerCase())
+            );
+    }, [activeTab, search]);
 
     return (
         <main className="min-h-screen bg-app">
@@ -60,8 +71,9 @@ export default function OwnerListings() {
                 <div className="flex justify-between items-center bg-transparent">
                     <InventoryTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-                    <button className="bg-bright hover:bg-bright/80 active:scale-95 text-app px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all " 
-                    onClick={() => setIsAddModalOpen(true)}>
+                    <button className="bg-bright hover:bg-bright/80 active:scale-95 text-app px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all 
+                    hover:cursor-pointer"
+                        onClick={() => setIsAddModalOpen(true)}>
                         <Plus size={16} strokeWidth={3} />
                         New Item
                     </button>
@@ -73,6 +85,7 @@ export default function OwnerListings() {
                         <InventoryCard
                             key={item.id}
                             item={item}
+                            onEdit={() => handleEditItem(item)}
                         />
                     ))}
                 </div>
@@ -83,6 +96,14 @@ export default function OwnerListings() {
                 <AddItemModal
                     onClose={() => setIsAddModalOpen(false)}
                     onSubmit={handleAddItem}
+                />
+            )}
+
+            {editingItem && (
+                <EditItemModal
+                    item={editingItem}
+                    onClose={() => setEditingItem(null)}
+                    onSubmit={handleUpdateItem}
                 />
             )}
         </main>
