@@ -30,7 +30,7 @@ export default function CompleteProfile({ switchMode }) {
     const url = import.meta.env.VITE_CLOUDINARY_URL;
     const img = new FormData();
     img.append("file", profilePic);
-    img.append("upload_preset", "test_preset");
+    img.append("upload_preset", import.meta.env.VITE_CLOUDINARY_PRESET);
     const res = await fetch(
       url,
       {

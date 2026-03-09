@@ -13,11 +13,11 @@ export default function OwnerListings() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
 
-    const handleAddItem = (itemData) => {
-        // 🔥 This is where backend API will be called later
-        console.log("New Item Data:", itemData);
-        setIsAddModalOpen(false);
-    };
+    // const handleAddItem = (itemData) => {
+    //     // 🔥 This is where backend API will be called later
+    //     console.log("New Item Data:", itemData);
+    //     setIsAddModalOpen(false);
+    // };
 
     const handleEditItem = (item) => {
         setEditingItem(item);
@@ -95,7 +95,6 @@ export default function OwnerListings() {
             {isAddModalOpen && (
                 <AddItemModal
                     onClose={() => setIsAddModalOpen(false)}
-                    onSubmit={handleAddItem}
                 />
             )}
 
