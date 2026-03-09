@@ -1,6 +1,6 @@
 import { Heart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-const ExploreCard = ({ item }) => {
+const ExploreCard = ({ item, linkPrefix = "/renter/rent_items" }) => {
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-divider bg-card shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:border-accent/60">
       {/* Featured Badge */}
@@ -18,7 +18,7 @@ const ExploreCard = ({ item }) => {
         <Heart size={16} className="stroke-[2.2]" />
       </button>
 
-      <Link to={`/renter/rent_items/${item.id}`} className="block">
+      <Link to={`${linkPrefix}/${item.id}`} className="block">
         {/* Image */}
         <div className="px-3 pt-3">
           <div

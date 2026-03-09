@@ -1,21 +1,84 @@
-import Navbar from "../../components/guest_ui/Navbar";
-import Footer from "../../components/guest_ui/Footer";
+import { useEffect, useState, useCallback } from "react";
+
 import LoginBanner from "../../components/guest_ui/explore/LoginBanner";
-import SearchBar from "../../components/guest_ui/explore/SearchBar";
-import Filters from "../../components/guest_ui/explore/Filters";
-import RentalsGrid from "../../components/guest_ui/explore/RentalsGrid";
+import ExploreSearchBar from "../../components/renter_ui/explore/ExploreSearchBar";
+// import ExploreFilters from "../../components/renter_ui/explore/ExploreFilters";
+import ExploreGrid from "../../components/renter_ui/explore/ExploreGrid";
+import ExploreEmptyState from "../../components/renter_ui/explore/ExploreEmptyState";
 
-export default function Explore() {
+import ExplorePagination from "../../components/renter_ui/explore/ExplorePagination";
+
+const Explore = () => {
+  const [rentals, setRentals] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const ITEMS_PER_PAGE = 16;
+
+  const fetchRentals = useCallback(async (p = 1) => {
+    setLoading(true);
+    try {
+      const queryParams = new URLSearchParams();
+      // Search logic is currently disabled as per user request in RenterExplore
+      queryParams.append("page", p);
+      queryParams.append("limit", ITEMS_PER_PAGE);
+
+      const query = `${import.meta.env.VITE_BACKEND_URL}/explore?${queryParams.toString()}`
+      console.log(query)
+      const res = await fetch(query);
+      const data = await res.json();
+      console.log(data)
+      const totalPages=Math.ceil((data.total || 0) / ITEMS_PER_PAGE);
+
+      if (data.status === "success") {
+        setRentals(data.data || []);
+        setTotalPages(totalPages || 1);
+        setPage(p || 1);
+
+        // Scroll to top when page changes
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (error) {
+      console.error("Error fetching rentals:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRentals(page);
+  }, [page, fetchRentals]);
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+    }
+  };
+
   return (
-    <>
+    <div className="mx-auto max-w-7xl px-6 lg:px-20 py-8 min-h-screen">
+      <LoginBanner />
+      <ExploreSearchBar value={search} onChange={setSearch} />
 
-      <main className="max-w-7xl mx-auto px-6 md:px-10 py-8">
-        <LoginBanner />
-        <SearchBar />
-        {/* <Filters /> */}
-        <RentalsGrid />
-      </main>
+      {/* <ExploreFilters filters={filters} onChange={setFilters} /> */}
 
-    </>
+      {rentals.length === 0 && !loading ? (
+        <ExploreEmptyState />
+      ) : (
+        <div className="flex flex-col gap-10">
+          <ExploreGrid rentals={rentals} linkPrefix="/item" />
+
+          <ExplorePagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
+    </div>
   );
-}
+};
+
+export default Explore;
