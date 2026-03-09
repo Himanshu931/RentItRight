@@ -26,7 +26,7 @@ export const registerService = async (userData: {
   });
 
   logger.info(`User registered successfully with email ${userData.email}`);
-};
+}
 
 export const sendOTPService = async (email: string) => {
   const otp = Math.floor(100000 + Math.random() * 900000).toString();

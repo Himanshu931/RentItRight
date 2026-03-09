@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Camera,
   ShoppingBasket,
@@ -9,9 +9,13 @@ import {
   ArrowRight
 } from "lucide-react";
 
+
 export default function CompleteProfile({ switchMode }) {
 
   const [intent, setIntent] = useState("renter");
+  const [profileImage, setProfileImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const fileInputRef = useRef(null);
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -19,6 +23,37 @@ export default function CompleteProfile({ switchMode }) {
   const [pincode, setPincode] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  // Convert ProfileImage to CloudinaryImage
+  const convertImage = async (profilePic) => {
+    if (!profilePic) return null;
+    const url = import.meta.env.VITE_CLOUDINARY_URL;
+    const img = new FormData();
+    img.append("file", profilePic);
+    img.append("upload_preset", "test_preset");
+    const res = await fetch(
+      url,
+      {
+        method: "POST",
+        body: img
+      }
+    );
+    const data = await res.json();
+    return data.secure_url;
+  }
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -75,7 +110,8 @@ export default function CompleteProfile({ switchMode }) {
               district: district,
               state: state,
               pincode: pincode
-            }
+            },
+            profileImage: await convertImage(profileImage)
           })
         }
       );
@@ -103,12 +139,30 @@ export default function CompleteProfile({ switchMode }) {
         {/* LEFT */}
         <div className="bg-app/80 p-8 flex flex-col items-center justify-center space-y-8 border-r border-white/5">
 
-          <div className="relative group cursor-pointer">
-            <div className="flex h-32 w-32 items-center justify-center rounded-full bg-zinc-800 border-2 border-dashed border-zinc-700 group-hover:border-emerald-500/50 transition-colors overflow-hidden">
-              <User className="w-16 h-16 text-zinc-600 group-hover:scale-110 group-hover:text-emerald-500/50 transition-all" />
+          <div className="relative group cursor-pointer" onClick={triggerFileInput}>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageChange}
+              accept="image/*"
+              className="hidden"
+            />
+            <div className="flex h-32 w-32 items-center justify-center rounded-full bg-zinc-800 border-2 border-dashed border-zinc-700 group-hover:border-bright transition-colors overflow-hidden">
+              {previewUrl ? (
+                <img src={previewUrl} alt="Profile Preview" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-16 h-16 text-zinc-600 group-hover:scale-110 group-hover:text-bright transition-all" />
+              )}
             </div>
-            <button type="button" className="absolute bottom-1 right-1 rounded-full bg-emerald-500 p-2.5 shadow-lg hover:bg-emerald-400 transition-colors">
-              <Camera className="w-4 h-4 text-white" />
+            <button
+              type="button"
+              className="absolute bottom-1 right-1 rounded-full bg-bright p-2.5 shadow-lg hover:bg-bright transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                triggerFileInput();
+              }}
+            >
+              <Camera className="w-4 h-4 text-surface hover:cursor-pointer" />
             </button>
           </div>
 
