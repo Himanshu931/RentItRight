@@ -42,22 +42,26 @@ const ExploreCard = ({ item }) => {
           </div>
 
           {/* Subtitle */}
-          <p className="mt-1 text-xs text-text-secondary/90 line-clamp-1">
-            {item.description}
-          </p>
+          {item.description && (
+            <p className="mt-1 text-xs text-text-secondary/90 line-clamp-1">
+              {item.description}
+            </p>
+          )}
 
           {/* Price + Distance */}
           <div className="mt-3 flex items-center justify-between">
             <p className="text-lg font-bold text-bright">
-              ₹{item.pricing.daily}
+              ₹{item.dailyPrice ?? item.pricing?.daily}
               <span className="ml-1 text-[11px] font-medium text-text-secondary">
                 /day
               </span>
             </p>
 
-            <span className="rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
-              {item.distanceKm} km away
-            </span>
+            {item.distanceKm && (
+              <span className="rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+                {item.distanceKm} km away
+              </span>
+            )}
           </div>
         </div>
 

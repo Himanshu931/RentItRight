@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 
-export interface IItem extends Document {
+export interface Item extends Document {
   ownerId: mongoose.Types.ObjectId;
   title: string;
   description: string;
@@ -48,7 +48,7 @@ export interface IItem extends Document {
 }
 
 
-const ItemSchema: Schema<IItem> = new Schema(
+const ItemSchema: Schema<Item> = new Schema(
   {
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -141,4 +141,4 @@ ItemSchema.index({ category: 1 });
 ItemSchema.index({ ownerId: 1 });
 
 
-export const Item = mongoose.model<IItem>("Item", ItemSchema);
+export const Item = mongoose.model<Item>("Item", ItemSchema);
