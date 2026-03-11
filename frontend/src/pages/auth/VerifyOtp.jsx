@@ -19,6 +19,11 @@ const VerifyOtp = ({ email, switchMode }) => {
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
     }
+
+    // Auto-submit if all digits are entered
+    if (newOtp.every((digit) => digit !== "")) {
+      handleVerifyOtp(newOtp);
+    }
   };
 
   const handleKeyDown = (index, e) => {
@@ -28,10 +33,16 @@ const VerifyOtp = ({ email, switchMode }) => {
     }
   };
 
-  const handleVerifyOtp = async () => {
+  const handleVerifyOtp = async (providedOtp) => {
+    if (loading) return;
+    
+    // If called automatically, use the providedOtp array; otherwise use state
+    const currentOtp = Array.isArray(providedOtp) ? providedOtp : otp;
+    if (currentOtp.includes("")) return;
+
     setLoading(true);
     try {
-      const otpString = otp.join("");
+      const otpString = currentOtp.join("");
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/verify-otp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

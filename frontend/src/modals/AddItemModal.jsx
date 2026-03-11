@@ -12,6 +12,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
         securityDeposit: "",
         images: []
     });
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleChange = (e) => {
         setFormData({
@@ -19,8 +20,6 @@ export default function AddItemModal({ onClose, onSubmit }) {
             [e.target.name]: e.target.value
         });
     };
-
-
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
@@ -41,7 +40,62 @@ export default function AddItemModal({ onClose, onSubmit }) {
     };
 
 
-    const handleSubmit = (e) => {
+    const uploadImagesToCloudinary = async (files) => {
+        const uploadUrl = import.meta.env.VITE_CLOUDINARY_URL;
+        const uploadPreset = import.meta.env.VITE_CLOUDINARY_PRESET;
+
+        const uploadPromises = files.map(async (file) => {
+            const data = new FormData();
+            data.append("file", file);
+            data.append("upload_preset", uploadPreset);
+
+            try {
+                const response = await fetch(uploadUrl, {
+                    method: "POST",
+                    body: data,
+                });
+                const resData = await response.json();
+                return resData.secure_url;
+            } catch (error) {
+                console.error("Cloudinary upload error:", error);
+                return null;
+            }
+        });
+
+        return Promise.all(uploadPromises);
+    };
+
+    const addItemToBackend = async (data) => {
+        try {
+            // 1. Get CSRF Token
+            const csrfRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+                method: "GET",
+                credentials: "include"
+            });
+            const { csrfToken } = await csrfRes.json();
+
+            // 2. Submit Data
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/additem`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken
+                },
+                credentials: "include",
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Failed to add item");
+            
+            return result;
+        } catch (error) {
+            console.error("Backend error:", error);
+            throw error;
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const { dailyPrice, weeklyPrice, monthlyPrice, securityDeposit, itemName, category, description } = formData;
@@ -94,9 +148,31 @@ export default function AddItemModal({ onClose, onSubmit }) {
             return;
         }
 
+        setIsUploading(true);
+        try {
+            const imageUrls = await uploadImagesToCloudinary(formData.images);
+            const finalData = { 
+                ...formData, 
+                images: imageUrls.filter(url => url !== null) 
+            };
 
-        onSubmit(formData);
+            // Call backend function
+            console.log(finalData)
+            await addItemToBackend(finalData);
+
+            alert("Item added successfully! 🚀");
+            onSubmit(finalData);
+            onClose();
+        } catch (error) {
+            console.error("Submission error:", error);
+            alert(error.message || "Failed to add item. Please try again.");
+        } finally {
+            setIsUploading(false);
+        }
     };
+
+
+    
 
     return (
         <div
@@ -107,14 +183,6 @@ export default function AddItemModal({ onClose, onSubmit }) {
                 className="bg-surface w-full max-w-2xl rounded-2xl shadow-2xl shadow-black/40 relative animate-[modalIn_0.25s_ease-out]"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* Inline keyframes */}
-                <style>{`
-          @keyframes modalIn {
-            from { opacity: 0; transform: scale(0.95) translateY(10px); }
-            to   { opacity: 1; transform: scale(1) translateY(0); }
-          }
-        `}</style>
-
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-divider">
                     <div className="flex items-center gap-3">
@@ -135,7 +203,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
                 </div>
 
                 {/* Scrollable Form Body */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
+                <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
 
                     {/* Item Name & Category Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -346,9 +414,17 @@ export default function AddItemModal({ onClose, onSubmit }) {
                     <button
                         type="submit"
                         onClick={handleSubmit}
-                        className="px-6 py-2.5 rounded-xl text-sm font-bold bg-bright text-app hover:bg-bright/85 active:scale-[0.98] transition-all"
+                        disabled={isUploading}
+                        className="px-6 py-2.5 rounded-xl text-sm font-bold bg-bright text-app hover:bg-bright/85 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                        Add Item
+                        {isUploading ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-app/30 border-t-app rounded-full animate-spin" />
+                                <span>Uploading...</span>
+                            </>
+                        ) : (
+                            "Add Item"
+                        )}
                     </button>
                 </div>
             </div>

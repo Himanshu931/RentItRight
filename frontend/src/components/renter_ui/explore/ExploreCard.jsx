@@ -1,6 +1,6 @@
 import { Heart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-const ExploreCard = ({ item }) => {
+const ExploreCard = ({ item, linkPrefix = "/renter/rent_items" }) => {
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-divider bg-card shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:border-accent/60">
       {/* Featured Badge */}
@@ -18,7 +18,7 @@ const ExploreCard = ({ item }) => {
         <Heart size={16} className="stroke-[2.2]" />
       </button>
 
-      <Link to={`/renter/rent_items/${item.id}`} className="block">
+      <Link to={`${linkPrefix}/${item.id}`} className="block">
         {/* Image */}
         <div className="px-3 pt-3">
           <div
@@ -42,22 +42,26 @@ const ExploreCard = ({ item }) => {
           </div>
 
           {/* Subtitle */}
-          <p className="mt-1 text-xs text-text-secondary/90 line-clamp-1">
-            {item.description}
-          </p>
+          {item.description && (
+            <p className="mt-1 text-xs text-text-secondary/90 line-clamp-1">
+              {item.description}
+            </p>
+          )}
 
           {/* Price + Distance */}
           <div className="mt-3 flex items-center justify-between">
             <p className="text-lg font-bold text-bright">
-              ₹{item.pricing.daily}
+              ₹{item.dailyPrice ?? item.pricing?.daily}
               <span className="ml-1 text-[11px] font-medium text-text-secondary">
                 /day
               </span>
             </p>
 
-            <span className="rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
-              {item.distanceKm} km away
-            </span>
+            {item.distanceKm && (
+              <span className="rounded-md bg-white/5 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+                {item.distanceKm} km away
+              </span>
+            )}
           </div>
         </div>
 

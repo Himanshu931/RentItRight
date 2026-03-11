@@ -1,5 +1,5 @@
 import mongoose, { Types } from "mongoose";
-import { Item, IItem } from "../models/item.model";
+import { Item} from "../models/item.model";
 import { AppError } from "../utils/AppError";
 import { esClient, ITEMS_INDEX } from "../config/elasticSearch";
 import type { QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
@@ -22,24 +22,26 @@ export interface SearchParams {
 // Mongoose services (listing / detail)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const getAllItemsService = async (cursor?: string, limit = 10) => {
-    const query: mongoose.FilterQuery<IItem> = { isActive: true };
+export const getAllItemsService = async (page = 1, limit = 10) => {
+    const query: mongoose.FilterQuery<Item> = { isActive: true };
+    const skip = (page - 1) * limit;
 
-    // Cursor-based pagination
-    if (cursor) {
-        query._id = { $lt: new Types.ObjectId(cursor) };
-    }
-
+    // total items before limiting
+    const totalItems = await Item.countDocuments(query);
     const items = await Item.find(query)
         .sort({ _id: -1 })
+        .skip(skip)
         .limit(limit)
         .lean();
 
     if (!items.length) {
-        return [];
+        return {
+            total: totalItems,
+            items: [],
+        };
     }
 
-    return items.map((i) => ({
+    const formattedItems = items.map((i) => ({
         id: i._id.toString(),
         title: i.title,
         image: i.images?.[0] ?? null,
@@ -48,6 +50,11 @@ export const getAllItemsService = async (cursor?: string, limit = 10) => {
         discount: i.discount?.daily ?? null,
         rating: i.rating?.average ?? 0,
     }));
+
+    return {
+        total: totalItems,
+        items: formattedItems,
+    };
 };
 
 export const getItemByIdService = async (id: string) => {
@@ -83,7 +90,7 @@ export const getItemByIdService = async (id: string) => {
 // ElasticSearch — index a single item (call after create / update)
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const indexItemToES = async (item: IItem & { _id: Types.ObjectId }) => {
+export const indexItemToES = async (item: Item & { _id: Types.ObjectId }) => {
     await esClient.index({
         index: ITEMS_INDEX,
         id: item._id.toString(),

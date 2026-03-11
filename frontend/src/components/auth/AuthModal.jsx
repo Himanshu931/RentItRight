@@ -42,7 +42,7 @@ export default function AuthModal({ open, onClose, children, maxWidth = "max-w-[
           onClick={staticModal ? undefined : onClose}
           className="absolute right-4 top-4 text-text-secondary hover:text-text-primary"
         >
-          <X size={20} />
+          <X size={20} className="hover:cursor-pointer" />
         </button>
 
         {children}

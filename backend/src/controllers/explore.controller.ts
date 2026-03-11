@@ -17,15 +17,15 @@ export const exploreItems = catchAsync(async (req: Request, res: Response) => {
     logger.info("fetching items");
 
     const limit = Number(req.query.limit) || 12;
-    const cursor = (req.query.cursor as string) || "";
+    const page = Number(req.query.page) || 1;
 
-    const items: item[] = await getAllItemsService(cursor, limit);
-
+    const { total, items } = await getAllItemsService(page, limit);
     logger.info("items fetched successfully");
 
     res.status(200).json({
         status: "success",
         data: items,
+        total,
     });
 });
 
