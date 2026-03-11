@@ -3,6 +3,9 @@ import { connectDB } from "./config/db";
 import logger from "./config/logger";
 import { initElasticIndex } from "./config/elasticSearch";
 import "./workers";
+import { initSentry } from "./config/sentry";
+
+initSentry();
 
 const PORT = process.env.PORT || 3000;
 

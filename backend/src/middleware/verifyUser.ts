@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
+import * as Sentry from "@sentry/node"
 
 export interface DecodedToken {
     userId: string,
@@ -19,5 +20,10 @@ export const VerifyUser = catchAsync(async (req: Request, res: Response, next: N
 
     req.userId = decoded.userId;
     req.userRole = decoded.userRole;
+
+    Sentry.setUser({
+        id: decoded.userId
+    })
+
     next();
 });
