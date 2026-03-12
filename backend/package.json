@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "^9.3.2",
+    "@sentry/node": "^10.43.0",
     "@types/csurf": "^1.11.5",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.70.1",

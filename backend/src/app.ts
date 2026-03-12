@@ -12,10 +12,11 @@ import cookieParser from "cookie-parser";
 import { RATE_LIMITER, AUTH_LIMITER } from "./middleware/rateLimiter";
 import csrf from "csurf";
 import mongoSanitize from "express-mongo-sanitize";
+import { healthController } from "./controllers/health.controller";
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
 import { globalErrorHandler } from "./middleware/error.middleware";
-
+import * as Sentry from "@sentry/node";
 
 const app = express();
 
@@ -52,6 +53,14 @@ app.get("/api/v1/csrf-token", csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
 });
 
+
+// -------------------- HEALTH CHECK --------------------
+app.get("/health", healthController);
+
+app.get("/debug-sentry", function mainHandler(req, res) {
+    throw new Error("My first Sentry error!");
+});
+
 // -------------------- ROUTES --------------------
 app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
 // app.use("/api/v1/auth", authRoute);
@@ -62,10 +71,8 @@ app.use("/api/v1/booking", csrfProtection, bookingRoute);
 // -------------------- API DOCUMENTATION--------------------
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// -------------------- HEALTH CHECK --------------------
-app.get("/", (req, res) => {
-    res.send("API is running...");
-});
+// -------------------- SENTRY ERROR HANDLER --------------------
+Sentry.setupExpressErrorHandler(app)
 
 // -------------------- CSRF ERROR HANDLER --------------------
 app.use((err: any, req: any, res: any, next: any) => {
