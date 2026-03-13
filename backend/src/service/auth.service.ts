@@ -11,10 +11,12 @@ export const registerService = async (userData: {
   email: string;
   password: string;
 }) => {
-  logger.info("Registering user");
+  logger.info("User registration started", { email: userData.email });
+
   const isExist = await User.findOne({ email: userData.email });
+
   if (isExist) {
-    logger.info(`User already exists`);
+    logger.warn("User already exists", { email: userData.email });
     throw new AppError("User already exists", 400);
   }
 
@@ -25,10 +27,12 @@ export const registerService = async (userData: {
     password: hashedPassword,
   });
 
-  logger.info(`User registered successfully with email ${userData.email}`);
+  logger.info("User registered successfully", { email: userData.email });
 }
 
 export const sendOTPService = async (email: string) => {
+  logger.info("OTP generation requested", { email });
+
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -40,7 +44,9 @@ export const sendOTPService = async (email: string) => {
     expiresAt,
   });
 
-  await sendOTP(email, otp)
+  await sendOTP(email, otp);
+
+  logger.info("OTP sent successfully", { email });
 };
 
 
@@ -48,23 +54,25 @@ export const verifyOTPService = async (otpData: {
   email: string;
   otp: string;
 }) => {
+
+  logger.info("OTP verification attempt", { email: otpData.email });
   const isExist = await OTP.findOne({ email: otpData.email }).sort({
     createdAt: -1,
   });
 
   if (!isExist) {
-    logger.info("OTP not found");
+    logger.warn("OTP not found", { email: otpData.email });
     throw new AppError("OTP not found", 400);
   }
 
   const isOtpValid = await bcrypt.compare(otpData.otp, isExist.otp);
   if (!isOtpValid) {
-    logger.info("Invalid OTP");
+    logger.warn("Invalid OTP", { email: otpData.email });
     throw new AppError("Invalid OTP", 400);
   }
 
   if (isExist.expiresAt < new Date()) {
-    logger.info("OTP expired");
+    logger.warn("OTP expired", { email: otpData.email });
     throw new AppError("OTP expired", 410);
   }
 
@@ -74,7 +82,7 @@ export const verifyOTPService = async (otpData: {
 
   const user = await User.findOne({ email: otpData.email });
   if (!user) {
-    logger.info("User not found after OTP verification");
+    logger.warn("User not found after OTP verification", { email: otpData.email });
     throw new AppError("User not found", 400);
   }
 
@@ -84,7 +92,8 @@ export const verifyOTPService = async (otpData: {
     { expiresIn: "24h" },
   );
 
-  logger.info(`OTP verified for ${otpData.email}`);
+  logger.info(`OTP verified successfully`, { email: otpData.email });
+
   return token;
 };
 
@@ -92,16 +101,16 @@ export const loginService = async (userData: {
   email: string;
   password: string;
 }) => {
-  logger.info(`User login attempt with email ${userData.email}`);
+  logger.info("User login attempt", { email: userData.email });
 
   const user = await User.findOne({ email: userData.email });
   if (!user) {
-    logger.info("User not found");
+    logger.warn("User not found", { email: userData.email });
     throw new AppError("User Not Found", 400);
   }
 
   if (user && !user.isVerified) {
-    logger.info("User not verified");
+    logger.warn("User not verified", { email: userData.email });
     throw new AppError("User Not Verified", 403);
   }
 
@@ -110,7 +119,7 @@ export const loginService = async (userData: {
     user.password,
   );
   if (!isPasswordValid) {
-    logger.info("Invalid password");
+    logger.warn("Invalid password", { email: userData.email });
     throw new AppError("Invalid Password", 400);
   }
 
@@ -118,18 +127,20 @@ export const loginService = async (userData: {
     expiresIn: "24h",
   });
 
-  logger.info(`User logged in successfully with email ${userData.email}`);
+  logger.info("User login success", { email: userData.email, userId: user._id });
   return token;
 };
 
 export const MeService = async (id: string | undefined) => {
+
+  logger.info("Fetching current user profile", { userId: id });
+
   if (id === undefined) {
-    logger.info("Id should be defined in Me controler");
     throw new AppError("Id is not defined", 400);
   }
   const user = await User.findById(id);
   if (!user) {
-    logger.info("User not found");
+    logger.warn("User not found", { userId: id });
     throw new AppError("User Not Found", 400);
   }
 
@@ -139,6 +150,8 @@ export const MeService = async (id: string | undefined) => {
     name: user.name!,
     role: user.roles!,
   };
+
+  logger.info("User profile fetched successfully", { userId: id });
 
   return userResponse;
 };

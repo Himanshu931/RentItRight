@@ -14,13 +14,10 @@ export interface item {
 }
 
 export const exploreItems = catchAsync(async (req: Request, res: Response) => {
-    logger.info("fetching items");
-
     const limit = Number(req.query.limit) || 12;
     const page = Number(req.query.page) || 1;
 
     const { total, items } = await getAllItemsService(page, limit);
-    logger.info("items fetched successfully");
 
     res.status(200).json({
         success: true,
@@ -31,13 +28,7 @@ export const exploreItems = catchAsync(async (req: Request, res: Response) => {
 });
 
 export const exploreItem = catchAsync(async (req: Request, res: Response) => {
-    const { id } = req.params;
-
-    logger.info(`fetching item ${id}`);
-
-    const item = await getItemByIdService(id as string);
-
-    logger.info("item fetched successfully");
+    const item = await getItemByIdService(req.params.id as string);
 
     res.status(200).json({
         status: "success",
@@ -54,11 +45,7 @@ export const searchItems = catchAsync(async (req: Request, res: Response) => {
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 12;
 
-    logger.info(`[Search] q=${q} category=${category} city=${city} price=${minPrice}-${maxPrice} page=${page}`);
-
     const result = await searchItemsService({ q, category, city, minPrice, maxPrice, page, limit });
-
-    logger.info(`[Search] Found ${result.total} items`);
 
     res.status(200).json({
         status: "success",
