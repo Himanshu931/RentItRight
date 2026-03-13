@@ -6,6 +6,11 @@ export const createBookingSchema = z.object({
     startDate: z.string().min(1, "Start date is required").refine((date) => new Date(date) > new Date(), {
         message: "Start date must be greater than current date",
     }),
+    address: z.object({
+        district: z.string().min(1, "District is required"),
+        state: z.string().min(1, "State is required"),
+        pincode: z.string().min(1, "Pincode is required"),
+    }),
     endDate: z.string().min(1, "End date is required").refine((date) => new Date(date) > new Date(), {
         message: "End date must be greater than start date",
     }),

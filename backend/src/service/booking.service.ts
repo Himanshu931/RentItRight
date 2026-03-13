@@ -25,6 +25,11 @@ interface ICreateBooking {
     ownerId: string;
     startDate: string;
     endDate: string;
+    address: {
+        district: string;
+        state: string;
+        pincode: string;
+    };
     pricing: {
         baseRate: number;
         discountApplied?: number;
@@ -60,6 +65,11 @@ export const getBookingService = async (userId: string, userRole: string) => {
             date: {
                 startDate: booking.start_date,
                 endDate: booking.end_date,
+            },
+            address: {
+                district: booking.address?.district,
+                state: booking.address?.state,
+                pincode: booking.address?.pincode,
             },
             totalAmount: booking.pricing?.totalAmount ?? 0,
             status: booking.booking_status,
@@ -113,6 +123,7 @@ export const createBookingService = async (
         item_id: booking.itemId,
         start_date: startDate,
         end_date: endDate,
+        address: booking.address,
         pricing: {
             totalAmount: booking.pricing.totalAmount,
             discountApplied: booking.pricing.discountApplied,
@@ -179,6 +190,12 @@ export const getBookingIdService = async (
             securityDeposit: booking.pricing.securityDeposit,
             tax: booking.pricing.tax,
             duration,
+        },
+
+        address: {
+            district: booking.address?.district,
+            state: booking.address?.state,
+            pincode: booking.address?.pincode,
         },
 
         startDate: booking.start_date,
