@@ -10,7 +10,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
         weeklyPrice: "",
         monthlyPrice: "",
         securityDeposit: "",
-        images_url: []
+        images: []
     });
     const [isUploading, setIsUploading] = useState(false);
 
@@ -73,9 +73,8 @@ export default function AddItemModal({ onClose, onSubmit }) {
                 credentials: "include"
             });
             const { csrfToken } = await csrfRes.json();
-
             // 2. Submit Data
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/additem`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -87,7 +86,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
 
             const result = await response.json();
             if (!response.ok) throw new Error(result.message || "Failed to add item");
-            
+
             return result;
         } catch (error) {
             console.error("Backend error:", error);
@@ -151,9 +150,17 @@ export default function AddItemModal({ onClose, onSubmit }) {
         setIsUploading(true);
         try {
             const imageUrls = await uploadImagesToCloudinary(formData.images);
-            const finalData = { 
-                ...formData, 
-                images: imageUrls.filter(url => url !== null) 
+            const finalData = {
+                title: formData.itemName,
+                description: formData.description,
+                category: formData.category,
+                price: {
+                    daily: Number(formData.dailyPrice),
+                    weekly: Number(formData.weeklyPrice) || 0,
+                    monthly: Number(formData.monthlyPrice) || 0
+                },
+                securityDeposit: Number(formData.securityDeposit),
+                images: imageUrls.filter(url => url !== null)
             };
 
             // Call backend function
@@ -161,7 +168,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
             await addItemToBackend(finalData);
 
             alert("Item added successfully! 🚀");
-            onSubmit(finalData);
+            // onSubmit(finalData);
             onClose();
         } catch (error) {
             console.error("Submission error:", error);
@@ -172,7 +179,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
     };
 
 
-    
+
 
     return (
         <div
@@ -309,7 +316,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                         <button
                                             type="button"
                                             onClick={(e) => {
-                                                e.stopPropagation();  
+                                                e.stopPropagation();
                                                 handleRemoveImage(index);
                                             }}
                                             className="absolute top-1 right-1 bg-black/70 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-all"

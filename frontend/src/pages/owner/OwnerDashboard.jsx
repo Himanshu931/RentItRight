@@ -10,7 +10,6 @@ const OwnerDashboard = () => {
 
   const [totalListings, setTotalListings] = useState(0);
   const [activeRentals, setActiveRentals] = useState(0);
-  const [upcomingReturns, setUpcomingReturns] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
 
 
@@ -38,8 +37,8 @@ const OwnerDashboard = () => {
       console.log("data", data.data)
 
       setActiveRentals(data.data.activeRentals);
-      setUpcomingRentals(data.data.upcomingRentals);
-      setWishlist(data.data.wishlist);
+      setTotalListings(data.data.totalListings);
+      setTotalEarnings(data.data.totalEarnings);
 
     }
     catch (error) {
@@ -70,12 +69,6 @@ const OwnerDashboard = () => {
     },
     {
       id: 3,
-      title: "Upcoming Returns",
-      value: upcomingReturns,
-      icon: ""
-    },
-    {
-      id: 4,
       title: "Total Earnings",
       value: totalEarnings,
       icon: ""
@@ -140,7 +133,7 @@ const OwnerDashboard = () => {
         <WelcomeSection user={user} />
 
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {stats.map((stat) => (
             <StatsCard key={stat.id} {...stat} />
           ))}
