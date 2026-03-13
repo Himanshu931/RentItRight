@@ -23,7 +23,8 @@ export const exploreItems = catchAsync(async (req: Request, res: Response) => {
     logger.info("items fetched successfully");
 
     res.status(200).json({
-        status: "success",
+        success: true,
+        message: "Items fetched successfully",
         data: items,
         total,
     });
