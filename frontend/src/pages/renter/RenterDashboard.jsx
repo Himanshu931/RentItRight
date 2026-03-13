@@ -6,8 +6,10 @@ import BookingCard from "../../components/renter_ui/renter_dashboard/BookingCard
 import QuickActions from "../../components/renter_ui/renter_dashboard/QuickActions";
 // import BecomeLenderCard from "../../components/renter_ui/renter_dashboard/BecomeLenderCard";
 import { Link } from "react-router-dom";
+import homeRedirect from "../../hooks/homeRedirect";
 
 export default function RenterDashboard() {
+  homeRedirect();
 
   const [activeRentals, setActiveRentals] = useState(0);
   const [upcomingRentals, setUpcomingRentals] = useState(0);
@@ -15,6 +17,7 @@ export default function RenterDashboard() {
 
 
   // Fetching Stats from Backend
+  
   const fetchStats = async () => {
     try {
 
