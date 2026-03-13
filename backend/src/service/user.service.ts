@@ -122,11 +122,14 @@ export const deleteProfileService = async (userId: string) => {
 }
 
 export const dashboardDataService = async (userId: string) => {
+
     const user = await User.findById(userId).lean();
 
     if (!user) {
         throw new AppError("User not found", 404);
     }
+
+    console.log("user role", user.roles)
 
     if (user.roles === "owner") {
         const activeOwnerRentals = await Item.countDocuments({

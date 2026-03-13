@@ -17,27 +17,36 @@ const OwnerDashboard = () => {
   // Fetching Stats from Backend
   const fetchStats = async () => {
     try {
+
+      const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+        method: "GET",
+        credentials: "include"
+      })
+
+      const csrfData = await csrf.json();
+
       const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/dashboard`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`
+          "X-CSRF-Token": csrfData.csrfToken
         },
         credentials: "include"
       })
+
       const data = await response.json();
-      
-        setActiveRentals(data.activeRentals);
-        setTotalListings(data.totalListings);
-        setUpcomingReturns(data.upcomingReturns);
-        setTotalEarnings(data.totalEarnings);
-      
-      console.log(data);
+      console.log("data", data.data)
+
+      setActiveRentals(data.data.activeRentals);
+      setUpcomingRentals(data.data.upcomingRentals);
+      setWishlist(data.data.wishlist);
+
     }
     catch (error) {
       console.log(error);
     }
   }
+
 
   useEffect(() => {
     fetchStats();
