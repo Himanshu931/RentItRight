@@ -1,6 +1,41 @@
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 
 const RenterNavbar = ({ user }) => {
+    const navigate = useNavigate();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    const handleSignOut = async () => {
+        try {
+            // Call backend logout
+            await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
+                method: "POST",
+                credentials: "include",
+            });
+        } catch (error) {
+            console.error("Logout failed:", error);
+        } finally {
+            // Clear all tokens/storage
+            localStorage.clear();
+            sessionStorage.clear();
+            // Redirect to home
+            navigate("/");
+            setIsDropdownOpen(false);
+        }
+    };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
 
     const navItemClass = ({ isActive }) =>
         [
@@ -41,15 +76,12 @@ const RenterNavbar = ({ user }) => {
                 </div>
 
                 {/* Right: User Section */}
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-6 relative" ref={dropdownRef}>
 
                     {/* Profile Button */}
                     <button
-                        className="flex items-center gap-3 text-left"
-                        onClick={() => {
-                            // later: open profile dropdown
-                            console.log("Profile clicked");
-                        }}
+                        className="flex items-center gap-3 text-left hover:bg-white/5 p-2 rounded-2xl transition-all"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     >
                         <div className="flex flex-col">
                             <span className="text-md text-text-primary font-medium">
@@ -69,6 +101,19 @@ const RenterNavbar = ({ user }) => {
                             )}
                         </div>
                     </button>
+
+                    {/* Dropdown Menu */}
+                    {isDropdownOpen && (
+                        <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-divider rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
+                            <button
+                                onClick={handleSignOut}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error/10 transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-lg">logout</span>
+                                <span className="font-medium">Sign Out</span>
+                            </button>
+                        </div>
+                    )}
 
                 </div>
 
