@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getItemsByUser, pauseItem, deleteItem, updateItem } from "../controllers/items.controller";
+import { getItemsByUser, pauseItem, deleteItem, updateItem, addItem } from "../controllers/items.controller";
 import { VerifyUser } from "../middleware/verifyUser";
 const router = Router();
 
@@ -8,7 +8,7 @@ const router = Router();
 router.get("/", VerifyUser, getItemsByUser)
 
 //add single element
-// router.post("/", VerifyUser, addItem)
+router.post("/", VerifyUser, addItem)
 
 router.patch("/:id", VerifyUser, updateItem)
 

@@ -9,7 +9,8 @@ export const itemValidationSchema = z.object({
         weekly: z.number().min(1, "Weekly price is required"),
         monthly: z.number().min(1, "Monthly price is required"),
     }),
-    images: z.array(z.string()).min(1, "Images are required"),
+    securityDeposit: z.number().min(1, "Security deposit is required"),
+    images: z.array(z.string()).min(1, "Images are required").optional(),
 })
 
 export const updateItemSchema = z.object({
@@ -21,5 +22,6 @@ export const updateItemSchema = z.object({
         weekly: z.number().min(1).optional(),
         monthly: z.number().min(1).optional(),
     }).optional(),
+    securityDeposit: z.number().min(1).optional(),
     images: z.array(z.string()).min(1).optional(),
 })

@@ -1,4 +1,5 @@
 import { Item } from "../models/item.model";
+import { User } from "../models/user.model";
 import mongoose from "mongoose";
 import { AppError } from "../utils/AppError";
 import { updateItemSchema, itemValidationSchema } from "../validatior/item.schema";
@@ -67,7 +68,15 @@ export const getItemService = async (
 
 export const addItemService = async (userId: string, data: z.infer<typeof itemValidationSchema>, role: ROLE) => {
 
-    ensureOwner(role);
+    const user = await User.findById(userId).select("roles").lean();
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    const userRole = user.roles;
+
+    ensureOwner(userRole);
 
     const item = await Item.create({
         ownerId: userId,

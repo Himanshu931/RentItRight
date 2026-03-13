@@ -60,7 +60,7 @@ export const addItem = catchAsync(async (req: Request, res: Response) => {
 
     res.status(200).json({
         success: true,
-        message: "Item added successfully"
+        message: "Item added successfully",
     })
 
 })

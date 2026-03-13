@@ -133,12 +133,16 @@ export const dashboardDataService = async (userId: string) => {
 
     if (user.roles === "owner") {
         const activeOwnerRentals = await Item.countDocuments({
-            owner: userId,
+            ownerId: userId,
             status: "active",
         });
 
+        const totalListings = await Item.countDocuments({
+            ownerId: userId,
+        });
+
         return {
-            totalListings: user.owner?.totalListings ?? 0,
+            totalListings: totalListings,
             activeRentals: activeOwnerRentals,
             totalEarnings: user.owner?.totalEarnings ?? 0,
         };
