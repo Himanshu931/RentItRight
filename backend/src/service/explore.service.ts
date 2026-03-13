@@ -1,12 +1,9 @@
 import mongoose, { Types } from "mongoose";
-import { Item} from "../models/item.model";
+import { Item } from "../models/item.model";
 import { AppError } from "../utils/AppError";
 import { esClient, ITEMS_INDEX } from "../config/elasticSearch";
+import logger from "../config/logger";
 import type { QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
 
 export interface SearchParams {
     q?: string;
@@ -18,16 +15,19 @@ export interface SearchParams {
     limit?: number;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Mongoose services (listing / detail)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────
+// Get all items
+// ─────────────────────────────────────────────────────
 
 export const getAllItemsService = async (page = 1, limit = 10) => {
+
+    logger.info("Fetching items list", { page, limit });
+
     const query: mongoose.FilterQuery<Item> = { isActive: true };
     const skip = (page - 1) * limit;
 
-    // total items before limiting
     const totalItems = await Item.countDocuments(query);
+
     const items = await Item.find(query)
         .sort({ _id: -1 })
         .skip(skip)
@@ -35,6 +35,8 @@ export const getAllItemsService = async (page = 1, limit = 10) => {
         .lean();
 
     if (!items.length) {
+        logger.warn("No items found", { page, limit });
+
         return {
             total: totalItems,
             items: [],
@@ -51,27 +53,42 @@ export const getAllItemsService = async (page = 1, limit = 10) => {
         rating: i.rating?.average ?? 0,
     }));
 
+    logger.info("Items fetched successfully", {
+        totalItems,
+        returned: formattedItems.length,
+        page
+    });
+
     return {
         total: totalItems,
         items: formattedItems,
     };
 };
 
+// ─────────────────────────────────────────────────────
+// Get item by id
+// ─────────────────────────────────────────────────────
+
 export const getItemByIdService = async (id: string) => {
+
+    logger.info("Fetching item details", { itemId: id });
+
     const item = await Item.findById(id)
         .populate<{ ownerId: { _id: Types.ObjectId; name: string; profileImage?: string } }>("ownerId")
         .lean();
 
     if (!item) {
+        logger.warn("Item not found", { itemId: id });
         throw new AppError("No Item found", 404);
     }
+
+    logger.info("Item details fetched", { itemId: id });
 
     return {
         id: item._id.toString(),
         title: item.title,
         description: item.description,
         images: item.images ?? [],
-        location: item.location,
         category: item.category,
         rating: item.rating.average,
         price: item.price?.daily ?? 0,
@@ -86,27 +103,45 @@ export const getItemByIdService = async (id: string) => {
     };
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ElasticSearch — index a single item (call after create / update)
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────
+// Index item to ElasticSearch
+// ─────────────────────────────────────────────────────
 
 export const indexItemToES = async (item: Item & { _id: Types.ObjectId }) => {
-    await esClient.index({
-        index: ITEMS_INDEX,
-        id: item._id.toString(),
-        document: {
-            title: item.title,
-            category: item.category,
-            subCategory: item.subCategory ?? null,
-            dailyPrice: item.price?.daily ?? 0,
-            rating: item.rating?.average ?? 0,
-        },
-    });
+
+    const itemId = item._id.toString();
+
+    logger.info("Indexing item to ElasticSearch", { itemId });
+
+    try {
+        await esClient.index({
+            index: ITEMS_INDEX,
+            id: itemId,
+            document: {
+                title: item.title,
+                category: item.category,
+                subCategory: item.subCategory ?? null,
+                dailyPrice: item.price?.daily ?? 0,
+                rating: item.rating?.average ?? 0,
+            },
+        });
+
+        logger.info("Item indexed successfully", { itemId });
+
+    } catch (error) {
+
+        logger.error("ElasticSearch indexing failed", {
+            itemId,
+            error
+        });
+
+        throw error;
+    }
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ElasticSearch — full-text search with filters + pagination
-// ─────────────────────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────
+// ElasticSearch Search
+// ─────────────────────────────────────────────────────
 
 export const searchItemsService = async ({
     q,
@@ -117,9 +152,19 @@ export const searchItemsService = async ({
     page = 1,
     limit = 12,
 }: SearchParams) => {
+
+    logger.info("Searching items", {
+        query: q,
+        category,
+        city,
+        minPrice,
+        maxPrice,
+        page,
+        limit
+    });
+
     const from = (page - 1) * limit;
 
-    // Build filter clauses
     const filters: object[] = [{ term: { isActive: true } }];
 
     if (category) {
@@ -128,12 +173,13 @@ export const searchItemsService = async ({
 
     if (minPrice !== undefined || maxPrice !== undefined) {
         const range: Record<string, number> = {};
+
         if (minPrice !== undefined) range.gte = minPrice;
         if (maxPrice !== undefined) range.lte = maxPrice;
+
         filters.push({ range: { dailyPrice: range } });
     }
 
-    // Build the query
     const esQuery: QueryDslQueryContainer = q
         ? {
             bool: {
@@ -157,42 +203,63 @@ export const searchItemsService = async ({
             },
         };
 
-    const result = await esClient.search({
-        index: ITEMS_INDEX,
-        from,
-        size: limit,
-        query: esQuery,
-        sort: q
-            ? [{ _score: { order: "desc" } }]            // relevance when searching
-            : [{ "rating": { order: "desc" } }],         // rating when browsing
-    });
+    try {
 
-    const hits = result.hits.hits;
-    const total = typeof result.hits.total === "number"
-        ? result.hits.total
-        : (result.hits.total?.value ?? 0);
+        const result = await esClient.search({
+            index: ITEMS_INDEX,
+            from,
+            size: limit,
+            query: esQuery,
+            sort: q
+                ? [{ _score: { order: "desc" } }]
+                : [{ rating: { order: "desc" } }],
+        });
 
-    const items = hits.map((hit) => {
-        const src = hit._source as any;
+        const hits = result.hits.hits;
+
+        const total = typeof result.hits.total === "number"
+            ? result.hits.total
+            : (result.hits.total?.value ?? 0);
+
+        const items = hits.map((hit) => {
+            const src = hit._source as any;
+
+            return {
+                id: hit._id,
+                title: src.title,
+                image: src.image ?? null,
+                dailyPrice: src.dailyPrice,
+                category: src.category,
+                discount: src.discountDaily ?? null,
+                rating: src.rating,
+                location: src.location,
+                score: hit._score ?? null,
+            };
+        });
+
+        logger.info("Search completed", {
+            totalResults: total,
+            returned: items.length,
+            page
+        });
+
         return {
-            id: hit._id,
-            title: src.title,
-            image: src.image ?? null,
-            dailyPrice: src.dailyPrice,
-            category: src.category,
-            discount: src.discountDaily ?? null,
-            rating: src.rating,
-            location: src.location,
-            score: hit._score ?? null,
+            items,
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+            hasNextPage: from + hits.length < total,
         };
-    });
 
-    return {
-        items,
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit),
-        hasNextPage: from + hits.length < total,
-    };
+    } catch (error) {
+
+        logger.error("ElasticSearch query failed", {
+            query: q,
+            category,
+            error
+        });
+
+        throw new AppError("Search service failed", 500);
+    }
 };

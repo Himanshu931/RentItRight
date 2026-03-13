@@ -9,6 +9,7 @@ import { ROLE } from "../validatior/auth.schema";
 
 function ensureOwner(role: ROLE) {
     if (role !== ROLE.OWNER) {
+        logger.warn("Unauthorized access attempt", { role });
         throw new AppError("Unauthorized", 403);
     }
 }
@@ -20,6 +21,8 @@ export const getItemService = async (
     q?: string,
     role?: ROLE
 ) => {
+
+    logger.info("Fetching items", { userId: id, status, page, q });
 
     ensureOwner(role!);
 
@@ -45,6 +48,12 @@ export const getItemService = async (
         Item.countDocuments(query)
     ]);
 
+    logger.info("Items fetched successfully", {
+        userId: id,
+        totalItems: total,
+        page
+    });
+
     const formattedItems = items.map((item) => ({
         id: item._id.toString(),
         title: item.title,
@@ -66,70 +75,113 @@ export const getItemService = async (
     };
 };
 
-export const addItemService = async (userId: string, data: z.infer<typeof itemValidationSchema>, role: ROLE) => {
+export const addItemService = async (
+    userId: string,
+    data: z.infer<typeof itemValidationSchema>
+) => {
+
+    logger.info("Creating new item", { userId });
 
     const user = await User.findById(userId).select("roles").lean();
 
     if (!user) {
+        logger.error("User not found while creating item", { userId });
         throw new AppError("User not found", 404);
     }
 
-    const userRole = user.roles;
-
-    ensureOwner(userRole);
+    ensureOwner(user.roles as ROLE);
 
     const item = await Item.create({
         ownerId: userId,
         ...data,
-    })
+    });
+
+    logger.info("Item created successfully", {
+        userId,
+        itemId: item._id
+    });
+
+    return item;
+};
+
+export const updateItemService = async (
+    itemId: string,
+    userId: string,
+    data: z.infer<typeof updateItemSchema>,
+    role: ROLE
+) => {
+
+    logger.info("Updating item", { itemId, userId });
+
+    ensureOwner(role);
+
+    const item = await Item.findOneAndUpdate(
+        { _id: itemId, ownerId: userId, status: { $ne: "rented" } },
+        { $set: data },
+        { new: true, runValidators: true }
+    );
 
     if (!item) {
-        logger.error("Unable to create item for user", userId)
-    }
-}
-
-export const updateItemService = async (itemId: string, userId: string, data: z.infer<typeof updateItemSchema>, role: ROLE) => {
-
-    ensureOwner(role!)
-
-    const item = await Item.findOneAndUpdate({ _id: itemId, ownerId: userId, status: { $ne: "rented" } }, { $set: data }, { new: true, runValidators: true })
-
-    if (!item) {
+        logger.warn("Item update failed - item not found", { itemId, userId });
         throw new AppError("Item not found", 404);
     }
-}
 
-export const pauseItemService = async (itemId: string, userId: string, role: ROLE) => {
+    logger.info("Item updated successfully", { itemId });
 
-    ensureOwner(role!)
+    return item;
+};
+
+export const pauseItemService = async (
+    itemId: string,
+    userId: string,
+    role: ROLE
+) => {
+
+    logger.info("Pausing item", { itemId, userId });
+
+    ensureOwner(role);
 
     const item = await Item.findOne({ _id: itemId, ownerId: userId });
 
     if (!item) {
+        logger.warn("Pause failed - item not found", { itemId });
         throw new AppError("Item not found", 404);
     }
 
     if (item.status === "rented") {
-        throw new AppError("Item already rented", 400)
+        logger.warn("Pause failed - item already rented", { itemId });
+        throw new AppError("Item already rented", 400);
     }
 
     item.status = "paused";
     await item.save();
-}
 
-export const deleteItemService = async (itemId: string, userId: string, role: ROLE) => {
+    logger.info("Item paused successfully", { itemId });
+};
 
-    ensureOwner(role!)
+export const deleteItemService = async (
+    itemId: string,
+    userId: string,
+    role: ROLE
+) => {
+
+    logger.info("Deleting item", { itemId, userId });
+
+    ensureOwner(role);
 
     const item = await Item.findOne({ _id: itemId, ownerId: userId });
 
     if (!item) {
+        logger.warn("Delete failed - item not found", { itemId });
         throw new AppError("Item not found", 404);
     }
 
     if (item.status === "rented") {
-        throw new AppError("Item can't be deleted as it is currently rented", 400)
+        logger.warn("Delete failed - item currently rented", { itemId });
+        throw new AppError("Item can't be deleted as it is currently rented", 400);
     }
 
     await Item.deleteOne({ _id: itemId, ownerId: userId });
-}
+
+    logger.info("Item deleted successfully", { itemId });
+};

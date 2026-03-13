@@ -1,56 +1,45 @@
-
-import { User } from "../models/user.model"
-import { Item } from "../models/item.model"
+import { User } from "../models/user.model";
+import { Item } from "../models/item.model";
 import { Booking } from "../models/booking.model";
+import { z } from "zod";
+import { profileSchema, updateProfileSchema, updateAddressSchema } from "../validatior/user.schema";
 import { AppError } from "../utils/AppError";
+import logger from "../config/logger";
 
-interface userData {
-    name: string;
-    phone: string;
-    address: {
-        pincode: string;
-        district: string;
-        state: string;
-    };
-    roles: "renter" | "owner" | "admin";
-    profileImage?: string;
-}
+export const userProfileService = async (
+    userId: string,
+    userData: z.infer<typeof profileSchema>
+) => {
 
-interface updateUserData {
-    name?: string;
-    phone?: string;
-    address?: {
-        pincode?: string;
-        district?: string;
-        state?: string;
-    };
-}
-
-interface addressData {
-    pincode?: string;
-    district?: string;
-    state?: string;
-}
-
-export const userProfileService = async (userId: string, userData: userData) => {
+    logger.info("Creating user profile", { userId });
 
     const isMobileExists = await User.findOne({ phone: userData.phone });
+
     if (isMobileExists) {
+        logger.warn("Mobile already exists", { phone: userData.phone });
         throw new AppError("Mobile number already exists", 400);
     }
 
     const user = await User.findByIdAndUpdate(userId, userData, { new: true });
+
     if (!user) {
+        logger.error("User not found while creating profile", { userId });
         throw new AppError("User not found", 404);
     }
 
-    return { success: true, user }
-}
+    logger.info("User profile created successfully", { userId });
+
+    return { success: true, user };
+};
 
 export const getUserProfileService = async (userId: string) => {
 
+    logger.info("Fetching user profile", { userId });
+
     const user = await User.findById(userId).select("-password");
+
     if (!user) {
+        logger.warn("User profile not found", { userId });
         throw new AppError("User not found", 404);
     }
 
@@ -65,73 +54,127 @@ export const getUserProfileService = async (userId: string) => {
             state: user.address?.state!,
         },
         profileImage: user.profileImage!,
-    }
+    };
 
-    if (user.roles?.includes("renter")) {
+    if (user.roles === "renter") {
         profile.renter = user.renter;
     }
 
-    if (user.roles?.includes("owner")) {
+    if (user.roles === "owner") {
         profile.owner = user.owner;
     }
 
+    logger.info("User profile fetched successfully", { userId });
+
     return profile;
-}
+};
 
-export const updateProfileService = async (userId: string, userData: updateUserData) => {
+export const updateProfileService = async (
+    userId: string,
+    userData: z.infer<typeof updateProfileSchema>
+) => {
 
-    const allowedFields = ["name", "phone", "address"]
+    logger.info("Updating user profile", { userId });
+
+    const allowedFields = ["name", "phone", "address"];
+
     const filteredData = Object.fromEntries(
         Object.entries(userData).filter(([key]) => allowedFields.includes(key))
     );
 
-    const user = await User.findByIdAndUpdate(userId, { $set: filteredData }, { new: true, runValidators: true })
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { $set: filteredData },
+        { new: true, runValidators: true }
+    );
+
     if (!user) {
+        logger.warn("Update profile failed - user not found", { userId });
         throw new AppError("User not found", 404);
     }
 
-    return { success: true }
-}
+    logger.info("User profile updated successfully", { userId });
 
-export const updateProfileImageService = async (userId: string, profileImage: string) => {
+    return { success: true };
+};
 
-    const user = await User.findByIdAndUpdate(userId, { $set: { profileImage } }, { new: true, runValidators: true })
+export const updateProfileImageService = async (
+    userId: string,
+    profileImage: string
+) => {
+
+    logger.info("Updating profile image", { userId });
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { $set: { profileImage } },
+        { new: true, runValidators: true }
+    );
+
     if (!user) {
+        logger.warn("Profile image update failed - user not found", { userId });
         throw new AppError("User not found", 404);
     }
 
-    return { success: true }
-}
+    logger.info("Profile image updated successfully", { userId });
 
-export const updateAddressService = async (userId: string, address: addressData) => {
-    const user = await User.findByIdAndUpdate(userId, { $set: { address } }, { new: true, runValidators: true })
+    return { success: true };
+};
+
+export const updateAddressService = async (
+    userId: string,
+    address: z.infer<typeof updateAddressSchema>
+) => {
+
+    logger.info("Updating address", { userId });
+
+    const user = await User.findByIdAndUpdate(
+        userId,
+        { $set: { address } },
+        { new: true, runValidators: true }
+    );
+
     if (!user) {
+        logger.warn("Address update failed - user not found", { userId });
         throw new AppError("User not found", 404);
     }
 
-    return { success: true }
-}
+    logger.info("Address updated successfully", { userId });
+
+    return { success: true };
+};
 
 export const deleteProfileService = async (userId: string) => {
-    const user = await User.findByIdAndDelete(userId, { new: true })
+
+    logger.warn("Deleting user profile", { userId });
+
+    const user = await User.findByIdAndDelete(userId);
+
     if (!user) {
+        logger.error("Delete profile failed - user not found", { userId });
         throw new AppError("User not found", 404);
     }
 
-    return { success: true }
-}
+    logger.warn("User profile deleted", { userId });
+
+    return { success: true };
+};
 
 export const dashboardDataService = async (userId: string) => {
+
+    logger.info("Fetching dashboard data", { userId });
 
     const user = await User.findById(userId).lean();
 
     if (!user) {
+        logger.error("Dashboard fetch failed - user not found", { userId });
         throw new AppError("User not found", 404);
     }
 
-    console.log("user role", user.roles)
-
     if (user.roles === "owner") {
+
+        logger.info("Fetching owner dashboard stats", { userId });
+
         const activeOwnerRentals = await Item.countDocuments({
             ownerId: userId,
             status: "active",
@@ -141,14 +184,19 @@ export const dashboardDataService = async (userId: string) => {
             ownerId: userId,
         });
 
+        logger.info("Owner dashboard stats fetched", { userId });
+
         return {
-            totalListings: totalListings,
+            totalListings,
             activeRentals: activeOwnerRentals,
             totalEarnings: user.owner?.totalEarnings ?? 0,
         };
     }
 
     if (user.roles === "renter") {
+
+        logger.info("Fetching renter dashboard stats", { userId });
+
         const activeRenterRentals = await Booking.countDocuments({
             renter_id: userId,
             booking_status: "ongoing",
@@ -160,12 +208,16 @@ export const dashboardDataService = async (userId: string) => {
             start_date: { $gt: new Date() },
         });
 
+        logger.info("Renter dashboard stats fetched", { userId });
+
         return {
             activeRentals: activeRenterRentals,
             upcomingRentals,
             wishlist: user.renter?.wishlist?.length ?? 0,
         };
     }
+
+    logger.error("Invalid user role for dashboard", { userId, roles: user.roles });
 
     throw new AppError("Invalid user role", 400);
 };

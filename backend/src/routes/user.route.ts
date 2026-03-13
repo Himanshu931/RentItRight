@@ -10,6 +10,8 @@ const router = Router();
  *   post:
  *     summary: Create the User's Profile
  *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -48,6 +50,8 @@ router.post("/me/profile", VerifyUser, createProfile);
  *   get:
  *     summary: Get the User's Profile
  *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: Profile fetched successfully
@@ -61,6 +65,8 @@ router.get("/me/profile", VerifyUser, getProfile);
  *   patch:
  *     summary: Update the User's Profile
  *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -85,6 +91,8 @@ router.patch("/me/profile", VerifyUser, updateProfile);
  *   patch:
  *     summary: Update the User's Profile Image
  *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -107,6 +115,8 @@ router.patch("/me/avatar", VerifyUser, updateProfileImage);
  *   delete:
  *     summary: Delete the User's Profile
  *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: Profile deleted successfully
@@ -120,6 +130,8 @@ router.delete("/me/profile", VerifyUser, deleteProfile);
  *   patch:
  *     summary: Update the User's Address
  *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -147,7 +159,7 @@ router.patch("/me/address", VerifyUser, updateAddress);
  *     summary: Get the User's Dashboard
  *     tags: [User]
  *     security:
- *       - bearerAuth: []
+ *       - cookieAuth: []
  *     responses:
  *       200:
  *         description: Dashboard fetched successfully

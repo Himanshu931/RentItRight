@@ -1,54 +1,29 @@
-import { Booking } from "../models/booking.model"
+import { Booking } from "../models/booking.model";
 import { Item } from "../models/item.model";
 import { AppError } from "../utils/AppError";
 import { BookingStatus } from "../validatior/booking.validator";
 import mongoose from "mongoose";
-import { emailQueue } from "../queues/email.queue";
-import { bookingStatusQueue } from "../queues/email.queue";
-
-interface PopulatedItem {
-    _id: mongoose.Types.ObjectId;
-    title: string;
-    images: string[];
-    category: string;
-}
-
-interface PopulatedOwner {
-    _id: mongoose.Types.ObjectId;
-    name: string;
-    email: string;
-    phone?: string;
-}
-
-interface ICreateBooking {
-    itemId: string;
-    ownerId: string;
-    startDate: string;
-    endDate: string;
-    address: {
-        district: string;
-        state: string;
-        pincode: string;
-    };
-    pricing: {
-        baseRate: number;
-        discountApplied?: number;
-        securityDeposit: number;
-        tax?: number;
-        platformFee: number;
-        totalAmount: number;
-    }
-}
+import { emailQueue, bookingStatusQueue } from "../queues/email.queue";
+import logger from "../config/logger";
 
 export const getBookingService = async (userId: string, userRole: string) => {
 
-    const filter = userRole === "owner" ? { owner_id: userId } : { renter_id: userId };
+    logger.info("Fetching bookings", { userId, userRole });
+
+    const filter = userRole === "owner"
+        ? { owner_id: userId }
+        : { renter_id: userId };
 
     const bookings = await Booking.find(filter)
         .select("item_id start_date end_date pricing booking_status payment_status")
         .populate("item_id", "title images")
         .sort({ createdAt: -1 })
         .lean();
+
+    logger.info("Bookings fetched", {
+        userId,
+        totalBookings: bookings.length
+    });
 
     return bookings.map((booking) => {
         const item = booking.item_id as any;
@@ -66,11 +41,7 @@ export const getBookingService = async (userId: string, userRole: string) => {
                 startDate: booking.start_date,
                 endDate: booking.end_date,
             },
-            address: {
-                district: booking.address?.district,
-                state: booking.address?.state,
-                pincode: booking.address?.pincode,
-            },
+            address: booking.address,
             totalAmount: booking.pricing?.totalAmount ?? 0,
             status: booking.booking_status,
             paymentStatus: booking.payment_status,
@@ -78,23 +49,53 @@ export const getBookingService = async (userId: string, userRole: string) => {
     });
 };
 
-export const createBookingService = async (
-    userId: string,
-    booking: ICreateBooking
-) => {
+export const createBookingService = async (userId: string, booking: any) => {
+
+    logger.info("Creating booking request", {
+        userId,
+        itemId: booking.itemId
+    });
+
     const startDate = new Date(booking.startDate);
     const endDate = new Date(booking.endDate);
 
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        logger.warn("Invalid booking dates", { startDate, endDate });
         throw new AppError("Invalid booking dates", 400);
     }
 
     if (endDate <= startDate) {
+        logger.warn("End date before start date", { startDate, endDate });
         throw new AppError("End date must be after start date", 400);
     }
 
     if (startDate < new Date()) {
+        logger.warn("Booking start date in past", { startDate });
         throw new AppError("Booking cannot start in the past", 400);
+    }
+
+    const existingBooking = await Booking.findOne({
+        item_id: booking.itemId,
+        booking_status: { $ne: BookingStatus.CANCELLED },
+        start_date: { $lt: endDate },
+        end_date: { $gt: startDate },
+    });
+
+    if (existingBooking) {
+        logger.warn("Booking conflict detected", {
+            itemId: booking.itemId,
+            startDate,
+            endDate
+        });
+
+        throw new AppError("Item already booked for selected dates", 409);
+    }
+
+    const item = await Item.findById(booking.itemId);
+
+    if (!item) {
+        logger.error("Item not found during booking", { itemId: booking.itemId });
+        throw new AppError("Item not found", 404);
     }
 
     const totalDays = Math.ceil(
@@ -102,169 +103,96 @@ export const createBookingService = async (
         (1000 * 60 * 60 * 24)
     );
 
-    // availability check
-    const existingBooking = await Booking.findOne({
-        item_id: booking.itemId,
-        status: { $ne: "cancelled" },
-        start_date: { $lt: endDate },
-        end_date: { $gt: startDate },
-    });
-
-    if (existingBooking) {
-        throw new AppError("Item already booked for selected dates", 409);
-    }
-
-    const item = await Item.findById(booking.itemId);
-    if (!item) throw new AppError("Item not found", 404);
-
-    await Booking.create({
+    const newBooking = await Booking.create({
         renter_id: userId,
         owner_id: item.ownerId,
         item_id: booking.itemId,
         start_date: startDate,
         end_date: endDate,
         address: booking.address,
-        pricing: {
-            totalAmount: booking.pricing.totalAmount,
-            discountApplied: booking.pricing.discountApplied,
-            securityDeposit: booking.pricing.securityDeposit,
-            tax: booking.pricing.tax,
-            platformFee: booking.pricing.platformFee,
-        },
+        pricing: booking.pricing,
         total_days: totalDays,
+    });
+
+    logger.info("Booking created successfully", {
+        bookingId: newBooking._id,
+        userId,
+        itemId: booking.itemId
     });
 
     return true;
 };
 
-export const getBookingIdService = async (
-    userId: string,
-    bookingId: string
-) => {
+export const getBookingIdService = async (userId: string, bookingId: string) => {
+
+    logger.info("Fetching booking details", { bookingId, userId });
+
     const booking = await Booking.findOne({
         _id: bookingId,
         $or: [{ renter_id: userId }, { owner_id: userId }],
     })
         .populate("item_id", "title images category")
         .populate("owner_id", "name email phone")
-        .lean() as any as (Omit<InstanceType<typeof Booking>, "item_id" | "owner_id"> & {
-            item_id: PopulatedItem | null;
-            owner_id: PopulatedOwner | null;
-        }) | null;
+        .lean();
 
     if (!booking) {
+        logger.warn("Booking not found", { bookingId, userId });
         throw new AppError("Booking not found", 404);
     }
 
-    const now = new Date();
+    logger.info("Booking details fetched", { bookingId });
 
-    const duration = Math.ceil(
-        (booking.end_date.getTime() - booking.start_date.getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
-
-    const daysRemaining =
-        booking.end_date > now
-            ? Math.ceil(
-                (booking.end_date.getTime() - now.getTime()) /
-                (1000 * 60 * 60 * 24)
-            )
-            : 0;
-
-    return {
-        id: booking._id.toString(),
-
-        item: booking.item_id
-            ? {
-                id: booking.item_id._id.toString(),
-                title: booking.item_id.title,
-                image: booking.item_id.images?.[0] || null,
-                category: booking.item_id.category,
-            }
-            : null,
-
-        pricing: {
-            baseRate: booking.pricing.baseRate,
-            totalAmount: booking.pricing.totalAmount,
-            discountApplied: booking.pricing.discountApplied,
-            securityDeposit: booking.pricing.securityDeposit,
-            tax: booking.pricing.tax,
-            duration,
-        },
-
-        address: {
-            district: booking.address?.district,
-            state: booking.address?.state,
-            pincode: booking.address?.pincode,
-        },
-
-        startDate: booking.start_date,
-        endDate: booking.end_date,
-        status: booking.booking_status,
-        paymentStatus: booking.payment_status,
-        daysRemaining,
-
-        ownerInfo: booking.owner_id
-            ? {
-                id: booking.owner_id._id.toString(),
-                name: booking.owner_id.name,
-                email: booking.owner_id.email,
-                phone: booking.owner_id.phone,
-            }
-            : null,
-    };
+    return booking;
 };
 
-export const acceptBookingService = async (
-    userId: string,
-    bookingId: string
-) => {
+export const acceptBookingService = async (userId: string, bookingId: string) => {
+
+    logger.info("Accepting booking", { bookingId, ownerId: userId });
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
 
-        const booking = await Booking.findOne(
-            {
-                _id: bookingId,
-                owner_id: userId,
-                booking_status: BookingStatus.PENDING,
-            }
-        ).session(session);
+        const booking = await Booking.findOne({
+            _id: bookingId,
+            owner_id: userId,
+            booking_status: BookingStatus.PENDING,
+        }).session(session);
 
         if (!booking) {
+            logger.warn("Booking already processed or not found", { bookingId });
             throw new AppError("Booking not found or already processed", 404);
         }
 
-        // Confirm selected booking
         booking.booking_status = BookingStatus.CONFIRMED;
         await booking.save({ session });
 
-        //sending email to queue to those who are accepted
+        logger.info("Booking confirmed", { bookingId });
+
         await emailQueue.add("sendBookingAcceptedEmail", {
             renter_id: booking.renter_id,
             bookingId: booking._id,
         });
 
-        //updating the status from completed to ONGOING to COMPLETED acc to start and End Date
+        logger.info("Accepted booking email queued", { bookingId });
+
         await bookingStatusQueue.add("update-status", {
             bookingId: booking._id,
         });
 
-        const rejectedBookings = await Booking.find(
-            {
-                _id: { $ne: booking._id },
-                item_id: booking.item_id,
-                booking_status: BookingStatus.PENDING,
-                start_date: { $lt: booking.end_date },
-                end_date: { $gt: booking.start_date },
-            }
-        ).session(session);
+        logger.info("Booking status scheduler queued", { bookingId });
 
-        // Reject all other overlapping pending bookings
+        const rejectedBookings = await Booking.find({
+            _id: { $ne: booking._id },
+            item_id: booking.item_id,
+            booking_status: BookingStatus.PENDING,
+            start_date: { $lt: booking.end_date },
+            end_date: { $gt: booking.start_date },
+        }).session(session);
+
         await Booking.updateMany(
-            { _id: { $in: rejectedBookings.map(booking => booking._id) } },
+            { _id: { $in: rejectedBookings.map(b => b._id) } },
             {
                 $set: {
                     booking_status: BookingStatus.REJECTED,
@@ -278,19 +206,35 @@ export const acceptBookingService = async (
         await session.commitTransaction();
         session.endSession();
 
-        // sending email to queue for background process 
-        for (const renter_id of rejectedBookings.map(booking => booking.renter_id)) {
+        logger.info("Conflicting bookings rejected", {
+            bookingId,
+            rejectedCount: rejectedBookings.length
+        });
+
+        for (const renter_id of rejectedBookings.map(b => b.renter_id)) {
             await emailQueue.add("sendBookingRejectedEmail", {
                 renter_id,
                 bookingId,
             });
         }
 
+        logger.info("Rejected booking emails queued", {
+            bookingId,
+            rejectedCount: rejectedBookings.length
+        });
+
         return true;
 
     } catch (error) {
+
         await session.abortTransaction();
         session.endSession();
+
+        logger.error("Booking acceptance failed", {
+            bookingId,
+            error
+        });
+
         throw error;
     }
 };
@@ -302,9 +246,12 @@ export const cancelBookingService = async (
     cancelMessage: string
 ) => {
 
-    const booking = await Booking.findOne({ renter_id: userId });
+    logger.info("Cancelling booking", { bookingId, userId, userRole });
+
+    const booking = await Booking.findOne({ _id: bookingId });
 
     if (!booking) {
+        logger.warn("Booking not found for cancellation", { bookingId });
         throw new AppError("Booking not found", 404);
     }
 
@@ -313,14 +260,8 @@ export const cancelBookingService = async (
         booking.booking_status === BookingStatus.REJECTED ||
         booking.booking_status === BookingStatus.COMPLETED
     ) {
+        logger.warn("Booking already finalized", { bookingId });
         throw new AppError("Booking already finalized", 400);
-    }
-
-    if (
-        booking.booking_status === BookingStatus.CONFIRMED &&
-        Date.now() > booking.start_date.getTime()
-    ) {
-        throw new AppError("Booking cannot be cancelled after start date", 400);
     }
 
     booking.booking_status = BookingStatus.CANCELLED;
@@ -329,21 +270,35 @@ export const cancelBookingService = async (
 
     await booking.save();
 
+    logger.info("Booking cancelled", { bookingId });
+
     return {
         id: booking._id.toString(),
         status: booking.booking_status,
     };
 };
 
-export const rejectBookingService = async (userId: string, bookingId: string, userRole: "owner", rejectMessage: string) => {
+export const rejectBookingService = async (
+    userId: string,
+    bookingId: string,
+    userRole: "owner",
+    rejectMessage: string
+) => {
 
-    const booking = await Booking.findOne({ _id: bookingId, owner_id: userId });
+    logger.info("Rejecting booking", { bookingId, ownerId: userId });
+
+    const booking = await Booking.findOne({
+        _id: bookingId,
+        owner_id: userId
+    });
 
     if (!booking) {
+        logger.warn("Booking not found for rejection", { bookingId });
         throw new AppError("Booking not found", 404);
     }
 
     if (booking.booking_status !== BookingStatus.PENDING) {
+        logger.warn("Booking already processed", { bookingId });
         throw new AppError("Booking is already processed", 400);
     }
 
@@ -353,5 +308,5 @@ export const rejectBookingService = async (userId: string, bookingId: string, us
 
     await booking.save();
 
-    return
-}
+    logger.info("Booking rejected", { bookingId });
+};
