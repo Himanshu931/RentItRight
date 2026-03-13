@@ -2,14 +2,46 @@ import WelcomeSection from "../../components/owner_ui/dashboard/WelcomeSection";
 import StatsCard from "../../components/owner_ui/dashboard/StatsCard";
 import RentalsSection from "../../components/owner_ui/dashboard/RentalSection";
 import QuickActions from "../../components/owner_ui/dashboard/QuickActions";
+import { useState, useEffect } from "react";
 
 
 const OwnerDashboard = () => {
 
-  /* ===============================
-     DUMMY DATA (Replace with API later)
-  ================================ */
 
+  const [totalListings, setTotalListings] = useState(0);
+  const [activeRentals, setActiveRentals] = useState(0);
+  const [upcomingReturns, setUpcomingReturns] = useState(0);
+  const [totalEarnings, setTotalEarnings] = useState(0);
+
+
+  // Fetching Stats from Backend
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/dashboard`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        credentials: "include"
+      })
+      const data = await response.json();
+      
+        setActiveRentals(data.activeRentals);
+        setTotalListings(data.totalListings);
+        setUpcomingReturns(data.upcomingReturns);
+        setTotalEarnings(data.totalEarnings);
+      
+      console.log(data);
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
   const user = {
     name: "Himanshu",
   };
@@ -18,25 +50,25 @@ const OwnerDashboard = () => {
     {
       id: 1,
       title: "Total Listings",
-      value: 25,
+      value: totalListings,
       icon: ""
     },
     {
       id: 2,
       title: "Active Rentals",
-      value: 8,
+      value: activeRentals,
       icon: ""
     },
     {
       id: 3,
       title: "Upcoming Returns",
-      value: 3,
+      value: upcomingReturns,
       icon: ""
     },
     {
       id: 4,
       title: "Total Earnings",
-      value: 12500,
+      value: totalEarnings,
       icon: ""
     }
   ];

@@ -84,5 +84,5 @@ export const dashboard = catchAsync(async (req: Request, res: Response) => {
     const data = await dashboardDataService(req.userId!);
 
     logger.info("Dashboard data fetched successfully");
-    res.status(200).json({ success: true, data });
+    res.status(200).json({ success: true, ...data });
 })

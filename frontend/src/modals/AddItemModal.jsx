@@ -10,7 +10,7 @@ export default function AddItemModal({ onClose, onSubmit }) {
         weeklyPrice: "",
         monthlyPrice: "",
         securityDeposit: "",
-        images: []
+        images_url: []
     });
     const [isUploading, setIsUploading] = useState(false);
 
