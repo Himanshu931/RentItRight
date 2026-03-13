@@ -88,9 +88,9 @@ const UserSchema: Schema<IUser> = new Schema(
     },
 
     roles: {
-      type: [String],
+      type: String,
       enum: ["renter", "owner", "admin"],
-      default: ["renter"],
+      default: "renter",
     },
 
     address: {
