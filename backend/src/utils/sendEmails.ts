@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { AppError } from "./AppError";
+import { logger } from "@sentry/node";
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
@@ -38,6 +39,7 @@ export const sendOTP = async (email: string, otp: string) => {
 `,
         });
     } catch (error) {
+        logger.error("Unable to send OTP", { email, error });
         throw new AppError("Unable to send OTP", 500)
     }
 }

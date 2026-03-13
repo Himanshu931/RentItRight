@@ -95,8 +95,5 @@ export const logout = (req: Request, res: Response) => {
     httpOnly: true,
     sameSite: "strict",
   });
-
-  logger.info("User logged out");
-
   res.status(200).json({ success: true, message: "Logged out" });
 };
