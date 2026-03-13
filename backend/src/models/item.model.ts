@@ -1,6 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-
 export interface Item extends Document {
   ownerId: mongoose.Types.ObjectId;
   title: string;
@@ -28,19 +27,13 @@ export interface Item extends Document {
     count: number;
   };
 
-  location: {
-    city: string;
-    state: string;
-    country: string;
-    pincode: string;
-  };
-
   availability: {
     isAvailable: boolean;
     unavailableDates: Date[];
   };
 
   isActive: boolean;
+  status: "active" | "paused" | "rented";
   totalBookings: number;
 
   createdAt: Date;
@@ -104,13 +97,6 @@ const ItemSchema: Schema<Item> = new Schema(
       count: { type: Number, default: 0 },
     },
 
-    location: {
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      country: { type: String, required: true },
-      pincode: { type: String, required: true },
-    },
-
     availability: {
       isAvailable: { type: Boolean, default: true },
       unavailableDates: [{ type: Date }],
@@ -119,6 +105,12 @@ const ItemSchema: Schema<Item> = new Schema(
     isActive: {
       type: Boolean,
       default: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "paused", "rented"],
+      default: "active",
     },
 
     totalBookings: {
@@ -136,6 +128,7 @@ const ItemSchema: Schema<Item> = new Schema(
 // Fast filtering by city & category
 ItemSchema.index({ "location.city": 1 });
 ItemSchema.index({ category: 1 });
+ItemSchema.index({ title: "text" });
 
 // Fast owner dashboard lookup
 ItemSchema.index({ ownerId: 1 });
