@@ -1,5 +1,5 @@
 
-
+import { useState, useEffect } from "react";
 import DashboardHeader from "../../components/renter_ui/renter_dashboard/DashboardHeader";
 import StatsCard from "../../components/renter_ui/renter_dashboard/StatsCard";
 import BookingCard from "../../components/renter_ui/renter_dashboard/BookingCard";
@@ -8,32 +8,64 @@ import QuickActions from "../../components/renter_ui/renter_dashboard/QuickActio
 import { Link } from "react-router-dom";
 
 export default function RenterDashboard() {
-  /* 🔌 BACKEND READY DATA */
-  const user = {
-    name: "Himanshu",
-  };
 
-  const stats = [
+  const [activeRentals, setActiveRentals] = useState(0);
+  const [upcomingRentals, setUpcomingRentals] = useState(0);
+  const [wishlist, setWishlist] = useState(0);
+
+
+  // Fetching Stats from Backend
+  const fetchStats = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/dashboard`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        credentials: "include"
+      })
+      const data = await response.json();
+      
+        setActiveRentals(data.activeRentals);
+        setUpcomingRentals(data.upcomingRentals);
+        setWishlist(data.wishlist);
+      
+      console.log(data)
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const [stats, setStats] = useState([
     {
       id: 1,
       title: "Active Rentals",
-      value: 3,
-      badge: "+1 this week",
+      value: activeRentals,
       icon: "shopping_bag",
     },
     {
       id: 2,
       title: "Upcoming",
-      value: 2,
+      value: upcomingRentals,
       icon: "event_upcoming",
     },
     {
       id: 3,
       title: "Wishlist",
-      value: 12,
+      value: wishlist,
       icon: "bookmark",
     },
-  ];
+  ]);
+  /* 🔌 BACKEND READY DATA */
+  const user = {
+    name: "Himanshu",
+  };
 
   const bookings = [
     {

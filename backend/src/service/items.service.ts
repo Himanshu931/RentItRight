@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { AppError } from "../utils/AppError";
 import { updateItemSchema, itemValidationSchema } from "../validatior/item.schema";
 import z from "zod";
-import logger from "../utils/logger";
+import logger from "../config/logger";
 import { ROLE } from "../validatior/auth.schema";
 
 function ensureOwner(role: ROLE) {
