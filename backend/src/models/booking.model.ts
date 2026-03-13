@@ -9,6 +9,12 @@ export interface IBooking extends Document {
   end_date: Date;
   total_days: number;
 
+  address: {
+    district?: string;
+    state?: string;
+    pincode?: string;
+  }
+
   pricing: {
     appliedPricing: "daily" | "weekly" | "monthly";
     baseRate: number;
@@ -66,6 +72,12 @@ const BookingSchema: Schema<IBooking> = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+
+    address: {
+      district: { type: String, required: true },
+      state: { type: String, required: true },
+      pincode: { type: String, required: true },
     },
 
     start_date: {
