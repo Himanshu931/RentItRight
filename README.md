@@ -118,4 +118,3 @@ RentItRight/
 ## 📝 API Documentation
 Once the backend is running, you can access the interactive API documentation at:
 `http://localhost:3000/swagger`
-Assisted By Dhruvil Tejani
