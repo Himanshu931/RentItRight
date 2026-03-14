@@ -5,6 +5,7 @@ import QuickActions from "../../components/owner_ui/dashboard/QuickActions";
 import { useState, useEffect } from "react";
 
 import homeRedirect from "../../hooks/homeRedirect";
+import useAuth from "../../hooks/authHook";
 
 
 const OwnerDashboard = () => {
@@ -51,9 +52,9 @@ const OwnerDashboard = () => {
   useEffect(() => {
     fetchStats();
   }, []);
-  const user = {
-    name: "Himanshu",
-  };
+
+  // Fetching user names from useAuth()
+  const { user }= useAuth();
 
   const stats = [
     {

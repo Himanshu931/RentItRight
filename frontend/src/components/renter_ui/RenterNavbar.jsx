@@ -1,10 +1,16 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import useAuth from "../../hooks/authHook";
 
-const RenterNavbar = ({ user }) => {
+const RenterNavbar = () => {
     const navigate = useNavigate();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
+
+    // Fetching user names and profileImage from useAuth()
+    const { user } = useAuth();
+    const name = user?.name;
+    const avatarUrl = user?.profileImage;
 
     const handleSignOut = async () => {
         try {
@@ -85,14 +91,14 @@ const RenterNavbar = ({ user }) => {
                     >
                         <div className="flex flex-col">
                             <span className="text-md text-text-primary font-medium">
-                                {user?.name || "Guest"}
+                                {name}
                             </span>
                         </div>
 
                         <div className="w-10 h-10 rounded-full bg-card border border-divider overflow-hidden flex items-center justify-center">
-                            {user?.avatarUrl ? (
+                            {avatarUrl ? (
                                 <img
-                                    src={user.avatarUrl}
+                                    src={avatarUrl}
                                     alt="Profile"
                                     className="w-full h-full object-cover"
                                 />
