@@ -149,6 +149,7 @@ export const MeService = async (id: string | undefined) => {
     email: user.email,
     name: user.name!,
     role: user.roles!,
+    profileImage: user.profileImage!,
   };
 
   logger.info("User profile fetched successfully", { userId: id });

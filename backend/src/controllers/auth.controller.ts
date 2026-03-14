@@ -11,6 +11,7 @@ export interface userInterface {
   name: string;
   email: string;
   role: string;
+  profileImage: string;
 }
 
 export const register = catchAsync(async (req: Request, res: Response) => {
