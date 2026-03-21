@@ -15,10 +15,15 @@ const RenterNavbar = () => {
     const handleSignOut = async () => {
         try {
             // Call backend logout
-            await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/logout`, {
                 method: "POST",
                 credentials: "include",
             });
+            const data = await res.json();
+            if (!data.success) {
+                throw new Error("Unable to logout");
+            }
+            navigate("/");
         } catch (error) {
             console.error("Logout failed:", error);
         } finally {
@@ -26,7 +31,6 @@ const RenterNavbar = () => {
             localStorage.clear();
             sessionStorage.clear();
             // Redirect to home
-            navigate("/");
             setIsDropdownOpen(false);
         }
     };

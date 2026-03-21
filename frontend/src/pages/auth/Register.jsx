@@ -10,7 +10,10 @@ import {
 } from "lucide-react";
 
 const Register = ({ switchMode, email, setEmail }) => {
-
+  const [error, setError] = useState({
+    email: "",
+    password: "",
+  });
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -25,6 +28,10 @@ const Register = ({ switchMode, email, setEmail }) => {
       alert("Please accept the terms and conditions")
       return;
     }
+    if (user.password.length < 6) {
+      setError((prev) => ({ ...prev, password: "Password must be at least 6 characters" }));
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/register`, {
@@ -36,6 +43,11 @@ const Register = ({ switchMode, email, setEmail }) => {
       })
       const data = await res.json();
       if (!data.success) {
+        setError({
+          email: data.message.toLowerCase().includes("exists") || data.message.toLowerCase().includes("email") ? data.message : "",
+          password: data.message.toLowerCase().includes("password") ? data.message : ""
+        });
+        console.log(error)
         throw new Error(data.message);
       }
 
@@ -64,10 +76,10 @@ const Register = ({ switchMode, email, setEmail }) => {
 
   return (
     <AuthLayout>
-      <div className="p-8 md:p-10">
+      <div className="px-8 pb-3 pt-6 md:px-10 ">
 
         {/* Header */}
-        <div className="flex flex-col items-center mb-10 text-center">
+        <div className="flex flex-col items-center mb-8 text-center">
 
           <h1 className="text-2xl font-bold tracking-tight text-text-primary">
             Create Your Account
@@ -92,11 +104,17 @@ const Register = ({ switchMode, email, setEmail }) => {
                 type="email"
                 placeholder="name@example.com"
                 value={user.email}
-                onChange={(e) => setUser({ ...user, email: e.target.value })}
+                onChange={(e) => {
+                  setUser({ ...user, email: e.target.value })
+                  setError((prev) => ({ ...prev, email: "" }));
+                }}
                 className="form-input w-full pl-12 pr-4 py-3 bg-app border-1  border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
                 focus:border-bright"
               />
             </div>
+            {error.email && (
+              <p className="text-white font-bold text-sm mt-2 bg-error/15 p-2 rounded-lg text-center border border-error/80">{error.email}</p>
+            )}
           </div>
 
           {/* Password + Confirm */}
@@ -114,17 +132,29 @@ const Register = ({ switchMode, email, setEmail }) => {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   value={user.password}
-                  onChange={(e) => setUser({ ...user, password: e.target.value })}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setUser({ ...user, password: val });
+                    if (val.length > 0 && val.length < 6) {
+                      setError((prev) => ({ ...prev, password: "Password must be at least 6 characters" }));
+                    } else {
+                      setError((prev) => ({ ...prev, password: "" }));
+                    }
+                  }}
+                  required
                   className="form-input w-full pl-12 pr-4 py-3 bg-app border rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-text-secondary/30 text-lg "
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
                 </button>
               </div>
+              {error.password && (
+                <p className="text-white font-bold text-sm mt-2 bg-error/15 p-2 rounded-lg text-center border border-error/80">{error.password}</p>
+              )}
             </div>
           </div>
 
@@ -189,7 +219,7 @@ const Register = ({ switchMode, email, setEmail }) => {
         </button>
 
         {/* Footer */}
-        <div className="mt-8 pt-8 border-t border-border-muted text-center">
+        <div className="mt-8 px-8 py-5 border-t border-divider text-center">
           <p className="text-text-secondary text-sm">
             Already have an account?
             <button className="text-bright font-semibold hover:text-bright/80 transition-colors ml-1" onClick={() => switchMode("login")}>

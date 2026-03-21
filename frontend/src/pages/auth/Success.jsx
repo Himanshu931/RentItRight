@@ -51,7 +51,7 @@ const Success = () => {
             className="w-full flex items-center justify-center gap-2 
                        rounded-xl h-14 px-8 bg-bright 
                        text-card text-lg font-extrabold 
-                       hover:brightness-110 active:scale-[0.98] transition-all"
+                       hover:brightness-110 active:scale-[0.98] transition-all cursor-pointer"
           >
             Go to Dashboard
             <ArrowRight className="w-5 h-5" />
