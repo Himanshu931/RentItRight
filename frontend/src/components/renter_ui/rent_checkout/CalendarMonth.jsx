@@ -44,6 +44,17 @@ export default function CalendarMonth({
 
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const day = i + 1;
+          const currentDate = new Date(year, month, day);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          const isPast = currentDate < today;
+          
+          const isDisabled = isPast || disabledDates.some(d => {
+            const blockedDate = new Date(d);
+            return blockedDate.setHours(0,0,0,0) === currentDate.setHours(0,0,0,0);
+          });
+
           const selected = isSelected(day);
           const start = isStart(day);
           const end = isEnd(day);
@@ -52,9 +63,11 @@ export default function CalendarMonth({
           return (
             <button
               key={day}
-              onClick={() => onDateClick(new Date(year, month, day))}
+              onClick={isDisabled ? undefined : () => onDateClick(currentDate)}
+              disabled={isDisabled}
               className={`py-2 transition text-sm
-                ${selected ? "bg-bright text-white" : "hover:bg-white/10"}
+                ${isDisabled ? "opacity-30 cursor-not-allowed" : "hover:bg-white/10"}
+                ${selected && !isDisabled ? "bg-bright text-white" : ""}
                 ${inRange ? "bg-bright/30 text-white" : ""}
                 ${start ? "rounded-l-md" : ""}
                 ${end ? "rounded-r-md" : ""}
