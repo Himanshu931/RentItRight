@@ -23,7 +23,7 @@ export const getAllItemsService = async (page = 1, limit = 10) => {
 
     logger.info("Fetching items list", { page, limit });
 
-    const query: mongoose.FilterQuery<Item> = { isActive: true };
+    const query: mongoose.FilterQuery<Item> = { isActive: true, status: "active" };
     const skip = (page - 1) * limit;
 
     const totalItems = await Item.countDocuments(query);
@@ -73,7 +73,7 @@ export const getItemByIdService = async (id: string) => {
 
     logger.info("Fetching item details", { itemId: id });
 
-    const item = await Item.findById(id)
+    const item = await Item.findOne({ _id: id, isActive: true, status: "active" })
         .populate<{ ownerId: { _id: Types.ObjectId; name: string; profileImage?: string } }>("ownerId")
         .lean();
 
@@ -123,6 +123,8 @@ export const indexItemToES = async (item: Item & { _id: Types.ObjectId }) => {
                 subCategory: item.subCategory ?? null,
                 dailyPrice: item.price?.daily ?? 0,
                 rating: item.rating?.average ?? 0,
+                isActive: item.isActive,
+                status: item.status,
             },
         });
 
@@ -165,7 +167,10 @@ export const searchItemsService = async ({
 
     const from = (page - 1) * limit;
 
-    const filters: object[] = [{ term: { isActive: true } }];
+    const filters: object[] = [
+        { term: { isActive: true } },
+        { term: { status: "active" } },
+    ];
 
     if (category) {
         filters.push({ term: { category } });
