@@ -15,8 +15,10 @@ export const getBookingService = async (userId: string, userRole: string) => {
         : { renter_id: userId };
 
     const bookings = await Booking.find(filter)
-        .select("item_id start_date end_date pricing booking_status payment_status")
+        .select("item_id renter_id owner_id start_date end_date pricing booking_status payment_status createdAt")
         .populate("item_id", "title images")
+        .populate("renter_id", "name profileImage")
+        .populate("owner_id", "name profileImage")
         .sort({ createdAt: -1 })
         .lean();
 
@@ -27,6 +29,8 @@ export const getBookingService = async (userId: string, userRole: string) => {
 
     return bookings.map((booking) => {
         const item = booking.item_id as any;
+        const renter = booking.renter_id as any;
+        const owner = booking.owner_id as any;
 
         return {
             id: booking._id.toString(),
@@ -37,14 +41,23 @@ export const getBookingService = async (userId: string, userRole: string) => {
                     image: item.images?.[0] || null,
                 }
                 : null,
-            date: {
-                startDate: booking.start_date,
-                endDate: booking.end_date,
-            },
+            renterInfo: renter ? {
+                id: renter._id?.toString(),
+                name: renter.name,
+                image: renter.profileImage
+            } : null,
+            ownerInfo: owner ? {
+                id: owner._id?.toString(),
+                name: owner.name,
+                image: owner.profileImage
+            } : null,
+            startDate: booking.start_date,
+            endDate: booking.end_date,
             address: booking.address,
             totalAmount: booking.pricing?.totalAmount ?? 0,
             status: booking.booking_status,
             paymentStatus: booking.payment_status,
+            createdAt: booking.createdAt
         };
     });
 };
