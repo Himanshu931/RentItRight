@@ -23,7 +23,7 @@ export const getAllItemsService = async (page = 1, limit = 10) => {
 
     logger.info("Fetching items list", { page, limit });
 
-    const query: mongoose.FilterQuery<Item> = { isActive: true, status: "active" };
+    const query: mongoose.FilterQuery<Item> = { status: "active" };
     const skip = (page - 1) * limit;
 
     const totalItems = await Item.countDocuments(query);
