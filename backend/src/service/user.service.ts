@@ -175,14 +175,33 @@ export const dashboardDataService = async (userId: string) => {
 
         logger.info("Fetching owner dashboard stats", { userId });
 
-        const activeOwnerRentals = await Item.countDocuments({
-            ownerId: userId,
-            status: "active",
+        const activeOwnerRentals = await Booking.countDocuments({
+            owner_id: userId,
+            booking_status: "ongoing",
         });
 
         const totalListings = await Item.countDocuments({
             ownerId: userId,
         });
+
+        const recentRentals = await Booking.find({ owner_id: userId })
+            .populate("item_id", "title images category rating")
+            .populate("renter_id", "name profileImage")
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .lean();
+
+        const formattedRentals = recentRentals.map((booking: any) => ({
+            id: booking._id.toString(),
+            title: booking.item_id?.title || "Unknown Item",
+            image: booking.item_id?.images?.[0] || null,
+            rentedBy: booking.renter_id?.name || "Unknown Renter",
+            status: booking.booking_status === "ongoing" ? "Active" : 
+                    booking.booking_status === "confirmed" ? "Upcoming" : 
+                    booking.booking_status.charAt(0).toUpperCase() + booking.booking_status.slice(1),
+            pricePerDay: booking.pricing?.baseRate || 0,
+            rating: booking.item_id?.rating?.average || 5.0,
+        }));
 
         logger.info("Owner dashboard stats fetched", { userId });
 
@@ -190,6 +209,7 @@ export const dashboardDataService = async (userId: string) => {
             totalListings,
             activeRentals: activeOwnerRentals,
             totalEarnings: user.owner?.totalEarnings ?? 0,
+            rentals: formattedRentals
         };
     }
 
