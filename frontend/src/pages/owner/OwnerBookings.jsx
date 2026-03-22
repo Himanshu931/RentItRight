@@ -16,7 +16,7 @@ const OwnerBookings = () => {
       });
       const csrfData = await csrf.json();
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bookings`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/booking`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ const OwnerBookings = () => {
       });
       const csrfData = await csrf.json();
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bookings/${id}/approve`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/booking/${id}/approve`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -80,7 +80,7 @@ const OwnerBookings = () => {
       });
       const csrfData = await csrf.json();
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bookings/${id}/reject`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/booking/${id}/reject`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -108,7 +108,7 @@ const OwnerBookings = () => {
       });
       const csrfData = await csrf.json();
 
-      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bookings/${id}/complete`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/booking/${id}/complete`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

@@ -85,7 +85,7 @@ const BookingCard = ({ booking, onApprove, onReject, onComplete, onExtend, activ
               className="flex-1 md:w-40 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 cursor-pointer"
             >
               <CheckCircle size={16} />
-              Approve
+              Accept
             </button>
             <button 
               onClick={() => onReject(id)}

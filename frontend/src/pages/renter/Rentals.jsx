@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import RentalsHeader from "../../components/renter_ui/rentals/RentalsHeader";
 import RentalsTabs from "../../components/renter_ui/rentals/RentalsTabs";
 import RentalsGrid from "../../components/renter_ui/rentals/RentalsGrid";
@@ -7,62 +6,83 @@ import RentalsEmptyState from "../../components/renter_ui/rentals/RentalsEmptySt
 
 export default function Rentals() {
   const [activeTab, setActiveTab] = useState("active");
+  const [rentals, setRentals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  /* 🔌 BACKEND READY DATA */
-  const rentals = [
-    {
-      id: 1,
-      status: "active",
-      title: "Modern Coastal Estate",
-      startDate: "Oct 12",
-      endDate: "Oct 28, 2023",
-      price: 4200,
-      badge: "Active",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuBdFFTVFLKp0YmD6sjbD6-Kth1NWz91De7EwqGJ7X1zsLLJI6FWiJIRjbYxUQTeQ1F9r4hAGjW3wjGyhZk6n3ifcPcdSAjkBVSHHarBDJk_OnrI02LCM5wFEZ33yPkMRT7xTqUJMna8MIj7hsGZ7gYQFaPxurCgd79mSGIYd7BkZDWsZZm-fco39w-yEbxM1ylsLQdHpW3HNxElvO2idJUf5jj_4o-eNDBdBgh18T2lhLLxMAEL0CqUZw9voHDvRKTY8vkYW8hthPg",
-    },
-    {
-      id: 2,
-      status: "active",
-      title: "Red V-Raptor Cinema Kit",
-      startDate: "Oct 15",
-      endDate: "Oct 20, 2023",
-      price: 1850,
-      badge: "In Progress",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuCq-5QcYJNXl2y4BbVISht9sYPptlJQ9_Q6meSQFagtFPYamZk6BcFiZLk-QJCEv5uTT7opiwFWGMVoAnu3Lgradv8dVXBybYMHahYWF3vu9znobbfFb5nomFzvOoIBmyiXWSUrEwU0l2Kms8sGWkEz4_pc3Gc9YdffLDWrkghVbvAUUUI7R3LaGrg5ZiR3vOEiKZR5rCR3hkbtc_ffo7_gzNS0lFmKtdcMhrt8MNqCAxwlvaaj5M130zLPyrUqiH9YzCzNNLRcnUk",
-    },
-    {
-      id: 3,
-      status: "active",
-      title: "Porsche Taycan Turbo S",
-      startDate: "Oct 18",
-      endDate: "Oct 22, 2023",
-      price: 2100,
-      badge: "Active",
-      image:
-        "https://lh3.googleusercontent.com/aida-public/AB6AXuDT1yFrErIC2xI8nYIVe9oqz4fdEOYS_sO50Le7ueyGEzXQ_jxGMLRTOFupJIlRmb5XkWA5jMAHh8sxof0tzWlMp3uvivvi3xERR8lfaAg2D6CJvvjanGhvcH17blaPrreJFajNN3tuDHFXcW_E8sISIDfr7IpLhHPROSmgR5YXq4Acp5LhU5u8vdHZo2MMKlKGXheKTKf8_go1hN-tUGxrTrOYIoHPR50VmFtwesdJthrFSz1B_4MWmMePqIdzFk0ben4RIdY5Ux8",
-    },
-  ];
+  useEffect(() => {
+    const fetchRentals = async () => {
+      setIsLoading(true);
+      try {
+        const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+          method: "GET",
+          credentials: "include"
+        });
+        const csrfData = await csrf.json();
 
-  const filteredRentals = rentals.filter(
-    (r) => r.status === activeTab
-  );
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/booking`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfData.csrfToken
+          },
+          credentials: "include"
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          // Map backend response to match UI format if needed
+          const mappedRentals = data.bookings.map(b => ({
+            id: b.id,
+            status: b.status,
+            title: b.item?.title || "Unknown Item",
+            startDate: new Date(b.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            endDate: new Date(b.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            price: b.totalAmount,
+            image: b.item?.image || "https://via.placeholder.com/400x300?text=No+Image",
+            badge: b.status.charAt(0).toUpperCase() + b.status.slice(1)
+          }));
+          setRentals(mappedRentals);
+        }
+      } catch (error) {
+        console.error("Failed to fetch rentals:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRentals();
+  }, []);
+
+  const filteredRentals = rentals.filter((r) => {
+    const status = r.status.toLowerCase();
+    if (activeTab === "active") {
+      return status === "ongoing" || status === "confirmed" || status === "pending";
+    }
+    if (activeTab === "upcoming") {
+      return status === "confirmed" && new Date(r.startDate) > new Date();
+    }
+    // Add other cases if needed (e.g., history)
+    return status === activeTab;
+  });
 
   return (
-    <main className="px-8 lg:px-40 py-10 max-w-[1440px] mx-auto w-full">
+    <main className="px-8 lg:px-40 py-10 max-w-[1440px] mx-auto w-full min-h-screen">
       <RentalsHeader />
 
       <RentalsTabs
         activeTab={activeTab}
         onChange={setActiveTab}
         counts={{
-          active: rentals.filter(r => r.status === "active").length,
-          upcoming: rentals.filter(r => r.status === "upcoming").length,
+          active: rentals.filter(r => ["ongoing", "confirmed", "pending"].includes(r.status.toLowerCase())).length,
+          upcoming: rentals.filter(r => r.status.toLowerCase() === "confirmed" && new Date(r.startDate) > new Date()).length,
         }}
       />
 
-      {filteredRentals.length > 0 ? (
+      {isLoading ? (
+        <div className="flex justify-center py-20">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-accent border-t-transparent" />
+        </div>
+      ) : filteredRentals.length > 0 ? (
         <RentalsGrid rentals={filteredRentals} />
       ) : (
         <RentalsEmptyState />

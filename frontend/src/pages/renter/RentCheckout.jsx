@@ -5,30 +5,41 @@ import RentCheckoutLayout from "../../components/renter_ui/rent_checkout/RentChe
 export default function RentCheckout() {
     const { id } = useParams();
     const [item, setItem] = useState(null);
+    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const fetchItem = async () => {
+        const fetchData = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/explore/${id}`);
-                const data = await res.json();
+                // Fetch Item
+                const itemRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/explore/${id}`);
+                const itemData = await itemRes.json();
                 
-                if (data.status === "success") {
-                    setItem(data.item);
+                if (itemData.status === "success") {
+                    setItem(itemData.item);
                 } else {
-                    setError(data.message || "Failed to fetch item details");
+                    throw new Error(itemData.message || "Failed to fetch item details");
+                }
+
+                // Fetch User Profile for Address
+                const userRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/me/profile`, {
+                    credentials: "include"
+                });
+                const userData = await userRes.json();
+                if (userData.success) {
+                    setUser(userData.user);
                 }
             } catch (err) {
-                console.error("Error fetching item details:", err);
-                setError("Network error. Please try again later.");
+                console.error("Error fetching data:", err);
+                setError(err.message || "Network error. Please try again later.");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchItem();
+        fetchData();
     }, [id]);
 
     if (loading) {
@@ -72,6 +83,7 @@ export default function RentCheckout() {
     return (
         <RentCheckoutLayout
             item={formattedItem}
+            user={user}
             availability={{
                 disabledDates: item.unavailableDates || []
             }}

@@ -1,4 +1,4 @@
-export default function CostSummary({ item, startDate, endDate }) {
+export default function CostSummary({ item, startDate, endDate, onRequestBooking, isSubmitting }) {
   const hasDates = !!(startDate && endDate);
   const days = hasDates
     ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1
@@ -21,12 +21,12 @@ export default function CostSummary({ item, startDate, endDate }) {
   if (days >= 30) {
     const months = Math.ceil(days / 30);
     rentalFee = months * pricing.monthly;
-    appliedDiscount = (rentalFee * discounts.monthlyPercent) / 100;
+    appliedDiscount = (rentalFee * (discounts.monthlyPercent || 0)) / 100;
     pricingLabel = "Monthly rate";
   } else if (days >= 7) {
     const weeks = Math.ceil(days / 7);
     rentalFee = weeks * pricing.weekly;
-    appliedDiscount = (rentalFee * discounts.weeklyPercent) / 100;
+    appliedDiscount = (rentalFee * (discounts.weeklyPercent || 0)) / 100;
     pricingLabel = "Weekly rate";
   } else if (days > 0) {
     rentalFee = days * pricing.daily;
@@ -37,6 +37,19 @@ export default function CostSummary({ item, startDate, endDate }) {
     (hasDates ? securityDeposit : 0) +
     (hasDates ? serviceFee : 0) -
     appliedDiscount;
+
+  const handleRequest = () => {
+    if (!hasDates) {
+      alert("Please select dates first");
+      return;
+    }
+    onRequestBooking(total, {
+      rentalFee,
+      securityDeposit,
+      serviceFee,
+      appliedDiscount
+    });
+  };
 
   return (
     <div className="bg-surface border border-app/80 rounded-xl p-6 space-y-4">
@@ -71,8 +84,16 @@ export default function CostSummary({ item, startDate, endDate }) {
         </div>
       )}
 
-      <button className="w-full py-2 rounded-lg bg-bright cursor-pointer text-surface font-bold">
-        Proceed to Checkout →
+      <button
+        onClick={handleRequest}
+        disabled={isSubmitting || !hasDates}
+        className={`w-full py-3 rounded-xl bg-bright text-surface font-black uppercase tracking-widest text-sm transition-all active:scale-95 ${
+          isSubmitting || !hasDates
+            ? "opacity-50 cursor-not-allowed"
+            : "hover:bg-bright/90 cursor-pointer shadow-lg shadow-bright/20"
+        }`}
+      >
+        {isSubmitting ? "Sending Request..." : "Request from Owner →"}
       </button>
     </div>
   );
