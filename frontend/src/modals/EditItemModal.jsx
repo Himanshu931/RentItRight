@@ -20,9 +20,9 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
                 category: item.category || "",
                 description: item.description || "Complete professional photography kit including Sony A7R IV, 24-70mm lens, 3 extra batteries, and 128GB SD card. Perfect for high-end production work.",
                 images: item.images || (item.image ? [item.image] : []),
-                dailyPrice: item.pricePerDay || "",
-                weeklyPrice: item.pricePerWeekly || "510",
-                monthlyPrice: item.pricePerMonthly || "1800"
+                dailyPrice: item.price || "",
+                weeklyPrice: item.weeklyPrice || "0",
+                monthlyPrice: item.monthlyPrice || "0"
             });
         }
     }, [item]);
@@ -88,8 +88,8 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
             const { csrfToken } = await csrfRes.json();
 
             // 2. Submit Data
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/edititem/${item.id}`, {
-                method: "PUT", // or PATCH
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items/${item.id}`, {
+                method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRF-Token": csrfToken
@@ -114,9 +114,16 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
         setIsUploading(true);
         try {
             const imageUrls = await uploadImagesToCloudinary(formData.images);
-            const finalData = { 
-                ...formData, 
-                images: imageUrls 
+            const finalData = {
+                title: formData.itemName,
+                description: formData.description,
+                category: formData.category,
+                price: {
+                    daily: Number(formData.dailyPrice),
+                    weekly: Number(formData.weeklyPrice) || 0,
+                    monthly: Number(formData.monthlyPrice) || 0
+                },
+                images: imageUrls.filter(url => url !== null).length > 0 ? imageUrls.filter(url => url !== null) : undefined
             };
 
             // Call backend function

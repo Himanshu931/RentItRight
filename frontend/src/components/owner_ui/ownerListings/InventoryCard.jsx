@@ -1,9 +1,10 @@
-import { Edit2, Pause, Trash2, Star } from "lucide-react";
+import { Edit2, Pause, PlayCircle, Trash2, Star } from "lucide-react";
 
 export default function InventoryCard({
     item,
     onEdit,
     onPause,
+    onActivate,
     onDelete
 }) {
     const isRented = item.status === "rented";
@@ -26,9 +27,11 @@ export default function InventoryCard({
                             <h3 className="text-base font-bold text-white tracking-tight">
                                 {item.title}
                             </h3>
-                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest border ${isRented
+                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest border ${item.status === "rented"
                                 ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                                : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                                : item.status === "paused"
+                                ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                                : "bg-bright/10 text-bright border-bright/20"
                                 }`}>
                                 {item.status}
                             </span>
@@ -43,7 +46,7 @@ export default function InventoryCard({
                                 {item.category}
                             </span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-black text-white">${item.pricePerDay}</span>
+                                <span className="text-sm font-black text-white">₹{item.price}</span>
                                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">/day</span>
                             </div>
                         </div>
@@ -58,11 +61,21 @@ export default function InventoryCard({
                             label="EDIT"
                             onClick={() => onEdit?.(item.id)}
                         />
-                        <ActionButton
-                            icon={<Pause size={18} />}
-                            label="PAUSE"
-                            onClick={() => onPause?.(item.id)}
-                        />
+                        {item.status !== "rented" && (
+                            item.status === "paused" ? (
+                                <ActionButton
+                                    icon={<PlayCircle size={18} />}
+                                    label="ACTIVE"
+                                    onClick={() => onActivate?.(item.id)}
+                                />
+                            ) : (
+                                <ActionButton
+                                    icon={<Pause size={18} />}
+                                    label="PAUSE"
+                                    onClick={() => onPause?.(item.id)}
+                                />
+                            )
+                        )}
                         <ActionButton
                             icon={<Trash2 size={18} />}
                             label="DELETE"

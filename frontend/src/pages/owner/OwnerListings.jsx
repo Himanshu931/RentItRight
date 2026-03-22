@@ -1,9 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus } from "lucide-react";
 import SearchBar from "../../components/owner_ui/ownerListings/SearchBar";
 import InventoryCard from "../../components/owner_ui/ownerListings/InventoryCard";
 import InventoryTabs from "../../components/owner_ui/ownerListings/InventoryTabs";
-import { inventoryItemsDummy } from "../../data/ownerListingDummy";
+
 import AddItemModal from "../../modals/AddItemModal";
 import EditItemModal from "../../modals/EditItemModal";
 
@@ -12,7 +12,37 @@ export default function OwnerListings() {
     const [activeTab, setActiveTab] = useState("all-items");
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
+    const [items,setItems]=useState([]);
 
+    const fetchItems = async () => {
+        try {
+            const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+                method: "GET",
+                credentials: "include"
+            });
+            const csrfData = await csrf.json();
+
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfData.csrfToken
+                },
+                credentials: "include"
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+                setItems(data.data.items || []);
+            }
+        } catch (error) {
+            console.error("Failed to fetch listings:", error);
+        }
+    };
+
+    useEffect(() => {
+        fetchItems();
+    }, []);
 
     const handleEditItem = (item) => {
         setEditingItem(item);
@@ -21,10 +51,98 @@ export default function OwnerListings() {
     const handleUpdateItem = (updatedItemData) => {
         console.log("Updated Item Data:", updatedItemData);
         setEditingItem(null);
+        fetchItems();
+    };
+
+    const handleAddItemSuccess = () => {
+        setIsAddModalOpen(false);
+        fetchItems();
+    };
+
+    const handlePauseItem = async (id) => {
+        try {
+            const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+                method: "GET",
+                credentials: "include"
+            });
+            const csrfData = await csrf.json();
+
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items/${id}/pause`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfData.csrfToken
+                },
+                credentials: "include"
+            });
+            const data = await response.json();
+            if (data.success) {
+                fetchItems();
+            } else {
+                alert(data.message || "Failed to pause item.");
+            }
+        } catch (error) {
+            console.error("Failed to pause item:", error);
+        }
+    };
+
+    const handleActivateItem = async (id) => {
+        try {
+            const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+                method: "GET",
+                credentials: "include"
+            });
+            const csrfData = await csrf.json();
+
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items/${id}/activate`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfData.csrfToken
+                },
+                credentials: "include"
+            });
+            const data = await response.json();
+            if (data.success) {
+                fetchItems();
+            } else {
+                alert(data.message || "Failed to activate item.");
+            }
+        } catch (error) {
+            console.error("Failed to activate item:", error);
+        }
+    };
+
+    const handleDeleteItem = async (id) => {
+        if (!window.confirm("Are you sure you want to delete this item?")) return;
+        try {
+            const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+                method: "GET",
+                credentials: "include"
+            });
+            const csrfData = await csrf.json();
+
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items/${id}/delete`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfData.csrfToken
+                },
+                credentials: "include"
+            });
+            const data = await response.json();
+            if (data.success) {
+                fetchItems();
+            } else {
+                alert(data.message || "Failed to delete item.");
+            }
+        } catch (error) {
+            console.error("Failed to delete item:", error);
+        }
     };
 
     const filteredItems = useMemo(() => {
-        return inventoryItemsDummy
+        return items
             .filter((item) => {
                 switch (activeTab) {
                     case "all-items":
@@ -42,7 +160,7 @@ export default function OwnerListings() {
             .filter((item) =>
                 item.title.toLowerCase().includes(search.toLowerCase())
             );
-    }, [activeTab, search]);
+    }, [items, activeTab, search]);
 
     return (
         <main className="min-h-screen bg-app">
@@ -80,6 +198,9 @@ export default function OwnerListings() {
                             key={item.id}
                             item={item}
                             onEdit={() => handleEditItem(item)}
+                            onPause={() => handlePauseItem(item.id)}
+                            onActivate={() => handleActivateItem(item.id)}
+                            onDelete={() => handleDeleteItem(item.id)}
                         />
                     ))}
                 </div>
@@ -89,6 +210,7 @@ export default function OwnerListings() {
             {isAddModalOpen && (
                 <AddItemModal
                     onClose={() => setIsAddModalOpen(false)}
+                    onSubmit={handleAddItemSuccess}
                 />
             )}
 

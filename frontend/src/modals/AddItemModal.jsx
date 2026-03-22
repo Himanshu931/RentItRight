@@ -168,7 +168,9 @@ export default function AddItemModal({ onClose, onSubmit }) {
             await addItemToBackend(finalData);
 
             alert("Item added successfully! 🚀");
-            // onSubmit(finalData);
+            if (onSubmit) {
+                onSubmit(finalData);
+            }
             onClose();
         } catch (error) {
             console.error("Submission error:", error);
