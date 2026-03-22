@@ -39,7 +39,7 @@ export const getItemService = async (
 
     const [items, total] = await Promise.all([
         Item.find(query)
-            .select("title images price category rating description status")
+            .select("title images price category rating description status securityDeposit")
             .lean()
             .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 })
             .skip(skip)
@@ -63,6 +63,7 @@ export const getItemService = async (
         price: item.price?.daily ?? 0,
         weeklyPrice: item.price?.weekly ?? 0,
         monthlyPrice: item.price?.monthly ?? 0,
+        securityDeposit: item.securityDeposit ?? 0,
         category: item.category,
         discount: item.discount?.daily ?? null,
         rating: item.rating?.average ?? 0,
