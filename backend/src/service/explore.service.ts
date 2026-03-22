@@ -74,7 +74,7 @@ export const getItemByIdService = async (id: string) => {
     logger.info("Fetching item details", { itemId: id });
 
     const item = await Item.findOne({ _id: id, isActive: true, status: "active" })
-        .populate<{ ownerId: { _id: Types.ObjectId; name: string; profileImage?: string } }>("ownerId")
+        .populate<{ ownerId: { _id: Types.ObjectId; name: string; profileImage?: string; owner?: { rating: { average: number } } } }>("ownerId")
         .lean();
 
     if (!item) {
@@ -91,13 +91,14 @@ export const getItemByIdService = async (id: string) => {
         images: item.images ?? [],
         category: item.category,
         rating: item.rating.average,
-        price: item.price?.daily ?? 0,
+        pricing: item.price,
         unavailableDates: item.availability.unavailableDates,
         owner: item.ownerId
             ? {
                 id: item.ownerId._id.toString(),
                 name: item.ownerId.name,
-                image: item.ownerId.profileImage ?? null,
+                avatar: item.ownerId.profileImage ?? null,
+                rating: (item.ownerId as any).owner?.rating?.average ?? 5.0,
             }
             : null,
     };
