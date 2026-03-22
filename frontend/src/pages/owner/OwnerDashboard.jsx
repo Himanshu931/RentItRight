@@ -3,6 +3,7 @@ import StatsCard from "../../components/owner_ui/dashboard/StatsCard";
 import RentalsSection from "../../components/owner_ui/dashboard/RentalSection";
 import QuickActions from "../../components/owner_ui/dashboard/QuickActions";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 import homeRedirect from "../../hooks/homeRedirect";
 import useAuth from "../../hooks/authHook";
@@ -14,6 +15,7 @@ const OwnerDashboard = () => {
   const [totalListings, setTotalListings] = useState(0);
   const [activeRentals, setActiveRentals] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
+  const [rentals, setRentals] = useState([]);
 
   // Fetching Stats from Backend
   const fetchStats = async () => {
@@ -41,6 +43,7 @@ const OwnerDashboard = () => {
       setActiveRentals(data.data.activeRentals);
       setTotalListings(data.data.totalListings);
       setTotalEarnings(data.data.totalEarnings);
+      setRentals(data.data.rentals || []);
 
     }
     catch (error) {
@@ -77,55 +80,15 @@ const OwnerDashboard = () => {
     }
   ];
 
-  const rentals = [
-    {
-      id: "1",
-      title: "Modern Apartment",
-      image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688",
-      rentedBy: "Sarah M.",
-      status: "Active",
-      pricePerDay: 85,
-      rating: 4.9,
-    },
-    {
-      id: "2",
-      title: "Luxury Sports Car",
-      image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70",
-      rentedBy: "David L.",
-      status: "Upcoming",
-      pricePerDay: 150,
-      rating: 5.0,
-    },
-    {
-      id: "3",
-      title: "Professional Camera Kit",
-      image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32",
-      rentedBy: "Emily R.",
-      status: "Active",
-      pricePerDay: 65,
-      rating: 4.8,
-    },
-  ];
 
   /* ===============================
      HANDLERS (Connect Router Later)
   ================================ */
 
-  const handleAddItem = () => {
-    console.log("Navigate to Add Item Page");
-  };
-
-  const handleViewBookings = () => {
-    console.log("Navigate to Bookings Page");
-  };
-
-  const handleManageListings = () => {
-    console.log("Navigate to Listings Page");
-  };
   const quickActions = [
-    { id: 1, icon: "add_circle", label: "Add New Item", onClick: handleAddItem },
-    { id: 2, icon: "receipt_long", label: "View Bookings", onClick: handleViewBookings },
-    { id: 3, icon: "inventory_2", label: "Manage Listings", onClick: handleManageListings },
+    { id: 1, icon: "add_circle", label: "Add New Item", to: "listings" },
+    { id: 2, icon: "receipt_long", label: "View Bookings", to: "bookings" },
+    { id: 3, icon: "inventory_2", label: "Manage Listings", to: "listings" },
   ];
 
   return (
@@ -165,13 +128,13 @@ const OwnerDashboard = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                  <button
-                    onClick={handleAddItem}
+                  <Link
+                    to="/listings"
                     className="flex items-center justify-center gap-2 bg-bright text-surface px-8 py-4 rounded-[1.25rem] font-black hover:scale-[1.01] active:scale-99 transition-all cursor-pointer"
                   >
                     <span className="material-symbols-outlined font-bold">add_circle</span>
                     List New Item
-                  </button>
+                  </Link>
                 </div>
               </div>
             )}
