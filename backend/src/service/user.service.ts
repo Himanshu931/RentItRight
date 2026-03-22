@@ -195,8 +195,6 @@ export const dashboardDataService = async (userId: string) => {
 
     if (user.roles === "renter") {
 
-        logger.info("Fetching renter dashboard stats", { userId });
-
         const activeRenterRentals = await Booking.countDocuments({
             renter_id: userId,
             booking_status: "ongoing",
@@ -208,12 +206,30 @@ export const dashboardDataService = async (userId: string) => {
             start_date: { $gt: new Date() },
         });
 
+        const recentBookings = await Booking.find({ renter_id: userId })
+            .populate("item_id", "title images category")
+            .populate("owner_id", "name profileImage")
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .lean();
+
+        const formattedBookings = recentBookings.map((booking: any) => ({
+            id: booking._id.toString(),
+            status: booking.booking_status === "ongoing" ? "active" : "upcoming",
+            title: booking.item_id?.title || "Unknown Item",
+            dateRange: `${new Date(booking.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${new Date(booking.end_date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
+            category: booking.item_id?.category || "Uncategorized",
+            price: booking.pricing?.totalAmount || 0,
+            image: booking.item_id?.images?.[0] || null,
+        }));
+
         logger.info("Renter dashboard stats fetched", { userId });
 
         return {
             activeRentals: activeRenterRentals,
             upcomingRentals,
             wishlist: user.renter?.wishlist?.length ?? 0,
+            bookings: formattedBookings,
         };
     }
 
