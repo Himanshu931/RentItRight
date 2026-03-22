@@ -152,7 +152,7 @@ export const getBookingIdService = async (userId: string, bookingId: string) => 
         $or: [{ renter_id: userId }, { owner_id: userId }],
     })
         .populate("item_id", "title images category")
-        .populate("owner_id", "name email phone")
+        .populate("owner_id", "name email phone profileImage")
         .lean();
 
     if (!booking) {
