@@ -4,6 +4,8 @@ import { AppError } from "../utils/AppError";
 import { esClient, ITEMS_INDEX } from "../config/elasticSearch";
 import logger from "../config/logger";
 import type { QueryDslQueryContainer } from "@elastic/elasticsearch/lib/api/types";
+import { Booking } from "../models/booking.model";
+import { BookingStatus } from "../validatior/booking.validator";
 
 export interface SearchParams {
     q?: string;
@@ -82,7 +84,32 @@ export const getItemByIdService = async (id: string) => {
         throw new AppError("No Item found", 404);
     }
 
-    logger.info("Item details fetched", { itemId: id });
+    // Fetch confirmed and ongoing bookings to block dates
+    const bookings = await Booking.find({
+        item_id: id,
+        booking_status: { $in: [BookingStatus.CONFIRMED, BookingStatus.ONGOING] }
+    }).select("start_date end_date").lean();
+
+    const occupiedDates: Date[] = [];
+    bookings.forEach(booking => {
+        let current = new Date(booking.start_date);
+        const end = new Date(booking.end_date);
+        while (current <= end) {
+            occupiedDates.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+    });
+
+    const allUnavailableDates = [
+        ...(item.availability.unavailableDates || []),
+        ...occupiedDates
+    ];
+
+    logger.info("Item details fetched with occupied dates", { 
+        itemId: id, 
+        bookedCount: bookings.length,
+        totalUnavailable: allUnavailableDates.length
+    });
 
     return {
         id: item._id.toString(),
@@ -92,7 +119,7 @@ export const getItemByIdService = async (id: string) => {
         category: item.category,
         rating: item.rating.average,
         pricing: item.price,
-        unavailableDates: item.availability.unavailableDates,
+        unavailableDates: allUnavailableDates,
         owner: item.ownerId
             ? {
                 id: item.ownerId._id.toString(),

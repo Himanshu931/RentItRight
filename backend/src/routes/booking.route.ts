@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { acceptBooking, cancelBooking, createBooking, getBookingById, getBookings, rejectBooking, completeBooking } from "../controllers/booking.controller"
+import { VerifyUser } from "../middleware/verifyUser";
 const router = Router();
+
+router.use(VerifyUser);
 
 // for user and owner to get all their bookings
 /**

@@ -114,7 +114,14 @@ export const createBookingService = async (userId: string, booking: any) => {
     const totalDays = Math.ceil(
         (endDate.getTime() - startDate.getTime()) /
         (1000 * 60 * 60 * 24)
-    );
+    ) + 1; // Including start date
+
+    const pricing = {
+        ...booking.pricing,
+        appliedPricing: totalDays >= 30 ? "monthly" : totalDays >= 7 ? "weekly" : "daily",
+        subtotal: booking.pricing.baseRate - (booking.pricing.discountApplied || 0),
+        ownerEarning: (booking.pricing.baseRate - (booking.pricing.discountApplied || 0)) * 0.90, // 10% platform fee example
+    };
 
     const newBooking = await Booking.create({
         renter_id: userId,
@@ -123,7 +130,7 @@ export const createBookingService = async (userId: string, booking: any) => {
         start_date: startDate,
         end_date: endDate,
         address: booking.address,
-        pricing: booking.pricing,
+        pricing,
         total_days: totalDays,
     });
 
