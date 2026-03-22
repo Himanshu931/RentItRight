@@ -1,14 +1,21 @@
-import React from 'react';
-import { Calendar, User, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, User, CheckCircle, XCircle, Clock, RotateCcw } from 'lucide-react';
 
-const BookingCard = ({ booking, onApprove, onReject, onCancel }) => {
-  const { item, renter, date, status, id } = booking;
+const BookingCard = ({ booking, onApprove, onReject, onComplete, onExtend, activeTab }) => {
+  const { item, status, id, startDate, endDate, renterInfo } = booking;
   
   const formatDate = (dateStr) => {
     return new Date(dateStr).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric'
     });
+  };
+
+  const getDaysRemaining = (endStr) => {
+    const today = new Date();
+    const end = new Date(endStr);
+    const diffTime = end - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   };
 
   const getStatusBadge = (status) => {
@@ -23,6 +30,8 @@ const BookingCard = ({ booking, onApprove, onReject, onCancel }) => {
       </span>
     );
   };
+
+  const daysRemaining = getDaysRemaining(endDate);
 
   return (
     <div className="bg-card border border-divider/20 rounded-2xl p-4 flex flex-col md:flex-row items-center gap-6 hover:border-divider/50 transition-all">
@@ -44,15 +53,26 @@ const BookingCard = ({ booking, onApprove, onReject, onCancel }) => {
           {item?.title || 'Unknown Item'}
         </h3>
         
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
-          <div className="flex items-center gap-2 text-text-secondary">
-            <User size={14} className="text-bright" />
-            <span>Renter: <span className="text-text-primary font-medium">{booking?.renterInfo?.name || 'Unknown Renter'}</span></span>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 text-text-secondary text-sm">
+            <span className="font-medium">Renter: <span className="text-text-primary">{renterInfo?.name || 'Unknown Renter'}</span></span>
           </div>
-          <div className="flex items-center gap-2 text-text-secondary">
-            <Calendar size={14} className="text-bright" />
-            <span>Dates: <span className="text-text-primary font-medium">{formatDate(booking?.startDate)} - {formatDate(booking?.endDate)}</span></span>
-          </div>
+          
+          {activeTab === 'active' ? (
+            <div className="space-y-1 mt-1">
+              <div className="text-sm font-medium text-text-primary">
+                Ends on: {formatDate(endDate)}
+              </div>
+              <div className={`text-xs font-bold ${daysRemaining <= 1 ? 'text-error' : 'text-bright'}`}>
+                {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-text-secondary text-sm mt-1">
+              <Calendar size={14} className="text-bright" />
+              <span>Dates: <span className="text-text-primary font-medium">{formatDate(startDate)} - {formatDate(endDate)}</span></span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -62,21 +82,41 @@ const BookingCard = ({ booking, onApprove, onReject, onCancel }) => {
           <>
             <button 
               onClick={() => onApprove(id)}
-              className="flex-1 md:w-32 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 cursor-pointer"
+              className="flex-1 md:w-40 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 cursor-pointer"
             >
               <CheckCircle size={16} />
               Approve
             </button>
             <button 
               onClick={() => onReject(id)}
-              className="flex-1 md:w-32 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 cursor-pointer"
+              className="flex-1 md:w-40 flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 cursor-pointer"
             >
               <XCircle size={16} />
               Reject
             </button>
           </>
         )}
-        {(status?.toLowerCase() === 'confirmed' || status?.toLowerCase() === 'ongoing') && (
+
+        {activeTab === 'active' && (status?.toLowerCase() === 'confirmed' || status?.toLowerCase() === 'ongoing') && (
+          <>
+            <button 
+              onClick={() => onComplete(id)}
+              className="flex-1 md:w-44 flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white font-bold py-2.5 rounded-xl text-sm transition-all active:scale-95 cursor-pointer shadow-lg"
+            >
+              <CheckCircle size={16} />
+              Mark as Returned
+            </button>
+            <button 
+              onClick={() => onExtend(id)}
+              className="flex-1 md:w-44 flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white font-bold py-2.5 rounded-xl text-sm transition-all border border-divider/30 active:scale-95 cursor-pointer"
+            >
+              <RotateCcw size={16} />
+              Extend Rental
+            </button>
+          </>
+        )}
+
+        {activeTab !== 'active' && (status?.toLowerCase() === 'confirmed' || status?.toLowerCase() === 'ongoing') && (
            <div className="text-green-500 flex items-center gap-1 font-bold text-sm px-4">
               <CheckCircle size={16} /> Confirmed
            </div>

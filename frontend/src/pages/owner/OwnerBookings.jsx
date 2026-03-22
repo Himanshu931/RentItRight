@@ -99,6 +99,37 @@ const OwnerBookings = () => {
     }
   };
 
+  const handleComplete = async (id) => {
+    if (!window.confirm("Are you sure the item has been returned?")) return;
+    try {
+      const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+        method: "GET",
+        credentials: "include"
+      });
+      const csrfData = await csrf.json();
+
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/bookings/${id}/complete`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfData.csrfToken
+        },
+        credentials: "include"
+      });
+      
+      const data = await response.json();
+      if (data.success) {
+        fetchBookings();
+      }
+    } catch (error) {
+      console.error("Failed to complete booking:", error);
+    }
+  };
+
+  const handleExtend = (id) => {
+    alert("Extend Rental functionality coming soon!");
+  };
+
   const filteredBookings = useMemo(() => {
     return bookings.filter((booking) => {
       const status = booking.status?.toLowerCase();
@@ -141,11 +172,14 @@ const OwnerBookings = () => {
                   booking={booking} 
                   onApprove={handleApprove} 
                   onReject={handleReject} 
+                  onComplete={handleComplete}
+                  onExtend={handleExtend}
+                  activeTab={activeTab}
                 />
               ))
             ) : (
-              <div className="text-text-secondary text-center py-20 bg-card border border-divider/10 rounded-2xl">
-                <p className="text-xl font-medium">No bookings found for "{activeTab}"</p>
+              <div className="text-text-secondary text-center py-20 bg-surface border border-divider/10 rounded-2xl">
+                <p className="text-xl font-medium text-white">No bookings found for "{activeTab}"</p>
                 <p className="text-sm">When you receive requests, they will appear here.</p>
               </div>
             )}

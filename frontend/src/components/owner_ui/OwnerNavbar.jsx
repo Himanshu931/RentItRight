@@ -76,15 +76,15 @@ const OwnerNavbar = () => {
                             Listings
                         </NavLink>
 
-                        <NavLink to="/owner/bookings" className={navItemClass}>
+                        <NavLink to="/bookings" className={navItemClass}>
                             Bookings
                         </NavLink>
 
-                        <NavLink to="/owner/earnings" className={navItemClass}>
+                        <NavLink to="/earnings" className={navItemClass}>
                             Earnings
                         </NavLink>
 
-                        <NavLink to="/owner/messages" className={navItemClass}>
+                        <NavLink to="/messages" className={navItemClass}>
                             Messages
                         </NavLink>
                     </nav>

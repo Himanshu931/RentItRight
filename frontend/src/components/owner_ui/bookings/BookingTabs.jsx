@@ -16,7 +16,7 @@ const BookingTabs = ({ activeTab, onTabChange }) => {
           onClick={() => onTabChange(tab.id)}
           className={`pb-4 text-sm font-semibold transition-all relative min-w-fit cursor-pointer ${
             activeTab === tab.id
-              ? 'text-bright'
+              ? 'text-text-primary'
               : 'text-text-secondary hover:text-text-primary'
           }`}
         >
