@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { acceptBooking, cancelBooking, createBooking, getBookingById, getBookings, rejectBooking } from "../controllers/booking.controller"
+import { acceptBooking, cancelBooking, createBooking, getBookingById, getBookings, rejectBooking, completeBooking } from "../controllers/booking.controller"
 const router = Router();
 
 // for user and owner to get all their bookings
@@ -278,5 +278,26 @@ router.patch("/:id/cancel", cancelBooking)
  */
 router.patch("/:id/reject", rejectBooking)
 
+/**
+ * @swagger
+ * /bookings/{id}/complete:
+ *   patch:
+ *     summary: Mark a booking as completed (owner only)
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Booking marked as completed successfully
+ *       404:
+ *         description: Booking not found
+ */
+router.patch("/:id/complete", completeBooking);
 
 export default router;

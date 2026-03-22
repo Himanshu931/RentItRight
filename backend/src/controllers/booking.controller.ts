@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { catchAsync } from "../utils/catchAsync";
 import logger from "../config/logger";
-import { createBookingService, getBookingService, getBookingIdService, acceptBookingService, cancelBookingService, rejectBookingService } from "../service/booking.service";
+import { createBookingService, getBookingService, getBookingIdService, acceptBookingService, cancelBookingService, rejectBookingService, completeBookingService } from "../service/booking.service";
 import { createBookingSchema } from "../validatior/booking.validator";
 import { AppError } from "../utils/AppError";
 
@@ -90,5 +90,18 @@ export const rejectBooking = catchAsync(async (req: Request, res: Response) => {
     res.status(200).json({
         success: true,
         message: "Booking rejected successfully",
+    })
+})
+
+export const completeBooking = catchAsync(async (req: Request, res: Response) => {
+    if (req.userRole !== "owner") {
+        throw new AppError("Forbidden: Only owner can mark the booking as completed", 403)
+    }
+
+    await completeBookingService(req.userId!, req.params.id as string);
+
+    res.status(200).json({
+        success: true,
+        message: "Booking marked as completed successfully",
     })
 })

@@ -323,3 +323,28 @@ export const rejectBookingService = async (
 
     logger.info("Booking rejected", { bookingId });
 };
+
+export const completeBookingService = async (userId: string, bookingId: string) => {
+    logger.info("Completing booking", { bookingId, ownerId: userId });
+
+    const booking = await Booking.findOne({
+        _id: bookingId,
+        owner_id: userId,
+    });
+
+    if (!booking) {
+        logger.warn("Booking not found for completion", { bookingId });
+        throw new AppError("Booking not found", 404);
+    }
+
+    if (booking.booking_status !== BookingStatus.CONFIRMED && booking.booking_status !== BookingStatus.ONGOING) {
+        logger.warn("Booking not in a completable state", { bookingId, status: booking.booking_status });
+        throw new AppError("Booking must be confirmed or ongoing to be completed", 400);
+    }
+
+    booking.booking_status = BookingStatus.COMPLETED;
+    await booking.save();
+
+    logger.info("Booking completed", { bookingId });
+    return true;
+};
