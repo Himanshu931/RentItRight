@@ -4,7 +4,7 @@ export default function OwnerInfo({ owner }) {
       <h3 className="text-sm font-bold uppercase mb-6">Owner Information</h3>
 
       <div className="flex items-center gap-4 mb-6">
-        <img src={owner.avatar} className="size-14 rounded-full" />
+        <img src={owner.avatar} className="size-14 rounded-full object-cover" />
         <div>
           <p className="font-bold">{owner.name}</p>
           <p className="text-sm text-text-secondary">

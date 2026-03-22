@@ -17,14 +17,9 @@ export default function RentalHero({ rental }) {
               </div>
               <p className="text-text-secondary text-sm">{rental.location}</p>
             </div>
-
-            <div className="text-right">
-              <p className="text-[10px] uppercase text-text-secondary">Rental ID</p>
-              <p className="font-mono">{rental.id}</p>
-            </div>
           </div>
 
-          <div className="mt-6 flex justify-between border-t border-border-color pt-4">
+          <div className="mt-6 flex justify-between border-t border-divider pt-4">
             <p className="text-sm text-text-secondary">
               Rental Type: <span className="font-bold uppercase">{rental.rentalType}</span>
             </p>

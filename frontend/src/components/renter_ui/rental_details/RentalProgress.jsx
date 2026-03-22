@@ -8,9 +8,9 @@ export default function RentalProgress({ rental }) {
         <p className="font-bold">{rental.endDate}</p>
       </div>
 
-      <div className="h-2 bg-border-color rounded-full overflow-hidden">
+      <div className="h-2 bg-divider rounded-full overflow-hidden">
         <div
-          className="h-full bg-success rounded-full"
+          className="h-full bg-success rounded-full transition-all duration-500"
           style={{ width: `${rental.progressPercent}%` }}
         />
       </div>
