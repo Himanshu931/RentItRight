@@ -15,6 +15,7 @@ export default function RenterDashboard() {
   const [activeRentals, setActiveRentals] = useState(0);
   const [upcomingRentals, setUpcomingRentals] = useState(0);
   const [wishlist, setWishlist] = useState(0);
+  const [bookings, setBookings] = useState([]);
 
 
   // Fetching Stats from Backend
@@ -45,6 +46,7 @@ export default function RenterDashboard() {
       setActiveRentals(data.data.activeRentals);
       setUpcomingRentals(data.data.upcomingRentals);
       setWishlist(data.data.wishlist);
+      setBookings(data.data.bookings || []);
 
     }
     catch (error) {
@@ -60,7 +62,7 @@ export default function RenterDashboard() {
     fetchStats();
   }, []);
 
-  const [stats, setStats] = useState([
+  const stats = [
     {
       id: 1,
       title: "Active Rentals",
@@ -79,41 +81,9 @@ export default function RenterDashboard() {
       value: wishlist,
       icon: "bookmark",
     },
-  ]);
+  ];
 
-  // const bookings = [
-  //   {
-  //     id: 1,
-  //     status: "active",
-  //     title: "Sony Alpha A7 IV",
-  //     dateRange: "Oct 12 - Oct 15",
-  //     category: "Professional Kit",
-  //     price: 145,
-  //     image:
-  //       "https://lh3.googleusercontent.com/aida-public/AB6AXuC_h7KKcXlbKA7xsOb8aZ0zwtcGMKwVFhL_PSNIx2QYVTznfrGSGJwsyL8xUYg4kw4pr06PuDTRXXojHm6aCCCe_GbupnZvwLVBEsvqzgTyXBciBWFMG-K_52FLbca44C4WiDm513WHtrkTUT55uHxAYyMvSLrpW7kbumdl3QuyqRTqATvnanu8zQsr7Mxll3VOKU-YqeOSL0Y9g0-0Oop9PtGE5Crf4DN3MMr5wksioQXZKMLW1HRrCmQP5QZMuqXnZrz_N1tdBME",
-  //   },
-  //   {
-  //     id: 2,
-  //     status: "upcoming",
-  //     title: "Specialized Stumpjumper",
-  //     dateRange: "Oct 18 - Oct 20",
-  //     category: "Mountain Bike",
-  //     price: 89,
-  //     image:
-  //       "https://lh3.googleusercontent.com/aida-public/AB6AXuCGc-oxaE2UdNo4fWPjF6rZlTh2M8G1cs8dBvUBgiiiUnnJ2Os6NCWxiHfT99ySxmfol7gsFg6zN37Y3agOxpu6CmuLq8MirqoPrRaEXy0hWypUEGsiQBCSr7wVw3DpauPEiDPGFdpWPySR7fyJNtYMbxrHoY_u9zTZuTAdce8MLTMW4wDTeZCGXRZyIPJOVi25kLtR1jl-EIw2QhYutzSQxydkCkoFDueDVOwbqaTh8dL836LVOgzBCrhkhk08SBYioIv6PqkY5ms",
-  //   },
-  //   {
-  //     id: 3,
-  //     status: "active",
-  //     title: "North Face 4-Person Tent",
-  //     dateRange: "Oct 10 - Oct 14",
-  //     category: "Camping Gear",
-  //     price: 65,
-  //     image:
-  //       "https://lh3.googleusercontent.com/aida-public/AB6AXuBDnnN-3h1lGS6BmoRFX9xMHJQmkQZt6PlA3bedEl9YcdIWsQr284FvyM2g-Ko0L5IR9_CzqLWWErDLaYg9b5GpyxlHVWC4gQccl7Aa9fShSK0qZmFZtjTl9soCG3cQooHMN-iqeHd3UmHvG7XlIi1N50JoRqhGELNBhspv-RsuVcO7DMEfqe8hYYoioOe3XWPajEZpCARZXXQTHxDsTuC7MtWJYa4utm4RGp9bfeT6hj5xm9CBb5c6T5lZgTzNslyKgCBQ9ah4RL8",
-  //   },
-  // ];
-  const bookings =[];
+
   const quickActions = [
     { id: 1, icon: "search_insights", label: "Discover New Gear", to: "/renter_explore" },
     { id: 2, icon: "receipt_long", label: "Manage Payments", to: "/payments" },
