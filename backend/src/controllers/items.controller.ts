@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import logger from "../config/logger";
 import { AppError } from "../utils/AppError";
-import { getItemService, pauseItemService, deleteItemService, updateItemService, addItemService } from "../service/items.service";
+import { getItemService, pauseItemService, deleteItemService, updateItemService, addItemService, activateItemService } from "../service/items.service";
 import { catchAsync } from "../utils/catchAsync";
 import { updateItemSchema, itemValidationSchema } from "../validatior/item.schema";
 import { ROLE } from "../validatior/auth.schema";
@@ -85,4 +85,17 @@ export const deleteItem = catchAsync(async (req: Request, res: Response) => {
 
 })
 
+export const activateItem = catchAsync(async (req: Request, res: Response) => {
+    const itemId = req.params.id as string;
 
+    if (!itemId) {
+        throw new AppError("Item ID is required", 400);
+    }
+
+    await activateItemService(itemId, req.userId!, req.userRole! as ROLE);
+
+    res.status(200).json({
+        success: true,
+        message: "Item activated successfully",
+    })
+})

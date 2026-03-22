@@ -39,7 +39,7 @@ export const getItemService = async (
 
     const [items, total] = await Promise.all([
         Item.find(query)
-            .select("title images price category rating description")
+            .select("title images price category rating description status")
             .lean()
             .sort(q ? { score: { $meta: "textScore" } } : { createdAt: -1 })
             .skip(skip)
@@ -58,10 +58,15 @@ export const getItemService = async (
         id: item._id.toString(),
         title: item.title,
         image: item.images?.[0] ?? null,
+        images: item.images ?? [],
+        description: item.description ?? "",
         price: item.price?.daily ?? 0,
+        weeklyPrice: item.price?.weekly ?? 0,
+        monthlyPrice: item.price?.monthly ?? 0,
         category: item.category,
         discount: item.discount?.daily ?? null,
         rating: item.rating?.average ?? 0,
+        status: item.status ?? "active",
     }));
 
     return {
@@ -184,4 +189,32 @@ export const deleteItemService = async (
     await Item.deleteOne({ _id: itemId, ownerId: userId });
 
     logger.info("Item deleted successfully", { itemId });
+};
+
+export const activateItemService = async (
+    itemId: string,
+    userId: string,
+    role: ROLE
+) => {
+
+    logger.info("Activating item", { itemId, userId });
+
+    ensureOwner(role);
+
+    const item = await Item.findOne({ _id: itemId, ownerId: userId });
+
+    if (!item) {
+        logger.warn("Activation failed - item not found", { itemId });
+        throw new AppError("Item not found", 404);
+    }
+
+    if (item.status === "rented") {
+        logger.warn("Activation failed - item already rented", { itemId });
+        throw new AppError("Item already rented", 400);
+    }
+
+    item.status = "active";
+    await item.save();
+
+    logger.info("Item activated successfully", { itemId });
 };

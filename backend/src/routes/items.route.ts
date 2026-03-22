@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getItemsByUser, pauseItem, deleteItem, updateItem, addItem } from "../controllers/items.controller";
+import { getItemsByUser, pauseItem, deleteItem, updateItem, addItem, activateItem } from "../controllers/items.controller";
 import { VerifyUser } from "../middleware/verifyUser";
 const router = Router();
 
@@ -179,6 +179,26 @@ router.patch("/:id/pause", VerifyUser, pauseItem)
  *         description: Item deleted successfully
 */
 router.delete("/:id/delete", VerifyUser, deleteItem)
+
+/**
+ * @swagger
+ * /items/{id}/activate:
+ *   patch:
+ *     summary: Activate an item
+ *     tags: [Items]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Item activated successfully
+*/
+router.patch("/:id/activate", VerifyUser, activateItem)
 
 export default router;
 
