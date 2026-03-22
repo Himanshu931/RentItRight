@@ -26,25 +26,27 @@ const PricingSelector = ({ pricing }) => {
 
       {/* Selector */}
       <div className="mt-4 flex gap-0.5 bg-app p-1 rounded-xl border-1 border-divider">
-        {["daily", "weekly", "monthly"].map((plan) => {
-          const isActive = selectedPlan === plan;
+        {["daily", "weekly", "monthly"]
+          .filter((plan) => pricing[plan] !== undefined && pricing[plan] !== null)
+          .map((plan) => {
+            const isActive = selectedPlan === plan;
 
-          return (
-            <button
-              key={plan}
-              onClick={() => setSelectedPlan(plan)}
-              className={`cursor-pointer rounded-lg px-4 py-1.5 text-xs transition
+            return (
+              <button
+                key={plan}
+                onClick={() => setSelectedPlan(plan)}
+                className={`cursor-pointer rounded-lg px-4 py-1.5 text-xs transition
                 ${
                   isActive
                     ? "bg-bright text-black border-1 border-bright"
                     : "border-1 border-app"
                 }
               `}
-            >
-              {plan.charAt(0).toUpperCase() + plan.slice(1)}
-            </button>
-          );
-        })}
+              >
+                {plan.charAt(0).toUpperCase() + plan.slice(1)}
+              </button>
+            );
+          })}
       </div>
     </div>
   );
