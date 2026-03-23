@@ -1,6 +1,6 @@
 import { Heart, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-const ExploreCard = ({ item, linkPrefix = "/renter/rent_items" }) => {
+const ExploreCard = ({ item, isWishlisted, onToggleWishlist, linkPrefix = "/renter/rent_items" }) => {
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-divider bg-card shadow-[0_12px_32px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:border-accent/60">
       {/* Featured Badge */}
@@ -14,9 +14,20 @@ const ExploreCard = ({ item, linkPrefix = "/renter/rent_items" }) => {
       )}
 
       {/* Wishlist */}
-      <button className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/60 text-black shadow-md transition hover:text-accent">
-        <Heart size={16} className="stroke-[2.2]" />
+      <button 
+        onClick={(e) => {
+          e.preventDefault();
+          onToggleWishlist(item.id);
+        }}
+        className={`absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full shadow-md transition-all cursor-pointer ${
+          isWishlisted 
+            ? "bg-app text-white" 
+            : "bg-white/60 text-black hover:text-accent"
+        }`}
+      >
+        <Heart size={16} className={`stroke-[2.2] ${isWishlisted ? "fill-current" : ""}`} />
       </button>
+
 
       <Link to={`${linkPrefix}/${item.id}`} className="block">
         {/* Image */}
