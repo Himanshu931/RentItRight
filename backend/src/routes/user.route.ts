@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { VerifyUser } from "../middleware/verifyUser";
-import { createProfile, getProfile, updateProfile, updateProfileImage, deleteProfile, updateAddress, dashboard } from "../controllers/user.controller"
+import { createProfile, getProfile, updateProfile, updateProfileImage, deleteProfile, updateAddress, dashboard, getWishlist, toggleWishlist } from "../controllers/user.controller"
 
 const router = Router();
 
@@ -189,5 +189,45 @@ router.patch("/me/address", VerifyUser, updateAddress);
  *         description: User not found
  */
 router.get("/dashboard", VerifyUser, dashboard);
+
+/**
+ * @swagger
+ * /user/wishlist:
+ *   get:
+ *     summary: Get the User's Wishlist
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Wishlist fetched successfully
+ *       404:
+ *         description: User not found
+ */
+router.get("/wishlist", VerifyUser, getWishlist);
+
+/**
+ * @swagger
+ * /user/wishlist/toggle:
+ *   post:
+ *     summary: Toggle item in User's Wishlist
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               itemId:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Wishlist toggled successfully
+ */
+router.post("/wishlist/toggle", VerifyUser, toggleWishlist);
+
 
 export default router;

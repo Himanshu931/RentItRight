@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import logger from "../config/logger";
 import { updateProfileSchema, updateAddressSchema, profileSchema } from "../validatior/user.schema";
-import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService, dashboardDataService } from "../service/user.service";
+import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService, dashboardDataService, getWishlistService, toggleWishlistService } from "../service/user.service";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 
@@ -59,3 +59,18 @@ export const dashboard = catchAsync(async (req: Request, res: Response) => {
     const data = await dashboardDataService(req.userId!);
     res.status(200).json({ success: true, data: data, message: "Dashboard data fetched successfully" });
 })
+
+export const getWishlist = catchAsync(async (req: Request, res: Response) => {
+    const wishlist = await getWishlistService(req.userId!);
+    res.status(200).json({ success: true, data: wishlist, message: "Wishlist fetched successfully" });
+})
+
+export const toggleWishlist = catchAsync(async (req: Request, res: Response) => {
+    const { itemId } = req.body;
+    if (!itemId) {
+        throw new AppError("Item ID is required", 400);
+    }
+
+    const result = await toggleWishlistService(req.userId!, itemId);
+    res.status(200).json({ success: true, data: result, message: result.message });
+})

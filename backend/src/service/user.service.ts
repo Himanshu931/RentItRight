@@ -257,3 +257,85 @@ export const dashboardDataService = async (userId: string) => {
 
     throw new AppError("Invalid user role", 400);
 };
+
+export const getWishlistService = async (userId: string) => {
+    logger.info("Fetching user wishlist", { userId });
+
+    const user = await User.findById(userId).populate({
+        path: "renter.wishlist",
+        model: "Item"
+    }).lean();
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    if (user.roles !== "renter") {
+        throw new AppError("Only renters can have a wishlist", 400);
+    }
+
+    const wishlist = user.renter?.wishlist || [];
+
+    const formattedWishlist = wishlist.map((item: any) => ({
+        id: item._id.toString(),
+        title: item.title,
+        category: item.category,
+        rating: item.rating?.average || 5.0,
+        reviews: item.rating?.count || 0,
+        pricePerDay: item.pricing?.daily || item.dailyPrice || 0,
+        image: item.images?.[0] || null,
+        available: item.item_status === "active" || item.item_status === "available"
+    }));
+
+    return formattedWishlist;
+};
+
+export const toggleWishlistService = async (userId: string, itemId: string) => {
+    logger.info("Toggling wishlist item", { userId, itemId });
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    if (user.roles !== "renter") {
+        throw new AppError("Only renters can have a wishlist", 400);
+    }
+
+    const itemIndex = user.renter?.wishlist?.findIndex((id) => id.toString() === itemId);
+
+    let message = "";
+    let isWishlisted = false;
+
+    if (itemIndex !== undefined && itemIndex > -1) {
+        // Remove from wishlist
+        user.renter?.wishlist?.splice(itemIndex, 1);
+        message = "Item removed from wishlist";
+        isWishlisted = false;
+    } else {
+        // Add to wishlist
+        if (!user.renter) {
+            user.renter = {
+                totalSpent: 0,
+                totalBookings: 0,
+                wishlist: [],
+                rating: { average: 0, count: 0 }
+            };
+        }
+        
+        // Check if item exists
+        const item = await Item.findById(itemId);
+        if (!item) {
+            throw new AppError("Item not found", 404);
+        }
+
+        user.renter?.wishlist?.push(new (require("mongoose")).Types.ObjectId(itemId));
+        message = "Item added to wishlist";
+        isWishlisted = true;
+    }
+
+    await user.save();
+
+    return { message, isWishlisted };
+};
