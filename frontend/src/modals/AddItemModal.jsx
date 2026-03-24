@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, UploadCloud, Package, ImagePlus, IndianRupee } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function AddItemModal({ onClose, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -103,47 +104,47 @@ export default function AddItemModal({ onClose, onSubmit }) {
             value === "" || /^[0-9]+(\.[0-9]+)?$/.test(value);
 
         if (!isValidNumber(dailyPrice)) {
-            alert("Daily price must be a valid number");
+            toast.error("Daily price must be a valid number");
             return;
         }
 
         if (!isValidNumber(weeklyPrice)) {
-            alert("Weekly price must be a valid number");
+            toast.error("Weekly price must be a valid number");
             return;
         }
 
         if (!isValidNumber(monthlyPrice)) {
-            alert("Monthly price must be a valid number");
+            toast.error("Monthly price must be a valid number");
             return;
         }
 
         if (!isValidNumber(securityDeposit)) {
-            alert("Security deposit must be a valid number");
+            toast.error("Security deposit must be a valid number");
             return;
         }
 
         // Required checks
         if (!itemName) {
-            alert("Item name is required");
+            toast.error("Item name is required");
             return;
         }
 
         if (!category) {
-            alert("Category is required");
+            toast.error("Category is required");
             return;
         }
 
         if (!description) {
-            alert("Description is required");
+            toast.error("Description is required");
             return;
         }
         if (!dailyPrice) {
-            alert("Daily price is required");
+            toast.error("Daily price is required");
             return;
         }
 
         if (!securityDeposit) {
-            alert("Security deposit is required");
+            toast.error("Security deposit is required");
             return;
         }
 
@@ -167,14 +168,14 @@ export default function AddItemModal({ onClose, onSubmit }) {
             console.log(finalData)
             await addItemToBackend(finalData);
 
-            alert("Item added successfully! 🚀");
+            toast.success("Item added successfully! 🚀");
             if (onSubmit) {
                 onSubmit(finalData);
             }
             onClose();
         } catch (error) {
             console.error("Submission error:", error);
-            alert(error.message || "Failed to add item. Please try again.");
+            toast.error(error.message || "Failed to add item. Please try again.");
         } finally {
             setIsUploading(false);
         }

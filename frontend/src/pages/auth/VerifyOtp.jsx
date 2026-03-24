@@ -1,6 +1,7 @@
 import { useState, useRef } from "react"; // Added useRef for auto-focus
 import AuthLayout from "../../components/auth/AuthLayout";
 import { ShieldCheck, Clock } from "lucide-react";
+import toast from "react-hot-toast";
 
 const VerifyOtp = ({ email, switchMode }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
@@ -56,7 +57,7 @@ const VerifyOtp = ({ email, switchMode }) => {
       switchMode("completeProfile");
     } catch (error) {
       console.error("Error in verify otp", error);
-      alert(error.message || "Invalid OTP");
+      toast.error(error.message || "Invalid OTP");
     } finally {
       setLoading(false);
     }

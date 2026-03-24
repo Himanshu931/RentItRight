@@ -1,3 +1,5 @@
+import toast from "react-hot-toast";
+
 export default function CostSummary({ item, startDate, endDate, onRequestBooking, isSubmitting }) {
   const hasDates = !!(startDate && endDate);
   const days = hasDates
@@ -40,7 +42,7 @@ export default function CostSummary({ item, startDate, endDate, onRequestBooking
 
   const handleRequest = () => {
     if (!hasDates) {
-      alert("Please select dates first");
+      toast.error("Please select dates first");
       return;
     }
     onRequestBooking(total, {

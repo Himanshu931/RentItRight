@@ -5,6 +5,7 @@ import ExploreEmptyState from "../../components/renter_ui/explore/ExploreEmptySt
 import ExplorePagination from "../../components/renter_ui/explore/ExplorePagination";
 import { Loader2 } from "lucide-react";
 import useAuth from "../../hooks/authHook";
+import toast from "react-hot-toast";
 
 
 const RenterExplore = () => {
@@ -75,7 +76,7 @@ const RenterExplore = () => {
   const handleToggleWishlist = async (itemId) => {
     try {
       if (!user) {
-        alert("Please login to use wishlist");
+        toast.error("Please login to use wishlist");
         return;
       }
 

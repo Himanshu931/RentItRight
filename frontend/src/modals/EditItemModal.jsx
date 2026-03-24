@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { X, ChevronDown, ImagePlus, Package, DollarSign, IndianRupee } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function EditItemModal({ item, onClose, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -133,12 +134,12 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
             console.log("Updating Item:", finalData);
             await updateItem(finalData);
 
-            alert("Item updated successfully! 🚀");
+            toast.success("Item updated successfully! 🚀");
             onSubmit(finalData);
             onClose();
         } catch (error) {
             console.error("Submission error:", error);
-            alert(error.message || "Failed to update item. Please try again.");
+            toast.error(error.message || "Failed to update item. Please try again.");
         } finally {
             setIsUploading(false);
         }

@@ -1,5 +1,6 @@
 import AuthLayout from "../../components/auth/AuthLayout";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 import {
   Mail,
@@ -25,7 +26,7 @@ const Register = ({ switchMode, email, setEmail }) => {
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!checked) {
-      alert("Please accept the terms and conditions")
+      toast.error("Please accept the terms and conditions")
       return;
     }
     if (user.password.length < 6) {

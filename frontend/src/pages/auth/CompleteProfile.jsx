@@ -8,6 +8,7 @@ import {
   Phone,
   ArrowRight
 } from "lucide-react";
+import toast from "react-hot-toast";
 
 
 export default function CompleteProfile({ switchMode }) {
@@ -122,11 +123,11 @@ export default function CompleteProfile({ switchMode }) {
         throw new Error(data.message || "Something went wrong");
       }
       switchMode("success");
-      alert("Profile Completed Successfully 🚀");
+      toast.success("Profile Completed Successfully 🚀");
 
     } catch (error) {
       console.error(error.message);
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }

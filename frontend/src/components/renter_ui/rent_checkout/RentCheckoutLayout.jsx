@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 import RentalCalendar from "./RentalCalendar";
 import RentalDuration from "./RentalDuration";
 import CostSummary from "./CostSummary";
@@ -19,7 +20,7 @@ export default function RentCheckoutLayout({ item, availability, user }) {
 
     if (!user?.address?.district || !user?.name) {
       // Small refinement: Check for address
-      alert("Please update your profile with name and address before booking.");
+      toast.error("Please update your profile with name and address before booking.");
       navigate("/renter/profile");
       return;
     }
@@ -64,7 +65,7 @@ export default function RentCheckoutLayout({ item, availability, user }) {
 
       const data = await response.json();
       if (data.success) {
-        alert("Booking request sent successfully! Redirecting to your rentals...");
+        toast.success("Booking request sent successfully! Redirecting to your rentals...");
         navigate("/rentals");
       } else {
         throw new Error(data.message || "Failed to create booking");
@@ -72,7 +73,7 @@ export default function RentCheckoutLayout({ item, availability, user }) {
     } catch (err) {
       console.error("Booking error:", err);
       setError(err.message || "Something went wrong. Please try again.");
-      alert(err.message || "Failed to send booking request.");
+      toast.error(err.message || "Failed to send booking request.");
     } finally {
       setIsSubmitting(false);
     }

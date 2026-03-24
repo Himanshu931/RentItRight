@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import GuestLayout from "./layouts/GuestLayout";
 import GuestHome from "./pages/guest/GuestHome";
@@ -24,6 +25,7 @@ import { NotFound } from "./pages/NotFound";
 function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-center" reverseOrder={false} />
       <Routes>
 
         {/* Guest pages */}

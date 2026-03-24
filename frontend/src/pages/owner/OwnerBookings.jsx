@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import BookingTabs from '../../components/owner_ui/bookings/BookingTabs';
 import BookingCard from '../../components/owner_ui/bookings/BookingCard';
+import toast from 'react-hot-toast';
 
 const OwnerBookings = () => {
   const [activeTab, setActiveTab] = useState('pending');
@@ -69,7 +70,7 @@ const OwnerBookings = () => {
   const handleReject = async (id) => {
     const message = prompt("Please enter a reason for rejection (min 10 chars):");
     if (!message || message.length < 10) {
-       alert("Rejection message must be at least 10 characters.");
+       toast.error("Rejection message must be at least 10 characters.");
        return;
     }
 
@@ -127,7 +128,7 @@ const OwnerBookings = () => {
   };
 
   const handleExtend = (id) => {
-    alert("Extend Rental functionality coming soon!");
+    toast("Extend Rental functionality coming soon!", { icon: "⏳" });
   };
 
   const filteredBookings = useMemo(() => {

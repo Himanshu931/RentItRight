@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import useAuth from "../../hooks/authHook";
+import toast from "react-hot-toast";
 
 import ImageGallery from "../../components/renter_ui/item_detail/ImageGallery";
 import ItemSummaryCard from "../../components/renter_ui/item_detail/ItemSummaryCard";
@@ -72,7 +73,7 @@ const RenterItemDetails = () => {
   const handleToggleWishlist = async () => {
     try {
       if (!user) {
-        alert("Please login to use wishlist");
+        toast.error("Please login to use wishlist");
         return;
       }
 

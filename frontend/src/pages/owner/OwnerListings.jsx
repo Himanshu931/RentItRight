@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Plus } from "lucide-react";
+import toast from "react-hot-toast";
 import SearchBar from "../../components/owner_ui/ownerListings/SearchBar";
 import InventoryCard from "../../components/owner_ui/ownerListings/InventoryCard";
 import InventoryTabs from "../../components/owner_ui/ownerListings/InventoryTabs";
@@ -79,7 +80,7 @@ export default function OwnerListings() {
             if (data.success) {
                 fetchItems();
             } else {
-                alert(data.message || "Failed to pause item.");
+                toast.error(data.message || "Failed to pause item.");
             }
         } catch (error) {
             console.error("Failed to pause item:", error);
@@ -106,7 +107,7 @@ export default function OwnerListings() {
             if (data.success) {
                 fetchItems();
             } else {
-                alert(data.message || "Failed to activate item.");
+                toast.error(data.message || "Failed to activate item.");
             }
         } catch (error) {
             console.error("Failed to activate item:", error);
@@ -134,7 +135,7 @@ export default function OwnerListings() {
             if (data.success) {
                 fetchItems();
             } else {
-                alert(data.message || "Failed to delete item.");
+                toast.error(data.message || "Failed to delete item.");
             }
         } catch (error) {
             console.error("Failed to delete item:", error);
