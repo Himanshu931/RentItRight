@@ -14,6 +14,7 @@
   --color-elevated: #1b222c;
   --color-divider: #2a2e36;
   --color-bright: #2fb7a4;
+  --color-primary: #2fb7a4;
 
   /* Text */
   --color-text-primary: #e6eaf0;
@@ -44,6 +45,14 @@
 
 /* Global Utilities */
 @layer utilities {
+  .glass-panel {
+    @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl;
+  }
+
+  .teal-glow {
+    background: radial-gradient(circle at 50% 50%, rgba(47, 183, 164, 0.08) 0%, transparent 70%);
+  }
+
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -66,10 +75,44 @@
       opacity: 0;
       transform: scale(0.95) translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
     }
+  }
+
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes gradient {
+
+    0%,
+    100% {
+      background-position: 0% center;
+    }
+
+    50% {
+      background-position: 100% center;
+    }
+
+    100% {
+      background-position: 0% center;
+    }
+  }
+
+  .animate-gradient {
+    background-size: 200% auto;
+    animation: gradient 6s linear infinite;
   }
 }
 

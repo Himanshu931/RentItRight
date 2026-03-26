@@ -1,69 +1,85 @@
+import { Search, ShieldCheck, Star } from "lucide-react";
+
 const steps = [
   {
-    id: 1,
-    title: "Browse",
+    id: "01",
+    icon: <Search className="size-6" />,
+    title: "Browse & Discover",
     description:
-      "Explore a curated catalog of local listings. From tools to tech, find exactly what you need right next door.",
-    icon: "search",
+      "Search thousands of high-quality items in your neighborhood — from professional cameras to power tools and luxury furniture.",
   },
   {
-    id: 2,
-    title: "Book",
+    id: "02",
+    icon: <ShieldCheck className="size-6" />,
+    title: "Book & Pay Securely",
     description:
-      "Secure your rental with our encrypted payment system and flexible scheduling tools. Instant peace of mind.",
-    icon: "event_available",
+      "Instantly check availability and reserve with our end-to-end encrypted checkout. Your payment is protected until pickup.",
   },
   {
-    id: 3,
-    title: "Return",
+    id: "03",
+    icon: <Star className="size-6" />,
+    title: "Return & Review",
     description:
-      "Once finished, follow our simple handoff guide. Rate your experience and help the community thrive.",
-    icon: "assignment_return",
+      "Complete a seamless handback with your neighbor. Build community trust by sharing a detailed, honest review.",
   },
 ];
 
 export default function Steps() {
   return (
-    <section id="steps" className="bg-app py-28 border-y border-divider scroll-mt-24">
-      <div className="max-w-[1400px] mx-auto px-6">
-
-        {/* Section header */}
-        <div className="text-center mb-20">
-          <h2 className="text-[28px] md:text-[40px] font-bold text-text-primary">
-            The Effortless Exchange
+    <section id="how-it-works" className="py-24 scroll-mt-24 border-t border-divider bg-app">
+      <div className="max-w-7xl mx-auto px-6 relative z-10 transition-all duration-700">
+        
+        {/* Section Header */}
+        <div className="text-center mb-24 max-w-3xl mx-auto">
+          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary mr-2 animate-pulse shadow-[0_0_8px_#2fb7a4]" />
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
+                Process
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-6xl font-black text-text-primary leading-[1.1] mb-6 tracking-tight">
+            Three Steps to Start
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-text-secondary text-base">
-            Three simple steps to start sharing and renting within your neighborhood today.
+          <p className="text-lg md:text-xl text-text-secondary leading-relaxed font-medium">
+            From browsing to earning — the whole experience is designed to be effortless.
           </p>
         </div>
 
-        {/* Steps grid */}
-        <div className="grid md:grid-cols-3 gap-8">
+        {/* Step Cards Grid */}
+        <div className="grid md:grid-cols-3 gap-10">
           {steps.map((step) => (
             <div
               key={step.id}
-              className="group bg-card border border-divider rounded-xl p-10 hover:bg-elevated transition-colors hover:border-bright"
+              className="group relative rounded-[32px] p-10 bg-card border border-white/5 transition-all duration-500 hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] cursor-default overflow-hidden"
             >
-              {/* Icon */}
-              <div className="w-14 h-14 flex items-center justify-center rounded-full bg-bright-soft border border-bright/30 mb-6">
-                <span className="material-symbols-outlined text-bright text-2xl">
-                  {step.icon}
-                </span>
+              {/* Giant Watermark Number */}
+              <div className="absolute -top-4 -right-2 text-[160px] font-black select-none pointer-events-none leading-none opacity-[0.03] text-primary transition-all duration-700 group-hover:opacity-[0.05] group-hover:translate-x-2 group-hover:-translate-y-2">
+                {step.id}
               </div>
 
-              {/* Title */}
-              <h3 className="text-2xl font-semibold text-text-primary mb-3">
-                {step.title}
-              </h3>
+              {/* Icon Container */}
+              <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-8 bg-primary/10 border border-primary/20 text-primary shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:shadow-primary/5 group-hover:bg-primary/20">
+                {step.icon}
+              </div>
 
-              {/* Description */}
-              <p className="text-text-secondary text-lg leading-relaxed">
-                {step.description}
-              </p>
+              {/* Step Title & Label */}
+              <div className="relative z-10">
+                <span className="block text-[10px] font-bold tracking-[0.3em] uppercase text-primary/70 mb-3 transition-colors group-hover:text-primary">
+                    Step {step.id}
+                </span>
+                <h3 className="text-2xl font-black text-text-primary mb-5 tracking-tight">
+                  {step.title}
+                </h3>
+                <p className="text-text-secondary text-base leading-relaxed font-medium opacity-80 group-hover:opacity-100 transition-opacity duration-500">
+                  {step.description}
+                </p>
+              </div>
+
+              {/* Subtle accent hover line */}
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-[2px]" />
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );
