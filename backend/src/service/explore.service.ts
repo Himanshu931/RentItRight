@@ -25,7 +25,7 @@ export const getAllItemsService = async (page = 1, limit = 10) => {
 
     logger.info("Fetching items list", { page, limit });
 
-    const query: mongoose.FilterQuery<Item> = { status: "active" };
+    const query = { status: "active" };
     const skip = (page - 1) * limit;
 
     const totalItems = await Item.countDocuments(query);
@@ -45,7 +45,7 @@ export const getAllItemsService = async (page = 1, limit = 10) => {
         };
     }
 
-    const formattedItems = items.map((i) => ({
+    const formattedItems = items.map((i: Item) => ({
         id: i._id.toString(),
         title: i.title,
         image: i.images?.[0] ?? null,
@@ -105,8 +105,8 @@ export const getItemByIdService = async (id: string) => {
         ...occupiedDates
     ];
 
-    logger.info("Item details fetched with occupied dates", { 
-        itemId: id, 
+    logger.info("Item details fetched with occupied dates", {
+        itemId: id,
         bookedCount: bookings.length,
         totalUnavailable: allUnavailableDates.length
     });

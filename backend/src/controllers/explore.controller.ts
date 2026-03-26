@@ -20,6 +20,7 @@ export const exploreItems = catchAsync(async (req: Request, res: Response) => {
     const { total, items } = await getAllItemsService(page, limit);
 
     res.status(200).json({
+        status: "success",
         success: true,
         message: "Items fetched successfully",
         data: items,

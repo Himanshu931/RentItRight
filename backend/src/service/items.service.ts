@@ -26,13 +26,11 @@ export const getItemService = async (
 
     ensureOwner(role!);
 
-    const query: mongoose.FilterQuery<Item> = {
-        ownerId: new mongoose.Types.ObjectId(id)
+    const query = {
+        ownerId: new mongoose.Types.ObjectId(id),
+        ...(status && { status }),
+        ...(q && { $text: { $search: q } }),
     };
-
-    if (status) query.status = status;
-
-    if (q) query.$text = { $search: q };
 
     const limit = 10;
     const skip = (page - 1) * limit;
