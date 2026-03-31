@@ -1,3 +1,5 @@
+import logo from "../../assets/logo.png";
+
 export default function Footer() {
   return (
     <footer className="bg-deep-dark border-t border-divider pt-20 pb-10">
@@ -9,11 +11,7 @@ export default function Footer() {
           {/* BRAND */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-primary p-1.5 rounded-lg">
-                <span className="material-symbols-outlined text-white text-sm">
-                  handshake
-                </span>
-              </div>
+              <img src={logo} alt="logo" width="35px" />
               <h2 className="text-lg font-bold text-white">
                 Rent It Right
               </h2>

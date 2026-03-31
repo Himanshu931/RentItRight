@@ -24,19 +24,13 @@ const features = [
 export default function Trust() {
   return (
     <section
-      className="py-32 border-t border-divider bg-app relative overflow-hidden"
+      className="py-20 border-t border-divider bg-app relative overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6 relative z-10 transition-all duration-700">
         
         {/* Section Header */}
-        <div className="text-center mb-24 max-w-3xl mx-auto">
-          <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary mr-2 animate-pulse shadow-[0_0_8px_#2fb7a4]" />
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
-                Why RentItRight
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary leading-[1.1] mb-6 tracking-tight">
+        <div className="text-center mb-16 max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-5xl lg:text-5xl font-black text-text-primary leading-[1.1] mb-5 tracking-tight">
             Built on Trust, <br />Designed for People
           </h2>
           <p className="text-lg md:text-xl text-text-secondary leading-relaxed font-medium">
@@ -46,20 +40,20 @@ export default function Trust() {
         </div>
 
         {/* Feature Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-10">
+        <div className="grid md:grid-cols-3 gap-8">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="group relative rounded-[32px] p-12 bg-card border border-white/5 transition-all duration-500 hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] cursor-default overflow-hidden"
+              className="group relative rounded-[32px] p-8 md:p-10 bg-card border border-white/5 transition-all duration-500 hover:scale-[1.02] hover:border-primary/30 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] cursor-default overflow-hidden"
             >
               {/* Icon Container */}
-              <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center mb-10 bg-primary/10 border border-primary/20 text-primary shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:shadow-primary/5 group-hover:bg-primary/20">
+              <div className="relative w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-primary/10 border border-primary/20 text-primary shadow-xl transition-all duration-500 group-hover:scale-110 group-hover:shadow-primary/5 group-hover:bg-primary/20">
                 {feature.icon}
               </div>
 
               {/* Feature Title & Text */}
               <div className="relative z-10">
-                <h3 className="text-2xl font-black text-text-primary mb-5 tracking-tight">
+                <h3 className="text-2xl font-black text-text-primary mb-4 tracking-tight">
                   {feature.title}
                 </h3>
                 <p className="text-text-secondary text-base leading-relaxed font-medium opacity-80 group-hover:opacity-100 transition-opacity duration-500">

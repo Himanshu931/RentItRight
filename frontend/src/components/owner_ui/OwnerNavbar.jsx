@@ -1,6 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import useAuth from "../../hooks/authHook";
+import logo from "../../assets/logo.png";
 
 
 const OwnerNavbar = () => {
@@ -60,7 +61,7 @@ const OwnerNavbar = () => {
                 {/* Left: Brand + Nav */}
                 <div className="flex items-center gap-10">
                     <Link to="/owner" className="flex items-center gap-2">
-                        <img src="./src/assets/logo.png" alt="logo" width="35px" />
+                        <img src={logo} alt="logo" width="35px" />
                         <h2 className="text-2xl font-bold text-text-primary">
                             RentIt<span className="text-bright">Right</span>
                         </h2>

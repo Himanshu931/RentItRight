@@ -32,18 +32,12 @@ export default function Categories() {
   return (
     <section 
       id="categories" 
-      className="py-24 scroll-mt-24 border-t border-divider bg-[#0c0e11]" 
+      className="py-16 scroll-mt-24 border-t border-divider bg-[#0c0e11]" 
     >
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-8 mb-16">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-8 mb-10">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary mr-2 animate-pulse shadow-[0_0_8px_#2fb7a4]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">
-                    Collection
-                </span>
-            </div>
             <h2 className="text-4xl md:text-5xl font-black text-text-primary leading-tight mb-4 tracking-tight">
               Explore What's Near You
             </h2>
@@ -66,7 +60,7 @@ export default function Categories() {
             <Link
               key={cat.title}
               to="/explore"
-              className="group relative h-[360px] rounded-[32px] overflow-hidden border border-white/5 shadow-2xl transition-all duration-[800ms] hover:scale-[1.03] hover:border-primary/30 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)]"
+              className="group relative h-[300px] rounded-[32px] overflow-hidden border border-white/5 shadow-2xl transition-all duration-[800ms] hover:scale-[1.03] hover:border-primary/30 hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.6)]"
             >
               {/* Image with zoom effect */}
               <img
@@ -82,11 +76,11 @@ export default function Categories() {
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(47,183,164,0.1),transparent_70%)]" />
 
               {/* Card Content Container */}
-              <div className="absolute bottom-0 left-0 right-0 p-8 transform transition-transform duration-700 group-hover:-translate-y-2">
-                <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-6 bg-white/10 backdrop-blur-xl border border-white/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-app shadow-2xl">
+              <div className="absolute bottom-0 left-0 right-0 p-6 transform transition-transform duration-700 group-hover:-translate-y-2">
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 bg-white/10 backdrop-blur-xl border border-white/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:bg-primary group-hover:text-app shadow-2xl">
                   {cat.icon}
                 </div>
-                <h3 className="text-2xl font-black text-text-primary mb-2 tracking-tight">
+                <h3 className="text-2xl font-black text-text-primary mb-1 tracking-tight">
                   {cat.title}
                 </h3>
                 <p className="text-[10px] font-black tracking-[0.25em] uppercase text-text-muted group-hover:text-white/80 transition-colors">

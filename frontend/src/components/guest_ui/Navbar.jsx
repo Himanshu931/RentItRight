@@ -1,6 +1,7 @@
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import AuthController from "../auth/AuthController";
+import logo from "../../assets/logo.png";
 
 const Navbar = () => {
   const [authOpen, setAuthOpen] = useState(false);
@@ -24,7 +25,7 @@ const Navbar = () => {
 
         <div className="flex items-center gap-10">
           <Link to="/" className="flex items-center gap-2">
-            <img src="./src/assets/logo.png" alt="logo" width="35px" />
+            <img src={logo} alt="logo" width="35px" />
             <h2 className="text-2xl font-bold text-text-primary">
               RentIt<span className="text-bright">Right</span>
             </h2>
