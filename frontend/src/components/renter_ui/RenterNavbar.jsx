@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import useAuth from "../../hooks/authHook";
 import logo from "../../assets/logo.png";
+import toast from "react-hot-toast";
 
 const RenterNavbar = () => {
     const navigate = useNavigate();
@@ -24,6 +25,7 @@ const RenterNavbar = () => {
             if (!data.success) {
                 throw new Error("Unable to logout");
             }
+            toast.success("Signed out successfully 👋");
             navigate("/");
         } catch (error) {
             console.error("Logout failed:", error);

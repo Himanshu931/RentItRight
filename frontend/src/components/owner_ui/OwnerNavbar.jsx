@@ -2,6 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import useAuth from "../../hooks/authHook";
 import logo from "../../assets/logo.png";
+import toast from "react-hot-toast";
 
 
 const OwnerNavbar = () => {
@@ -23,6 +24,7 @@ const OwnerNavbar = () => {
             localStorage.clear();
             sessionStorage.clear();
             // Redirect to home
+            toast.success("Signed out successfully 👋");
             navigate("/");
             setIsDropdownOpen(false);
         }

@@ -56,8 +56,40 @@ const VerifyOtp = ({ email, switchMode }) => {
 
       switchMode("completeProfile");
     } catch (error) {
-      console.error("Error in verify otp", error);
-      toast.error(error.message || "Invalid OTP");
+      console.error("Error in verify otp", error.message);
+      let errorMessage = error.message;
+      if (errorMessage.toLowerCase().includes("limit") || errorMessage.toLowerCase().includes("too many")) {
+        errorMessage = "Too many attempts, please try again after 10 minutes";
+      } else if (errorMessage === "Failed to fetch") {
+        errorMessage = "Server is unreachable";
+      }
+      toast.error(errorMessage || "Invalid OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/send-otp`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!data.success) throw new Error(data.message);
+      toast.success("Verification code resent! 📩");
+    } catch (error) {
+      console.error("Error resending OTP", error.message);
+      let errorMessage = error.message;
+      if (errorMessage.toLowerCase().includes("limit") || errorMessage.toLowerCase().includes("too many")) {
+        errorMessage = "Too many attempts, please try again after 10 minutes";
+      } else if (errorMessage === "Failed to fetch") {
+        errorMessage = "Server is unreachable";
+      }
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -116,7 +148,14 @@ const VerifyOtp = ({ email, switchMode }) => {
           <div className="flex flex-col items-center gap-2">
             <div className="flex items-center gap-2 text-sm">
               <span className="text-text-secondary">Didn’t receive the code?</span>
-              <button className="text-bright font-medium hover:underline">Resend</button>
+              <button
+                type="button"
+                onClick={handleResendOtp}
+                disabled={loading}
+                className="text-bright font-medium hover:underline disabled:opacity-50"
+              >
+                Resend
+              </button>
             </div>
           </div>
         </div>

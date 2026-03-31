@@ -4,14 +4,11 @@ import { Mail, Eye, EyeOff } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+import toast from "react-hot-toast";
 import { useState } from "react";
 
 const Login = ({ switchMode, onClose }) => {
   const navigate = useNavigate();
-  const [error, setError] = useState({
-    email: "",
-    password: "",
-  });
   const [user, setUser] = useState({
     email: "",
     password: ""
@@ -24,7 +21,21 @@ const Login = ({ switchMode, onClose }) => {
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    setError({ email: "", password: "" });
+    if (!user.email.trim()) {
+      toast.error("Email is required");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(user.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    if (!user.password.trim()) {
+      toast.error("Password is required");
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, {
@@ -37,19 +48,16 @@ const Login = ({ switchMode, onClose }) => {
       })
       const data = await res.json();
       if (!data.success) {
-        setError({
-          email: data.message.toLowerCase().includes("not found") || data.message.toLowerCase().includes("email") ? data.message : "",
-          password: data.message.toLowerCase().includes("password") ? data.message : ""
-        });
-        console.log(data.message)
-        throw new Error(data.message);
+        throw new Error("Invalid credentials");
       }
 
+      toast.success("Welcome back! 🚀");
       navigate("/role-redirect");
-      onClose()
+      onClose();
 
     } catch (error) {
-      console.log(error);
+      console.error(error.message);
+      toast.error(error.message === "Failed to fetch" ? "Server is unreachable" : error.message);
     } finally {
       setLoading(false);
     }
@@ -87,16 +95,11 @@ const Login = ({ switchMode, onClose }) => {
                 value={user.email}
                 onChange={(e) => {
                   setUser({ ...user, email: e.target.value });
-                  setError((prev) => ({ ...prev, email: "" }));
                 }}
                 className="form-input w-full pl-12 pr-4 py-3 bg-app border border-text-secondary/30 rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition
               focus:border-bright"
-                required
               />
             </div>
-            {error.email && (
-              <p className="text-white font-bold text-sm mt-2 bg-error/15 p-2 rounded-lg text-center border border-error/80">{error.email}</p>
-            )}
           </div>
 
           {/* Password */}
@@ -122,10 +125,8 @@ const Login = ({ switchMode, onClose }) => {
                 value={user.password}
                 onChange={(e) => {
                   setUser({ ...user, password: e.target.value });
-                  setError((prev) => ({ ...prev, password: "" }));
                 }}
                 className="form-input w-full pl-12 pr-4 py-3 bg-app border rounded-2xl text-text-primary placeholder:text-text-secondary/30 focus:outline-none transition focus:border-bright border-text-secondary/30"
-                required
               />
               <button
                 type="button"
@@ -135,9 +136,6 @@ const Login = ({ switchMode, onClose }) => {
                 {showPassword ? <EyeOff /> : <Eye />}
               </button>
             </div>
-            {error.password && (
-              <p className="text-white font-bold text-sm mt-2 bg-error/15 p-2 rounded-lg text-center border border-error/80">{error.password}</p>
-            )}
           </div>
 
           {/* Login Button */}
