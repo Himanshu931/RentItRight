@@ -28,7 +28,7 @@ const app = express();
 // -------------------- CORS --------------------
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: "https://rent-it-right.vercel.app",
         credentials: true,
     })
 );
