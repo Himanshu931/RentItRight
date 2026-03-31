@@ -28,7 +28,8 @@ const app = express();
 // -------------------- CORS --------------------
 app.use(
     cors({
-        origin: "https://rent-it-right.vercel.app",
+        // origin: "https://rent-it-right.vercel.app",
+        origin: "http://localhost:5173",
         credentials: true,
     })
 );
@@ -49,7 +50,7 @@ const csrfProtection = csrf({
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
     },
 });
 
