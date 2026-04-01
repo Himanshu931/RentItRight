@@ -28,7 +28,7 @@ export default function Steps() {
   return (
     <section id="how-it-works" className="py-16 scroll-mt-24 border-t border-divider bg-app">
       <div className="max-w-7xl mx-auto px-6 relative z-10 transition-all duration-700">
-        
+
         {/* Section Header */}
         <div className="text-center mb-12 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black text-text-primary leading-[1.1] mb-5 tracking-tight">
@@ -59,7 +59,7 @@ export default function Steps() {
               {/* Step Title & Label */}
               <div className="relative z-10">
                 <span className="block text-[10px] font-bold tracking-[0.3em] uppercase text-primary/60 mb-2 transition-colors group-hover:text-primary">
-                    Step {step.id}
+                  Step {step.id}
                 </span>
                 <h3 className="text-2xl font-black text-text-primary mb-4 tracking-tight">
                   {step.title}

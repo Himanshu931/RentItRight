@@ -3,10 +3,10 @@ const ExploreSearchBar = ({ value, onChange }) => {
   return (
     <div className="mb-10">
       <div className="relative max-w-3xl mx-auto rounded-3xl bg-card border border-divider flex items-center h-14 px-4">
-    
-        <Search className="text-text-secondary mr-3"/>
+
+        <Search className="text-text-secondary mr-3" />
         <input
-        value={value}
+          value={value}
           onChange={(e) => onChange(e.target.value)}
           className="w-full bg-transparent outline-none text-text-primary placeholder:text-text-secondary"
           placeholder="Search items near you..."

@@ -4,10 +4,14 @@ const PricingSelector = ({ pricing }) => {
   const [selectedPlan, setSelectedPlan] = useState("daily");
 
   const priceMap = {
-    daily: { label: "day", value: pricing.daily },
-    weekly: { label: "week", value: pricing.weekly },
-    monthly: { label: "month", value: pricing.monthly },
+    daily: { label: "day", value: pricing?.daily || 0 },
+    weekly: { label: "week", value: pricing?.weekly || 0 },
+    monthly: { label: "month", value: pricing?.monthly || 0 },
   };
+
+  const availablePlans = ["daily", "weekly", "monthly"].filter(
+    (plan) => pricing?.[plan] !== undefined && pricing?.[plan] !== null
+  );
 
   return (
     <div className="mt-6 flex justify-between items-center border-b-1 border-divider pb-7">
@@ -26,9 +30,7 @@ const PricingSelector = ({ pricing }) => {
 
       {/* Selector */}
       <div className="mt-4 flex gap-0.5 bg-app p-1 rounded-xl border-1 border-divider">
-        {["daily", "weekly", "monthly"]
-          .filter((plan) => pricing[plan] !== undefined && pricing[plan] !== null)
-          .map((plan) => {
+        {availablePlans.map((plan) => {
             const isActive = selectedPlan === plan;
 
             return (

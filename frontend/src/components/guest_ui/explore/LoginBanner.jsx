@@ -20,17 +20,17 @@ export default function LoginBanner() {
         </div>
       </div>
 
-      <button className="bg-accent text-text-primary px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-accent-hover" 
-      onClick={
-        ()=>{
-          setAuthOpen(true);
-        }}>
+      <button className="bg-accent text-text-primary px-6 py-2.5 rounded-lg font-bold text-sm hover:bg-accent-hover"
+        onClick={
+          () => {
+            setAuthOpen(true);
+          }}>
         Sign In / Sign Up
       </button>
 
       <AuthController
         open={authOpen}
-        onClose={()=>setAuthOpen(false)}
+        onClose={() => setAuthOpen(false)}
         defaultMode={authMode}
       />
     </div>

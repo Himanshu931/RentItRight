@@ -30,9 +30,9 @@ const categories = [
 
 export default function Categories() {
   return (
-    <section 
-      id="categories" 
-      className="py-16 scroll-mt-24 border-t border-divider bg-[#0c0e11]" 
+    <section
+      id="categories"
+      className="py-16 scroll-mt-24 border-t border-divider bg-[#0c0e11]"
     >
       <div className="max-w-7xl mx-auto px-6">
         {/* Section Header */}
@@ -71,7 +71,7 @@ export default function Categories() {
 
               {/* Dynamic Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-75" />
-              
+
               {/* Cyan radial glow on hover */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(47,183,164,0.1),transparent_70%)]" />
 
@@ -90,7 +90,7 @@ export default function Categories() {
 
               {/* Hover indicator link button (bottom corner) */}
               <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-primary/20 backdrop-blur-md opacity-0 transform translate-x-4 transition-all duration-700 group-hover:opacity-100 group-hover:translate-x-0 flex items-center justify-center">
-                 <ArrowRight size={20} className="text-primary" />
+                <ArrowRight size={20} className="text-primary" />
               </div>
             </Link>
           ))}

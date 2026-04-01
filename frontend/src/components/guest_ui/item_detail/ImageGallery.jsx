@@ -1,14 +1,20 @@
-export default function ImageGallery() {
+export default function ImageGallery({ images }) {
+  const displayImage = images && images.length > 0 ? images[0] : "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200";
+
   return (
     <div className="space-y-5">
-      <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-surface">
+      <div className="relative aspect-[16/9] rounded-[32px] overflow-hidden bg-surface border border-white/5 shadow-2xl">
         <img
-          src="https://images.unsplash.com/photo-1495707902641-75cac588d2e9?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          className="w-full h-full object-cover"
+          src={displayImage}
+          alt="Item visualization"
+          className="w-full h-full object-cover transition-transform duration-700 hover:scale-[1.03]"
         />
-        <span className="absolute top-4 left-4 bg-inherit px-3 py-1 text-[12px] font-bold text-bright rounded-full border-2 border-bright">
-          VERIFIED GEAR
-        </span>
+        <div className="absolute top-6 left-6 flex items-center gap-2 bg-app/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+          <span className="material-symbols-outlined text-primary !text-[18px]">verified_user</span>
+          <span className="text-[10px] font-black tracking-[0.2em] text-text-primary uppercase">
+            CERTIFIED GEAR
+          </span>
+        </div>
       </div>
     </div>
   );
