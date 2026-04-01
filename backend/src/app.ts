@@ -14,6 +14,8 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import session from "express-session";
+import passport from "./config/passport";
 import { RATE_LIMITER, AUTH_LIMITER } from "./middleware/rateLimiter";
 import csrf from "csurf";
 import mongoSanitize from "express-mongo-sanitize";
@@ -40,6 +42,22 @@ app.use(morgan("dev"));
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// -------------------- SESSION & PASSPORT --------------------
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || "rentitright_secret_session_key",
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 1000,
+        },
+    })
+);
+app.use(passport.initialize());
+app.use(passport.session());
 
 // -------------------- RATE LIMITING --------------------
 app.use(RATE_LIMITER);

@@ -6,7 +6,9 @@ import {
   register,
   sendOTP,
   verifyOTP,
+  googleCallback,
 } from "../controllers/auth.controller";
+import passport from "passport";
 import { VerifyUser } from "../middleware/verifyUser";
 import { OTP_LIMITER } from "../middleware/rateLimiter";
 
@@ -125,6 +127,43 @@ router.get("/me", VerifyUser, me);
  *         description: User logged out successfully
  */
 router.post("/logout", VerifyUser, logout);
+
+/**
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: Initiate Google OAuth
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: flow
+ *         schema:
+ *           type: string
+ *         description: "State to distinguish between 'login' and 'register'"
+ */
+router.get(
+  "/google",
+  (req, res, next) => {
+    const { flow } = req.query;
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      state: flow as string,
+    })(req, res, next);
+  }
+);
+
+/**
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth Callback
+ *     tags: [Auth]
+ */
+router.get(
+  "/google/callback",
+  passport.authenticate("google", { session: false }),
+  googleCallback
+);
 
 
 export default router;
