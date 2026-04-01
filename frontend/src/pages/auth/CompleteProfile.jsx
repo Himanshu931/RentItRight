@@ -11,8 +11,13 @@ import {
 import toast from "react-hot-toast";
 
 
+import useAuth from "../../hooks/authHook";
+import { useEffect } from "react";
+
+
 export default function CompleteProfile({ switchMode }) {
 
+  const { user, loading: authLoading } = useAuth();
   const [intent, setIntent] = useState("renter");
   const [profileImage, setProfileImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
@@ -24,6 +29,18 @@ export default function CompleteProfile({ switchMode }) {
   const [pincode, setPincode] = useState("");
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        fullName: prev.fullName || user.name || "",
+      }));
+      if (user.profileImage && !previewUrl) {
+        setPreviewUrl(user.profileImage);
+      }
+    }
+  }, [user]);
 
   // Convert ProfileImage to CloudinaryImage
   const convertImage = async (profilePic) => {
@@ -66,7 +83,7 @@ export default function CompleteProfile({ switchMode }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!profileImage) {
+    if (!profileImage && !previewUrl) {
       toast.error("Please upload a profile photo");
       return;
     }
@@ -132,7 +149,7 @@ export default function CompleteProfile({ switchMode }) {
               state: state,
               pincode: pincode
             },
-            profileImage: await convertImage(profileImage)
+            profileImage: profileImage ? await convertImage(profileImage) : previewUrl
           })
         }
       );

@@ -1,11 +1,33 @@
-import { Link, NavLink } from "react-router-dom";
-import { useState } from "react";
+import { Link, NavLink, useLocation, useSearchParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import AuthController from "../auth/AuthController";
 import logo from "../../assets/logo.png";
 
 const Navbar = () => {
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState("login");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+
+  useEffect(() => {
+    const authStatus = searchParams.get("auth");
+    const mode = searchParams.get("mode");
+
+    if (authStatus === "success" && mode) {
+      setAuthMode(mode);
+      setAuthOpen(true);
+    }
+  }, [searchParams]);
+
+  const handleAuthClose = () => {
+    setAuthOpen(false);
+    if (searchParams.has("auth") || searchParams.has("mode")) {
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("auth");
+      newParams.delete("mode");
+      setSearchParams(newParams, { replace: true });
+    }
+  };
 
   const navItemClass = ({ isActive }) =>
     [
@@ -67,7 +89,7 @@ const Navbar = () => {
 
           <AuthController
             open={authOpen}
-            onClose={() => setAuthOpen(false)}
+            onClose={handleAuthClose}
             defaultMode={authMode}
           />
         </div>
