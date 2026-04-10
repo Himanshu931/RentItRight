@@ -3,7 +3,6 @@ import ExploreSearchBar from "../../components/renter_ui/explore/ExploreSearchBa
 import ExploreGrid from "../../components/renter_ui/explore/ExploreGrid";
 import ExploreEmptyState from "../../components/renter_ui/explore/ExploreEmptyState";
 import ExplorePagination from "../../components/renter_ui/explore/ExplorePagination";
-import { Loader2 } from "lucide-react";
 import useAuth from "../../hooks/authHook";
 import toast from "react-hot-toast";
 
@@ -118,11 +117,7 @@ const RenterExplore = () => {
     <div className="mx-auto max-w-7xl px-6 lg:px-20 py-8 min-h-screen">
       <ExploreSearchBar value={search} onChange={setSearch} />
 
-      {loading && rentals.length === 0 ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-10 h-10 animate-spin text-app" />
-        </div>
-      ) : rentals.length === 0 ? (
+      {rentals.length === 0 && !loading ? (
         <ExploreEmptyState />
       ) : (
         <div className="flex flex-col gap-10">
@@ -130,6 +125,7 @@ const RenterExplore = () => {
             rentals={rentals} 
             wishlistIds={wishlistIds} 
             onToggleWishlist={handleToggleWishlist} 
+            loading={loading}
           />
 
           <ExplorePagination

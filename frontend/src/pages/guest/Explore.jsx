@@ -68,7 +68,7 @@ const Explore = () => {
         <ExploreEmptyState />
       ) : (
         <div className="flex flex-col gap-10">
-          <ExploreGrid rentals={rentals} linkPrefix="/item" />
+          <ExploreGrid rentals={rentals} loading={loading} linkPrefix="/item" />
 
           <ExplorePagination
             currentPage={page}
