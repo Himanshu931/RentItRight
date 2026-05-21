@@ -1,0 +1,17 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Allow: /explore
+Allow: /item/
+
+# Disallow auth, renter dashboard, and owner dashboard paths
+Disallow: /renter
+Disallow: /owner
+Disallow: /rentals
+Disallow: /listings
+Disallow: /bookings
+Disallow: /wishlist
+Disallow: /role-redirect
+Disallow: /renter_explore
+
+Sitemap: https://rentitright.vercel.app/sitemap.xml

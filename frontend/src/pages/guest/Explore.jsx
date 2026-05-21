@@ -5,6 +5,7 @@ import ExploreSearchBar from "../../components/renter_ui/explore/ExploreSearchBa
 // import ExploreFilters from "../../components/renter_ui/explore/ExploreFilters";
 import ExploreGrid from "../../components/renter_ui/explore/ExploreGrid";
 import ExploreEmptyState from "../../components/renter_ui/explore/ExploreEmptyState";
+import SEO from "../../components/common/SEO";
 
 import ExplorePagination from "../../components/renter_ui/explore/ExplorePagination";
 
@@ -16,6 +17,14 @@ const Explore = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const ITEMS_PER_PAGE = 16;
+
+  const exploreSchema = {
+    "@context": "https://schema.org",
+    "@type": "SearchResultsPage",
+    "name": "Explore Rentals | RentItRight",
+    "description": "Browse, filter, and search premium items, camera gear, power tools, party supplies, and appliances available for rent in your local community.",
+    "url": "https://rentitright.vercel.app/explore"
+  };
 
   const fetchRentals = useCallback(async (p = 1) => {
     setLoading(true);
@@ -59,6 +68,13 @@ const Explore = () => {
 
   return (
     <div className="mx-auto max-w-7xl px-6 lg:px-20 py-8 min-h-screen">
+      <SEO
+        title="Explore Rental Items"
+        description="Search and browse thousands of tools, electronics, appliances, and camera gear available for rent in your local area on RentItRight."
+        keywords="rentals, browse items, rent tools near me, hire camera gear, peer to peer gear rental, RentItRight explore"
+        url="/explore"
+        schema={exploreSchema}
+      />
       <LoginBanner />
       <ExploreSearchBar value={search} onChange={setSearch} />
 

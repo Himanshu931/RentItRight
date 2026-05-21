@@ -1,0 +1,21 @@
+{
+  "name": "RentItRight - Peer-to-Peer Rental Marketplace",
+  "short_name": "RentItRight",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0f12",
+  "theme_color": "#2fb7a4",
+  "description": "Peer-to-peer item renting made simple. Rent tools, electronics, appliances, and more from people around you safely and locally.",
+  "icons": [
+    {
+      "src": "/src/assets/favicon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/src/assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
