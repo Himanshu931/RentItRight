@@ -4,8 +4,8 @@ import {
     getDashboardStatsService,
     getUsersService,
     getUserDetailService,
-    blockUserService,
-    unblockUserService,
+    suspendUserService,
+    unsuspendUserService,
     getListingsService,
     toggleListingActiveService,
 } from "../service/admin.service";
@@ -52,24 +52,24 @@ export const getUserDetail = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-export const blockUser = catchAsync(async (req: Request, res: Response) => {
+export const suspendUser = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const result = await blockUserService(id);
+    const result = await suspendUserService(id);
     res.status(200).json({
         success: true,
         message: result.message,
     });
 });
 
-
-export const unblockUser = catchAsync(async (req: Request, res: Response) => {
+export const unsuspendUser = catchAsync(async (req: Request, res: Response) => {
     const id = req.params.id as string;
-    const result = await unblockUserService(id);
+    const result = await unsuspendUserService(id);
     res.status(200).json({
         success: true,
         message: result.message,
     });
 });
+
 
 
 // ── Listings ───────────────────────────────────────────

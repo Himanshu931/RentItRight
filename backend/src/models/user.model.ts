@@ -40,7 +40,7 @@ export interface IUser extends Document {
 
   walletBalance: number;
   isActive: boolean;
-  isBlocked: boolean;
+  isSuspended: boolean;
 
   createdAt: Date;
   updatedAt: Date;
@@ -144,7 +144,7 @@ const UserSchema: Schema<IUser> = new Schema(
       default: true,
     },
 
-    isBlocked: {
+    isSuspended: {
       type: Boolean,
       default: false,
     },

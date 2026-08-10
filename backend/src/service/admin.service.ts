@@ -50,11 +50,11 @@ export const getDashboardStatsService = async (): Promise<DashboardStats> => {
         suspendedRenters,
     ] = await Promise.all([
         User.countDocuments({ roles: "owner", isVerified: true }),
-        User.countDocuments({ roles: "owner", isVerified: true, isBlocked: false, isActive: true }),
-        User.countDocuments({ roles: "owner", isBlocked: true }),
+        User.countDocuments({ roles: "owner", isVerified: true, isSuspended: false, isActive: true }),
+        User.countDocuments({ roles: "owner", isSuspended: true }),
         User.countDocuments({ roles: "renter", isVerified: true }),
-        User.countDocuments({ roles: "renter", isVerified: true, isBlocked: false, isActive: true }),
-        User.countDocuments({ roles: "renter", isBlocked: true }),
+        User.countDocuments({ roles: "renter", isVerified: true, isSuspended: false, isActive: true }),
+        User.countDocuments({ roles: "renter", isSuspended: true }),
     ]);
 
     // ── Listings Health ──
@@ -192,10 +192,10 @@ export const getUsersService = async ({ page, limit, role, search, status }: Get
 
     // Status filter
     if (status === "active") {
-        filter.isBlocked = false;
+        filter.isSuspended = false;
         filter.isActive = true;
     } else if (status === "suspended") {
-        filter.isBlocked = true;
+        filter.isSuspended = true;
     } else if (status === "inactive") {
         filter.isActive = false;
     }
@@ -212,7 +212,7 @@ export const getUsersService = async ({ page, limit, role, search, status }: Get
 
     const [users, total] = await Promise.all([
         User.find(filter)
-            .select("name email roles profileImage isBlocked isActive isVerified createdAt owner renter")
+            .select("name email roles profileImage isSuspended isActive isVerified createdAt owner renter")
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
@@ -223,7 +223,7 @@ export const getUsersService = async ({ page, limit, role, search, status }: Get
     // Format users for frontend
     const formattedUsers = users.map((user) => {
         let userStatus = "Active";
-        if (user.isBlocked) userStatus = "Suspended";
+        if (user.isSuspended) userStatus = "Suspended";
         else if (!user.isActive) userStatus = "Inactive";
 
         const isOwner = user.roles === "owner";
@@ -246,7 +246,7 @@ export const getUsersService = async ({ page, limit, role, search, status }: Get
                 ? (user.owner?.rating?.average || 0).toFixed(1)
                 : (user.renter?.rating?.average || 0).toFixed(1),
             avatar: user.profileImage || "",
-            suspended: user.isBlocked,
+            suspended: user.isSuspended,
         };
     });
 
@@ -346,7 +346,7 @@ export const getUserDetailService = async (userId: string) => {
 
     // Determine status
     let status = "Active";
-    if (user.isBlocked) status = "Suspended";
+    if (user.isSuspended) status = "Suspended";
     else if (!user.isActive) status = "Inactive";
 
     return {
@@ -359,7 +359,7 @@ export const getUserDetailService = async (userId: string) => {
             role: user.roles,
             status,
             isVerified: user.isVerified,
-            isBlocked: user.isBlocked,
+            isSuspended: user.isSuspended,
             joinDate: new Date(user.createdAt).toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
@@ -383,36 +383,35 @@ export const getUserDetailService = async (userId: string) => {
 
 
 // ─────────────────────────────────────────────────────────
-//  USER ACTIONS — Block / Unblock
+//  USER ACTIONS — Suspend / Unsuspend
 // ─────────────────────────────────────────────────────────
 
-export const blockUserService = async (userId: string) => {
+export const suspendUserService = async (userId: string) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new AppError("Invalid user ID", 400);
     }
 
-    const user = await User.findById(userId).select("roles isBlocked").lean();
+    const user = await User.findById(userId).select("roles isSuspended").lean();
     if (!user) throw new AppError("User not found", 404);
-    if (user.roles === "admin") throw new AppError("Cannot block an admin user", 403);
-    if (user.isBlocked) throw new AppError("User is already blocked", 400);
+    if (user.roles === "admin") throw new AppError("Cannot suspend an admin user", 403);
+    if (user.isSuspended) throw new AppError("User is already suspended", 400);
 
-    await User.findByIdAndUpdate(userId, { isBlocked: true });
-    return { message: "User has been blocked successfully" };
+    await User.findByIdAndUpdate(userId, { isSuspended: true });
+    return { message: "User has been suspended successfully" };
 };
 
-export const unblockUserService = async (userId: string) => {
+export const unsuspendUserService = async (userId: string) => {
     if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new AppError("Invalid user ID", 400);
     }
 
-    const user = await User.findById(userId).select("isBlocked").lean();
+    const user = await User.findById(userId).select("isSuspended").lean();
     if (!user) throw new AppError("User not found", 404);
-    if (!user.isBlocked) throw new AppError("User is not blocked", 400);
+    if (!user.isSuspended) throw new AppError("User is not suspended", 400);
 
-    await User.findByIdAndUpdate(userId, { isBlocked: false });
-    return { message: "User has been unblocked successfully" };
+    await User.findByIdAndUpdate(userId, { isSuspended: false });
+    return { message: "User has been unsuspended successfully" };
 };
-
 
 // ─────────────────────────────────────────────────────────
 //  LISTINGS — List with Filters + Pagination

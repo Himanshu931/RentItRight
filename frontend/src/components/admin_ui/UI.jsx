@@ -140,31 +140,64 @@ export function Status({ value }) {
   );
 }
 
-export function Pagination({ total = "42" }) {
+export function Pagination({ currentPage = 1, totalPages = 1, onPageChange }) {
+  if (totalPages <= 1) return null;
+
   return (
     <div className="flex items-center justify-center gap-1.5 mt-8">
       <button
-        className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-divider text-text-muted cursor-not-allowed opacity-50"
-        disabled
+        onClick={() => onPageChange(currentPage - 1)}
+        disabled={currentPage === 1}
+        className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-colors ${
+          currentPage === 1
+            ? "bg-white/5 border-divider text-text-muted cursor-not-allowed opacity-50"
+            : "bg-white/5 border-divider text-text-secondary hover:bg-white/10"
+        }`}
       >
         <span className="material-symbols-outlined text-[18px]">
           chevron_left
         </span>
       </button>
-      <button className="w-9 h-9 rounded-lg flex items-center justify-center bg-bright text-app font-semibold text-sm">
-        1
-      </button>
-      <button className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-divider text-text-secondary hover:bg-white/10 text-sm transition-colors">
-        2
-      </button>
-      <button className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-divider text-text-secondary hover:bg-white/10 text-sm transition-colors">
-        3
-      </button>
-      <span className="text-text-muted text-sm px-1">...</span>
-      <button className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-divider text-text-secondary hover:bg-white/10 text-sm transition-colors">
-        {total}
-      </button>
-      <button className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-divider text-text-secondary hover:bg-white/10 transition-colors">
+
+      {[...Array(totalPages)].map((_, i) => {
+        const page = i + 1;
+        if (
+          page === 1 ||
+          page === totalPages ||
+          (page >= currentPage - 1 && page <= currentPage + 1)
+        ) {
+          return (
+            <button
+              key={page}
+              onClick={() => onPageChange(page)}
+              className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-semibold transition-colors ${
+                currentPage === page
+                  ? "bg-bright text-app border-transparent"
+                  : "bg-white/5 border border-divider text-text-secondary hover:bg-white/10"
+              }`}
+            >
+              {page}
+            </button>
+          );
+        } else if (page === currentPage - 2 || page === currentPage + 2) {
+          return (
+            <span key={page} className="text-text-muted text-sm px-1">
+              ...
+            </span>
+          );
+        }
+        return null;
+      })}
+
+      <button
+        onClick={() => onPageChange(currentPage + 1)}
+        disabled={currentPage === totalPages}
+        className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-colors ${
+          currentPage === totalPages
+            ? "bg-white/5 border-divider text-text-muted cursor-not-allowed opacity-50"
+            : "bg-white/5 border-divider text-text-secondary hover:bg-white/10"
+        }`}
+      >
         <span className="material-symbols-outlined text-[18px]">
           chevron_right
         </span>

@@ -5,8 +5,8 @@ import {
     getDashboard,
     getUsers,
     getUserDetail,
-    blockUser,
-    unblockUser,
+    suspendUser,
+    unsuspendUser,
     getListings,
     toggleListingActive,
 } from "../controllers/admin.controller";
@@ -98,9 +98,9 @@ router.get("/users/:id", getUserDetail);
 
 /**
  * @swagger
- * /admin/users/{id}/block:
+ * /admin/users/{id}/suspend:
  *   patch:
- *     summary: Block/suspend a user account
+ *     summary: Suspend a user account
  *     tags: [Admin]
  *     security:
  *       - cookieAuth: []
@@ -112,18 +112,18 @@ router.get("/users/:id", getUserDetail);
  *           type: string
  *     responses:
  *       200:
- *         description: User blocked successfully
+ *         description: User suspended successfully
  *       403:
- *         description: Cannot block admin users
+ *         description: Cannot suspend admin users
  */
-router.patch("/users/:id/block", blockUser);
+router.patch("/users/:id/suspend", suspendUser);
 
 
 /**
  * @swagger
- * /admin/users/{id}/unblock:
+ * /admin/users/{id}/unsuspend:
  *   patch:
- *     summary: Unblock/unsuspend a user account
+ *     summary: Unsuspend a user account
  *     tags: [Admin]
  *     security:
  *       - cookieAuth: []
@@ -135,9 +135,9 @@ router.patch("/users/:id/block", blockUser);
  *           type: string
  *     responses:
  *       200:
- *         description: User unblocked successfully
+ *         description: User unsuspended successfully
  */
-router.patch("/users/:id/unblock", unblockUser);
+router.patch("/users/:id/unsuspend", unsuspendUser);
 
 
 /**

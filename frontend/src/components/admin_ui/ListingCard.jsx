@@ -1,7 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { Status } from "./UI";
 
-export default function ListingCard({ listing }) {
+export default function ListingCard({ listing, onToggle }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleToggle = async () => {
+    setLoading(true);
+    try {
+      const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+        method: "GET",
+        credentials: "include"
+      });
+      const csrfData = await csrf.json();
+
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/admin/listings/${listing._id}/toggle-active`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfData.csrfToken
+        },
+        credentials: "include"
+      });
+      const result = await response.json();
+      if (result.success && onToggle) {
+        onToggle();
+      }
+    } catch (error) {
+      console.error("Failed to toggle listing status:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div
       className={`bg-surface border border-divider rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-5 hover:border-bright/30 transition-all ${
@@ -83,14 +112,18 @@ export default function ListingCard({ listing }) {
               ? "Restore Listing"
               : "Disable Listing"
           }
+          onClick={handleToggle}
+          disabled={loading}
           className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
+            loading ? "opacity-50 cursor-not-allowed " : ""
+          }${
             listing.status === "Removed"
               ? "bg-success/10 border-success/20 text-success hover:bg-success/20"
               : "bg-warning/10 border-warning/20 text-warning hover:bg-warning/20"
           }`}
         >
           <span className="material-symbols-outlined text-[18px]">
-            {listing.status === "Removed" ? "restore" : "block"}
+            {loading ? "sync" : (listing.status === "Removed" ? "restore" : "block")}
           </span>
         </button>
         <button
