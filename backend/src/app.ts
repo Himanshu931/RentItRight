@@ -86,6 +86,9 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 
 // -------------------- ROUTES --------------------
 // app.use("/api/v1/auth", AUTH_LIMITER, authRoute);
+app.get('/', (req, res) => {
+    res.json({ message: "Rent It Right API is running" });
+})
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/user", csrfProtection, userRouter);
 app.use("/api/v1/explore", exploreRoute);

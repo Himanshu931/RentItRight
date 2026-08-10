@@ -50,7 +50,7 @@ const GuestHome = () => {
       <SEO
         title="Rent Anything. Anytime. Locally."
         description="Access premium equipment, tools, cameras, and appliances without the ownership burden. RentItRight is the ultra-modern peer-to-peer local renting marketplace."
-        keywords="peer to peer rental, rent tools, rent cameras, rent equipment locally, RentItRight, rent gear"
+        keywords="peer to peer rental, rent tools, rent cameras, rent equipment locally, RentItRight, rent gear, rent it right"
         schema={homeSchema}
       />
       <main className="bg-app min-h-screen">

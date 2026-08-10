@@ -123,7 +123,7 @@ export const googleCallback = catchAsync(async (req: Request, res: Response) => 
     maxAge: 24 * 60 * 60 * 1000,
   });
 
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  const frontendUrl = process.env.FRONTEND_URL;
   
   // If user doesn't have a phone, they haven't completed their profile
   if (!user.phone) {
