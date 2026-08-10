@@ -21,6 +21,8 @@ import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import OwnerListings from "./pages/owner/OwnerListings";
 import OwnerBookings from "./pages/owner/OwnerBookings";
 
+
+import AdminLayout from "./layouts/AdminLayout"
 import { NotFound } from "./pages/NotFound";
 function App() {
   return (
@@ -56,6 +58,11 @@ function App() {
           <Route path="/bookings" element={<OwnerBookings />} />
         </Route>
 
+
+        {/* Admin pages */}
+        <Route element={<AdminLayout/>}>
+          {/* <Route path="/admin" element={<AdminDashboard />} /> */}
+        </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

@@ -12,14 +12,24 @@ export default function RentCheckoutLayout({ item, availability, user }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const formatDateToYYYYMMDD = (d) => {
+    if (!d || !(d instanceof Date) || isNaN(d.getTime())) return null;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleRequestBooking = async (totalAmount, breakdown) => {
-    if (!startDate || !endDate) {
-      setError("Please select rental dates");
+    const formattedStartDate = formatDateToYYYYMMDD(startDate);
+    const formattedEndDate = formatDateToYYYYMMDD(endDate);
+
+    if (!formattedStartDate || !formattedEndDate) {
+      setError("Please select valid rental dates");
       return;
     }
 
     if (!user?.address?.district || !user?.name) {
-      // Small refinement: Check for address
       toast.error("Please update your profile with name and address before booking.");
       navigate("/renter/profile");
       return;
@@ -44,8 +54,8 @@ export default function RentCheckoutLayout({ item, availability, user }) {
         body: JSON.stringify({
           itemId: item.id,
           ownerId: item.owner?.id,
-          startDate: startDate.toISOString().split('T')[0],
-          endDate: endDate.toISOString().split('T')[0],
+          startDate: formattedStartDate,
+          endDate: formattedEndDate,
           address: {
             district: user.address?.district || "Unknown",
             state: user.address?.state || "Unknown",

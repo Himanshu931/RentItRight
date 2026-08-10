@@ -1,11 +1,20 @@
 import { z } from "zod";
 
+const parseLocalDate = (dateStr: string) => {
+    const parts = dateStr.split("-").map(Number);
+    if (parts.length !== 3 || parts.some(isNaN)) return null;
+    const [year, month, day] = parts;
+    const d = new Date(year, month - 1, day);
+    d.setHours(0, 0, 0, 0);
+    return d;
+};
+
 export const createBookingSchema = z.object({
     itemId: z.string().min(1, "Item ID is required"),
     ownerId: z.string().min(1, "Owner ID is required"),
     startDate: z.string().min(1, "Start date is required").refine((date) => {
-        const selected = new Date(date);
-        selected.setHours(0, 0, 0, 0);
+        const selected = parseLocalDate(date);
+        if (!selected) return false;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return selected >= today;
@@ -18,8 +27,8 @@ export const createBookingSchema = z.object({
         pincode: z.string().min(1, "Pincode is required"),
     }),
     endDate: z.string().min(1, "End date is required").refine((date) => {
-        const selected = new Date(date);
-        selected.setHours(0, 0, 0, 0);
+        const selected = parseLocalDate(date);
+        if (!selected) return false;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         return selected >= today;

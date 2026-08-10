@@ -17,6 +17,7 @@ export default function RentalCalendar({ disabledDates = [], onSelect }) {
     function handleDateClick(date) {
         if (!range.start || (range.start && range.end)) {
             setRange({ start: date, end: null });
+            if (onSelect) onSelect(date, null);
         } else {
             if (date < range.start) {
                 setRange({ start: date, end: null });
@@ -26,7 +27,7 @@ export default function RentalCalendar({ disabledDates = [], onSelect }) {
 
             const updated = { ...range, end: date };
             setRange(updated);
-            onSelect(updated.start, date);
+            if (onSelect) onSelect(updated.start, date);
         }
     }
 

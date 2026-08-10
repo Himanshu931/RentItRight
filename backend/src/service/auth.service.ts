@@ -87,7 +87,7 @@ export const verifyOTPService = async (otpData: {
   }
 
   const token = jwt.sign(
-    { userId: user._id },
+    { userId: user._id, userRole: user.roles },
     process.env.JWT_SECRET!,
     { expiresIn: "24h" },
   );

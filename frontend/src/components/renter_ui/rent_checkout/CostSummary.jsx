@@ -1,9 +1,10 @@
 import toast from "react-hot-toast";
 
 export default function CostSummary({ item, startDate, endDate, onRequestBooking, isSubmitting }) {
-  const hasDates = !!(startDate && endDate);
+  const isValidDate = (d) => d && d instanceof Date && !isNaN(d.getTime());
+  const hasDates = isValidDate(startDate) && isValidDate(endDate) && endDate >= startDate;
   const days = hasDates
-    ? Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1
+    ? Math.max(1, Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1)
     : 0;
 
   const {

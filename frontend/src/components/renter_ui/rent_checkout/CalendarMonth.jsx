@@ -52,7 +52,11 @@ export default function CalendarMonth({
           
           const isDisabled = isPast || disabledDates.some(d => {
             const blockedDate = new Date(d);
-            return blockedDate.setHours(0,0,0,0) === currentDate.setHours(0,0,0,0);
+            return (
+              blockedDate.getFullYear() === currentDate.getFullYear() &&
+              blockedDate.getMonth() === currentDate.getMonth() &&
+              blockedDate.getDate() === currentDate.getDate()
+            );
           });
 
           const selected = isSelected(day);

@@ -64,17 +64,17 @@ export default function RentalDetails() {
           location: booking.address ? `${booking.address.district}, ${booking.address.state}` : "Location not available",
           image: booking.item_id?.images?.[0] || "https://via.placeholder.com/400x300?text=No+Image",
           rentalType: booking.pricing?.appliedPricing || "Daily",
-          agreementDate: new Date(booking.createdAt).toLocaleDateString("en-US", {
+          agreementDate: new Date(booking.createdAt).toLocaleDateString(undefined, {
             month: "short",
             day: "numeric",
             year: "numeric",
           }),
-          startDate: new Date(booking.start_date).toLocaleDateString("en-US", {
+          startDate: new Date(booking.start_date).toLocaleDateString(undefined, {
             month: "short",
             day: "numeric",
             year: "numeric",
           }),
-          endDate: new Date(booking.end_date).toLocaleDateString("en-US", {
+          endDate: new Date(booking.end_date).toLocaleDateString(undefined, {
             month: "short",
             day: "numeric",
             year: "numeric",

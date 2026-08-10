@@ -35,8 +35,8 @@ export default function Rentals() {
             id: b.id,
             status: b.status,
             title: b.item?.title || "Unknown Item",
-            startDate: new Date(b.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            endDate: new Date(b.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            startDate: new Date(b.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+            endDate: new Date(b.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
             price: b.totalAmount,
             image: b.item?.image || "https://via.placeholder.com/400x300?text=No+Image",
             badge: b.status.charAt(0).toUpperCase() + b.status.slice(1)

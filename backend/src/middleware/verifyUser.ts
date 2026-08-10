@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 import * as Sentry from "@sentry/node"
+import { User } from "../models/user.model";
 
 export interface DecodedToken {
     userId: string,
@@ -20,6 +21,13 @@ export const VerifyUser = catchAsync(async (req: Request, res: Response, next: N
 
     req.userId = decoded.userId;
     req.userRole = decoded.userRole;
+
+    if (!req.userRole && req.userId) {
+        const user = await User.findById(req.userId).select("roles").lean();
+        if (user && user.roles) {
+            req.userRole = user.roles;
+        }
+    }
 
     Sentry.setUser({
         id: decoded.userId

@@ -10,10 +10,10 @@ type ItemStatus = "active" | "paused" | "rented";
 
 export const getItemsByUser = catchAsync(async (req: Request, res: Response) => {
     const status = req.query.status as ItemStatus;
-    const page = req.query.page;
+    const page = req.query.page ? Number(req.query.page) : 1;
     const q = req.query.q as string;
 
-    const items = await getItemService(req.userId!, status, Number(page), q, req.userRole! as ROLE);
+    const items = await getItemService(req.userId!, status, isNaN(page) ? 1 : page, q, req.userRole! as ROLE);
 
     res.status(200).json({
         success: true,

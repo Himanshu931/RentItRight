@@ -34,10 +34,13 @@ export default function OwnerListings() {
             
             const data = await response.json();
             if (data.success) {
-                setItems(data.data.items || []);
+                setItems(data.data?.items || []);
+            } else {
+                toast.error(data.message || "Failed to fetch listings");
             }
         } catch (error) {
             console.error("Failed to fetch listings:", error);
+            toast.error("Failed to fetch listings");
         }
     };
 
@@ -159,7 +162,7 @@ export default function OwnerListings() {
                 }
             })
             .filter((item) =>
-                item.title.toLowerCase().includes(search.toLowerCase())
+                item.title?.toLowerCase().includes(search.toLowerCase()) ?? true
             );
     }, [items, activeTab, search]);
 

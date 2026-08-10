@@ -21,8 +21,9 @@ export const getItemService = async (
     q?: string,
     role?: ROLE
 ) => {
+    const pageNum = (!page || isNaN(Number(page)) || Number(page) < 1) ? 1 : Number(page);
 
-    logger.info("Fetching items", { userId: id, status, page, q });
+    logger.info("Fetching items", { userId: id, status, page: pageNum, q });
 
     ensureOwner(role!);
 
@@ -33,7 +34,7 @@ export const getItemService = async (
     };
 
     const limit = 10;
-    const skip = (page - 1) * limit;
+    const skip = (pageNum - 1) * limit;
 
     const [items, total] = await Promise.all([
         Item.find(query)

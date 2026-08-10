@@ -4,7 +4,7 @@ const BookingCard = ({ booking, onApprove, onReject, onComplete, onExtend, activ
   const { item, status, id, startDate, endDate, renterInfo } = booking;
   
   const formatDate = (dateStr) => {
-    return new Date(dateStr).toLocaleDateString('en-US', {
+    return new Date(dateStr).toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric'
     });
