@@ -69,12 +69,6 @@ export default function Users() {
         <PageHeader
           title="Users Management"
           description="Manage owners and renters across the platform"
-          actions={
-            <>
-              <Button icon="download">Export Users</Button>
-              <Button icon="person_add">Add Admin</Button>
-            </>
-          }
         />
 
         <Tabs
@@ -122,7 +116,7 @@ export default function Users() {
             <div className="text-center py-10 text-text-muted">No users found.</div>
           ) : (
             users.map((user) => (
-              <UserCard key={user._id} user={user} />
+              <UserCard key={user._id} user={user} onToggle={fetchUsers} />
             ))
           )}
         </div>

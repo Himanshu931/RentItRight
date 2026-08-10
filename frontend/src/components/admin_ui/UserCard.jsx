@@ -1,9 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Status } from "./UI";
 
-export default function UserCard({ user }) {
+export default function UserCard({ user, onToggle }) {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleToggle = async () => {
+    setLoading(true);
+    const endpoint = user.suspended ? "unsuspend" : "suspend";
+    try {
+      const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+        method: "GET",
+        credentials: "include"
+      });
+      const csrfData = await csrf.json();
+
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/admin/users/${user._id}/${endpoint}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfData.csrfToken
+        },
+        credentials: "include"
+      });
+      const result = await response.json();
+      if (result.success && onToggle) {
+        onToggle();
+      }
+    } catch (error) {
+      console.error(`Failed to ${endpoint} user:`, error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -61,7 +91,7 @@ export default function UserCard({ user }) {
       <div className="flex items-center gap-1.5">
         <button
           title="View Profile"
-          onClick={() => navigate("/adminuserdetail")}
+          onClick={() => navigate(`/adminuserdetail/${user._id}`)}
           className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5 border border-divider text-text-secondary hover:text-bright hover:border-bright/30 transition-all cursor-pointer"
         >
           <span className="material-symbols-outlined text-[18px]">
@@ -77,21 +107,19 @@ export default function UserCard({ user }) {
           </span>
         </button>
         <button
-          title={
-            user.status === "Suspended" ? "Reactivate" : "Suspend"
-          }
+          title={user.suspended ? "Reactivate" : "Suspend"}
+          onClick={handleToggle}
+          disabled={loading}
           className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all cursor-pointer ${
-            user.status === "Suspended"
+            loading ? "opacity-50 cursor-not-allowed " : ""
+          }${
+            user.suspended
               ? "bg-success/10 border-success/20 text-success hover:bg-success/20"
               : "bg-error/10 border-error/20 text-error hover:bg-error/20"
           }`}
         >
-          <span className="material-symbols-outlined text-[18px]">
-            {user.status === "Pending"
-              ? "check_circle"
-              : user.status === "Suspended"
-              ? "restore"
-              : "block"}
+          <span className="material-symbols-outlined text-[18px] ">
+            {loading ? "sync" : (user.suspended ? "restore" : "block")}
           </span>
         </button>
       </div>

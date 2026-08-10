@@ -72,7 +72,7 @@ function App() {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/adminlisting" element={<AdminListings />} />
             <Route path="/adminusers" element={<AdminUsers />} />
-            <Route path="/adminuserdetail" element={<AdminUserDetail />} />
+            <Route path="/adminuserdetail/:id" element={<AdminUserDetail />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />

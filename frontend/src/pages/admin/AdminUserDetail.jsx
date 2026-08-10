@@ -220,9 +220,9 @@ export default function UserDetail() {
                 <Button icon="flag" warning>
                   Flag Account
                 </Button>
-                <div onClick={handleSuspendToggle} className="w-full">
-                  <Button icon="block" danger={!profile.isSuspended} warning={profile.isSuspended} className="w-full">
-                    {actionLoading ? "Processing..." : (profile.isSuspended ? "Unsuspend Account" : "Suspend Account")}
+                <div onClick={handleSuspendToggle} className="w-full mt-3">
+                  <Button icon="block" danger={!profile.isSuspended} warning={profile.isSuspended} className="w-full flex justify-center items-center gap-2">
+                    {actionLoading ? "Processing..." : (profile.isSuspended ? "Restore Account" : "Suspend Account")}
                   </Button>
                 </div>
               </div>
@@ -306,7 +306,7 @@ export default function UserDetail() {
 
               <div className="border-t border-divider px-6 py-4 text-center">
                 <button className="text-sm text-bright font-semibold hover:underline cursor-pointer">
-                  Show All Activity (324)
+                  Show All Activity...
                 </button>
               </div>
             </div>
