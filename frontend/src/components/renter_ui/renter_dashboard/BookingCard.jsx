@@ -1,6 +1,8 @@
+import { Link } from "react-router-dom";
+
 export default function BookingCard({ booking }) {
   const isActive = booking.status === "active";
-
+  
   return (
     <div className="flex justify-between gap-6 rounded-2xl bg-surface p-5 border-1 border-app/80 hover:border-bright/40 transition-all">
       <div className="flex gap-5">
@@ -26,10 +28,13 @@ export default function BookingCard({ booking }) {
 
       <div className="text-right">
         <p className="font-black text-lg">${booking.price}</p>
-        <button className="mt-3 px-4 py-2 text-app text-xs font-bold rounded-xl flex items-center gap-2 hover:scale-104 bg-bright hover:cursor-pointer">
+        <Link
+          to={`/rentals/${booking.id || booking._id}`}
+          className="mt-3 px-4 py-2 text-app text-xs font-bold rounded-xl flex items-center gap-2 hover:scale-104 bg-bright hover:cursor-pointer inline-flex"
+        >
           View Details
           <span className="material-symbols-outlined text-sm">arrow_forward</span>
-        </button>
+        </Link>
       </div>
     </div>
   );
