@@ -9,6 +9,7 @@ import userRouter from "./routes/user.route";
 import exploreRoute from "./routes/explore.route";
 import bookingRoute from "./routes/booking.route";
 import itemsRoute from "./routes/items.route";
+import adminRoute from "./routes/admin.route";
 
 import cors from "cors";
 import helmet from "helmet";
@@ -94,6 +95,7 @@ app.use("/api/v1/user", csrfProtection, userRouter);
 app.use("/api/v1/explore", exploreRoute);
 app.use("/api/v1/booking", csrfProtection, bookingRoute);
 app.use("/api/v1/items", csrfProtection, itemsRoute)
+app.use("/api/v1/admin", csrfProtection, adminRoute)
 
 // -------------------- API DOCUMENTATION--------------------
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));

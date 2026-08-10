@@ -1,0 +1,206 @@
+import { Router } from "express";
+import { VerifyUser } from "../middleware/verifyUser";
+import { AdminGuard } from "../middleware/adminGuard";
+import {
+    getDashboard,
+    getUsers,
+    getUserDetail,
+    blockUser,
+    unblockUser,
+    getListings,
+    toggleListingActive,
+} from "../controllers/admin.controller";
+
+const router = Router();
+
+// All routes require authentication + admin role
+router.use(VerifyUser, AdminGuard);
+
+
+/**
+ * @swagger
+ * /admin/dashboard:
+ *   get:
+ *     summary: Get admin dashboard aggregate data
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: Dashboard data with stats, user overview, health metrics, financials, and alerts
+ */
+router.get("/dashboard", getDashboard);
+
+
+/**
+ * @swagger
+ * /admin/users:
+ *   get:
+ *     summary: List all users with pagination and filters
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: role
+ *         schema:
+ *           type: string
+ *           enum: [owner, renter]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by name or email
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [active, suspended, inactive]
+ *     responses:
+ *       200:
+ *         description: Paginated list of users
+ */
+router.get("/users", getUsers);
+
+
+/**
+ * @swagger
+ * /admin/users/{id}:
+ *   get:
+ *     summary: Get detailed user profile with stats and activity
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User profile, stats, and recent activity
+ *       404:
+ *         description: User not found
+ */
+router.get("/users/:id", getUserDetail);
+
+
+/**
+ * @swagger
+ * /admin/users/{id}/block:
+ *   patch:
+ *     summary: Block/suspend a user account
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User blocked successfully
+ *       403:
+ *         description: Cannot block admin users
+ */
+router.patch("/users/:id/block", blockUser);
+
+
+/**
+ * @swagger
+ * /admin/users/{id}/unblock:
+ *   patch:
+ *     summary: Unblock/unsuspend a user account
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User unblocked successfully
+ */
+router.patch("/users/:id/unblock", unblockUser);
+
+
+/**
+ * @swagger
+ * /admin/listings:
+ *   get:
+ *     summary: List all items/listings with pagination and filters
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [active, paused, removed, rented]
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by title
+ *     responses:
+ *       200:
+ *         description: Paginated list of listings
+ */
+router.get("/listings", getListings);
+
+
+/**
+ * @swagger
+ * /admin/listings/{id}/toggle-active:
+ *   patch:
+ *     summary: Toggle a listing's active status (deactivate/reactivate)
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Listing status toggled
+ *       404:
+ *         description: Listing not found
+ */
+router.patch("/listings/:id/toggle-active", toggleListingActive);
+
+
+export default router;

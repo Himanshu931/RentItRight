@@ -1,22 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   PageHeader,
   Button,
   StatCard,
   SectionTitle,
 } from "../../components/admin_ui/UI";
-
-const health = [
-  ["Active Listings", "7,840", "success"],
-  ["Paused by Owner", "245", "warning"],
-  ["Removed/Reported", "125", "error"],
-];
-
-const bookings = [
-  ["Active Sessions", "456", "bright"],
-  ["Completed (MTD)", "1,240", "success"],
-  ["Cancelled", "18", "muted"],
-];
 
 function OverviewCard({ title, total, active, suspended }) {
   return (
@@ -96,6 +84,57 @@ function HealthCard({ title, rows }) {
 }
 
 export default function Dashboard() {
+  const [data, setData] = useState({
+    topStats: { totalUsers: 0, totalListings: 0, activeRentals: 0 },
+    userOverview: {
+      owners: { total: 0, active: 0, suspended: 0 },
+      renters: { total: 0, active: 0, suspended: 0 }
+    },
+    listingsHealth: [],
+    bookingsHealth: [],
+    financialSnapshot: { grossRevenue: 0, commissionEarned: 0, payoutsPending: 0 },
+    alerts: []
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const csrf = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+          method: "GET",
+          credentials: "include"
+        });
+        const csrfData = await csrf.json();
+
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/admin/dashboard`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": csrfData.csrfToken
+          },
+          credentials: "include"
+        });
+        const result = await response.json();
+        if (result.success) {
+          setData(result.data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch admin dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboard();
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="flex-1 flex items-center justify-center h-full">
+        <div className="text-text-secondary text-lg font-medium animate-pulse">Loading dashboard...</div>
+      </main>
+    );
+  }
+
   return (
     <main className="flex-1 overflow-y-auto">
       <div className="max-w-[1400px] mx-auto px-8 py-10">
@@ -114,29 +153,17 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
           <StatCard
             label="Total Users"
-            value="12,450"
-            note="+12% growth"
+            value={data.topStats.totalUsers.toLocaleString()}
+            note="Platform users"
             noteType="success"
           />
           <StatCard
             label="Total Listings"
-            value="8,210"
-            note="+5.2% MTD"
+            value={data.topStats.totalListings.toLocaleString()}
+            note="Platform listings"
             noteType="success"
           />
-          <StatCard label="Active Rentals" value="456" note="Live tracking" />
-          <StatCard
-            label="Open Disputes"
-            value="24"
-            note="High priority"
-            noteType="danger"
-          />
-          <StatCard
-            label="Pending KYC"
-            value="85"
-            note="4h wait avg."
-            noteType="warning"
-          />
+          <StatCard label="Active Rentals" value={data.topStats.activeRentals.toLocaleString()} note="Live tracking" />
         </div>
 
         {/* User Overview */}
@@ -145,15 +172,15 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <OverviewCard
               title="Owners"
-              total="5,200"
-              active="4,850"
-              suspended="12"
+              total={data.userOverview.owners.total.toLocaleString()}
+              active={data.userOverview.owners.active.toLocaleString()}
+              suspended={data.userOverview.owners.suspended.toLocaleString()}
             />
             <OverviewCard
               title="Renters"
-              total="7,250"
-              active="6,900"
-              suspended="45"
+              total={data.userOverview.renters.total.toLocaleString()}
+              active={data.userOverview.renters.active.toLocaleString()}
+              suspended={data.userOverview.renters.suspended.toLocaleString()}
             />
           </div>
         </section>
@@ -162,8 +189,8 @@ export default function Dashboard() {
         <section className="mb-10">
           <SectionTitle>Platform Health</SectionTitle>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <HealthCard title="Listings Health" rows={health} />
-            <HealthCard title="Bookings Status" rows={bookings} />
+            <HealthCard title="Listings Health" rows={data.listingsHealth} />
+            <HealthCard title="Bookings Status" rows={data.bookingsHealth} />
           </div>
         </section>
 
@@ -173,19 +200,19 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <StatCard
               label="Gross Revenue"
-              value="$452,100"
+              value={`₹${data.financialSnapshot.grossRevenue.toLocaleString()}`}
               note="Total volume processed"
               icon="account_balance_wallet"
             />
             <StatCard
               label="Commission Earned"
-              value="$67,815"
+              value={`₹${data.financialSnapshot.commissionEarned.toLocaleString()}`}
               note="Platform net fees"
               icon="percent"
             />
             <StatCard
               label="Payouts Pending"
-              value="$34,220"
+              value={`₹${data.financialSnapshot.payoutsPending.toLocaleString()}`}
               note="Awaiting owner withdrawal"
               icon="outbound"
             />
@@ -205,21 +232,23 @@ export default function Dashboard() {
               </strong>
             </div>
             <div className="divide-y divide-divider">
-              {[
-                "12 listings have multiple reports",
-                "85 users are waiting for KYC verification",
-                "24 disputes require administrative attention",
-              ].map((text) => (
-                <div
-                  key={text}
-                  className="flex items-center justify-between px-6 py-4"
-                >
-                  <span className="text-sm text-text-secondary">{text}</span>
-                  <button className="px-3 py-1.5 rounded-lg bg-white/5 border border-divider text-xs font-semibold text-text-secondary hover:text-bright hover:border-bright/30 transition-all cursor-pointer">
-                    Review
-                  </button>
+              {data.alerts.length === 0 ? (
+                <div className="px-6 py-8 text-center text-sm text-text-secondary">
+                  No critical alerts at this time.
                 </div>
-              ))}
+              ) : (
+                data.alerts.map((alert, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between px-6 py-4"
+                  >
+                    <span className="text-sm text-text-secondary">{alert.text}</span>
+                    <button className="px-3 py-1.5 rounded-lg bg-white/5 border border-divider text-xs font-semibold text-text-secondary hover:text-bright hover:border-bright/30 transition-all cursor-pointer">
+                      Review
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </section>
