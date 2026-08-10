@@ -24,12 +24,18 @@ export default function RoleRedirect() {
         const roleValue = user.role ?? user.roles ?? [];
         const roles = Array.isArray(roleValue) ? roleValue : [roleValue];
 
-        if (roles.includes("owner") || roles.includes("admin")) {
+        if (roles.includes("admin")) {
+            navigate("/admin", { replace: true });
+            return;
+        }
+        else if (roles.includes("owner")) {
             navigate("/owner", { replace: true });
             return;
         }
-
-        navigate("/renter", { replace: true });
+        else if (roles.includes("renter")) {
+            navigate("/renter", { replace: true });
+            return;
+        }
     }, [loading, user, navigate]);
 
 
