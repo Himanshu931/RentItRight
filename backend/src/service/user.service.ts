@@ -2,7 +2,8 @@ import { User } from "../models/user.model";
 import { Item } from "../models/item.model";
 import { Booking } from "../models/booking.model";
 import { z } from "zod";
-import { profileSchema, updateProfileSchema, updateAddressSchema } from "../validatior/user.schema";
+import bcrypt from "bcrypt";
+import { profileSchema, updateProfileSchema, updateAddressSchema, changePasswordSchema } from "../validatior/user.schema";
 import { AppError } from "../utils/AppError";
 import logger from "../config/logger";
 
@@ -338,4 +339,40 @@ export const toggleWishlistService = async (userId: string, itemId: string) => {
     await user.save();
 
     return { message, isWishlisted };
+};
+
+export const changePasswordService = async (
+    userId: string,
+    data: z.infer<typeof changePasswordSchema>
+) => {
+
+    logger.info("Password change requested", { userId });
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+        logger.warn("Password change failed - user not found", { userId });
+        throw new AppError("User not found", 404);
+    }
+
+    if (!user.password) {
+        logger.warn("Password change failed - no password set (OAuth user)", { userId });
+        throw new AppError("Cannot change password for accounts without a password. You may have signed up with Google.", 400);
+    }
+
+    const isCurrentPasswordValid = await bcrypt.compare(data.currentPassword, user.password);
+
+    if (!isCurrentPasswordValid) {
+        logger.warn("Password change failed - incorrect current password", { userId });
+        throw new AppError("Current password is incorrect", 400);
+    }
+
+    const hashedPassword = await bcrypt.hash(data.newPassword, 10);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    logger.info("Password changed successfully", { userId });
+
+    return { success: true };
 };

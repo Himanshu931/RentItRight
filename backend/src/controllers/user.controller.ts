@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import logger from "../config/logger";
-import { updateProfileSchema, updateAddressSchema, profileSchema } from "../validatior/user.schema";
-import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService, dashboardDataService, getWishlistService, toggleWishlistService } from "../service/user.service";
+import { updateProfileSchema, updateAddressSchema, profileSchema, changePasswordSchema } from "../validatior/user.schema";
+import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService, dashboardDataService, getWishlistService, toggleWishlistService, changePasswordService } from "../service/user.service";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
 
@@ -73,4 +73,14 @@ export const toggleWishlist = catchAsync(async (req: Request, res: Response) => 
 
     const result = await toggleWishlistService(req.userId!, itemId);
     res.status(200).json({ success: true, data: result, message: result.message });
+})
+
+export const changePassword = catchAsync(async (req: Request, res: Response) => {
+    const validate = changePasswordSchema.safeParse(req.body);
+    if (!validate.success) {
+        throw new AppError(`Invalid Data ${validate.error.flatten()}`, 400)
+    }
+
+    await changePasswordService(req.userId!, validate.data);
+    res.status(200).json({ success: true, message: "Password changed successfully" });
 })

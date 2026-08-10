@@ -104,6 +104,13 @@ export default function AdminNavbar() {
 
           {isDropdownOpen && (
             <div className="absolute right-0 top-full mt-2 w-48 bg-card border border-divider rounded-2xl shadow-xl py-2 z-50 overflow-hidden">
+              <Link
+                  to="/admin/profile"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 transition-colors"
+              >
+                  <span className="material-symbols-outlined text-lg">account_circle</span>
+                  <span className="font-medium">Profile</span>
+              </Link>
               <button
                 onClick={handleSignOut}
                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error/10 transition-colors"

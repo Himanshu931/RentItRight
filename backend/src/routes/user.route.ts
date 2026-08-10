@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { VerifyUser } from "../middleware/verifyUser";
-import { createProfile, getProfile, updateProfile, updateProfileImage, deleteProfile, updateAddress, dashboard, getWishlist, toggleWishlist } from "../controllers/user.controller"
+import { createProfile, getProfile, updateProfile, updateProfileImage, deleteProfile, updateAddress, dashboard, getWishlist, toggleWishlist, changePassword } from "../controllers/user.controller"
 
 const router = Router();
 
@@ -150,6 +150,34 @@ router.delete("/me/profile", VerifyUser, deleteProfile);
  *         description: Address updated successfully
  */
 router.patch("/me/address", VerifyUser, updateAddress);
+
+
+/**
+ * @swagger
+ * /user/me/password:
+ *   patch:
+ *     summary: Change the User's Password
+ *     tags: [User]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Invalid current password or validation error
+ */
+router.patch("/me/password", VerifyUser, changePassword);
 
 
 /**

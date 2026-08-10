@@ -14,7 +14,7 @@ declare module "express-serve-static-core" {
 
 export const RATE_LIMITER = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 100,
+    max: 1000,
     message: {
         error: 'Too many requests from this IP address',
         retryAfter: '15 minutes',

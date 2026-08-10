@@ -28,6 +28,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminListings from "./pages/admin/AdminListings";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminUserDetail from "./pages/admin/AdminUserDetail";
+import ProfileSettings from "./pages/shared/ProfileSettings";
 import { NotFound } from "./pages/NotFound";
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
             <Route path="/renter/rent_items/:id" element={<RenterItemDetails />} />
             <Route path="/wishlist" element={<RenterWishlist />} />
             <Route path="/renter/rent/:id" element={<RentCheckout />} />
+            <Route path="/renter/profile" element={<ProfileSettings />} />
           </Route>
         </Route>
 
@@ -62,6 +64,7 @@ function App() {
             <Route path="/owner" element={<OwnerDashboard />} />
             <Route path="/listings" element={<OwnerListings />} />
             <Route path="/bookings" element={<OwnerBookings />} />
+            <Route path="/owner/profile" element={<ProfileSettings />} />
           </Route>
         </Route>
 
@@ -73,6 +76,7 @@ function App() {
             <Route path="/adminlisting" element={<AdminListings />} />
             <Route path="/adminusers" element={<AdminUsers />} />
             <Route path="/adminuserdetail/:id" element={<AdminUserDetail />} />
+            <Route path="/admin/profile" element={<ProfileSettings />} />
           </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
