@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { X, UploadCloud, Package, ImagePlus, IndianRupee } from "lucide-react";
+import { X, Package, ImagePlus, IndianRupee } from "lucide-react";
 import toast from "react-hot-toast";
+import CategoryInput from "../components/common/CategoryInput";
 
 export default function AddItemModal({ onClose, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -236,19 +237,15 @@ export default function AddItemModal({ onClose, onSubmit }) {
                             <label className="block text-xs font-bold text-text-secondary mb-1.5 uppercase tracking-wider">
                                 Category<span className="text-bright"> *</span>
                             </label>
-                            <select
+                            <CategoryInput
+                                id="add-item-category"
                                 name="category"
                                 value={formData.category}
                                 onChange={handleChange}
-                                className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all appearance-none"
+                                placeholder="Type or select category"
+                                className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
                                 required
-                            >
-                                <option value="" className="bg-card text-text-muted">Select Category</option>
-                                <option value="Photography" className="bg-card">Photography</option>
-                                <option value="Electronics" className="bg-card">Electronics</option>
-                                <option value="Furniture" className="bg-card">Furniture</option>
-                                <option value="Sports" className="bg-card">Sports</option>
-                            </select>
+                            />
                         </div>
                     </div>
 

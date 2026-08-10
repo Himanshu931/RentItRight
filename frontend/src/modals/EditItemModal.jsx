@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { X, ChevronDown, ImagePlus, Package, DollarSign, IndianRupee } from "lucide-react";
+import { X, ImagePlus, Package, IndianRupee } from "lucide-react";
 import toast from "react-hot-toast";
+import CategoryInput from "../components/common/CategoryInput";
 
 export default function EditItemModal({ item, onClose, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -191,23 +192,15 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-text-secondary mb-1.5 uppercase tracking-wider">Category</label>
-                                <div className="relative group">
-                                    <select
-                                        name="category"
-                                        value={formData.category}
-                                        onChange={handleChange}
-                                        className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all appearance-none cursor-pointer font-medium"
-                                        required
-                                    >
-                                        <option value="" className="bg-card text-text-muted">Select Category</option>
-                                        <option value="Photography" className="bg-card">Photography</option>
-                                        <option value="Electronics" className="bg-card">Electronics</option>
-                                        <option value="Furniture" className="bg-card">Furniture</option>
-                                        <option value="Sports" className="bg-card">Sports</option>
-                                        <option value="Music" className="bg-card">Music</option>
-                                    </select>
-                                    <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none" size={16} />
-                                </div>
+                                <CategoryInput
+                                    id="edit-item-category"
+                                    name="category"
+                                    value={formData.category}
+                                    onChange={handleChange}
+                                    placeholder="Type or select category"
+                                    className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all font-medium"
+                                    required
+                                />
                             </div>
                         </div>
 
