@@ -282,9 +282,9 @@ export const getWishlistService = async (userId: string) => {
         category: item.category,
         rating: item.rating?.average || 5.0,
         reviews: item.rating?.count || 0,
-        pricePerDay: item.pricing?.daily || item.dailyPrice || 0,
+        pricePerDay: item.price?.daily || item.pricing?.daily || item.dailyPrice || 0,
         image: item.images?.[0] || null,
-        available: item.item_status === "active" || item.item_status === "available"
+        available: item.status === "active" || item.status === "available" || item.isActive !== false
     }));
 
     return formattedWishlist;

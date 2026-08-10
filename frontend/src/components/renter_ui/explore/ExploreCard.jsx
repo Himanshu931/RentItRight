@@ -48,7 +48,7 @@ const ExploreCard = ({ item, isWishlisted, onToggleWishlist, linkPrefix = "/rent
 
             <div className="flex items-center gap-1 text-sm font-semibold">
               <Star size={14} className="text-bright fill-bright" />
-              {item.rating}
+              {typeof item.rating === "object" ? (item.rating?.average ?? 0) : (item.rating ?? 0)}
             </div>
           </div>
 
@@ -62,7 +62,7 @@ const ExploreCard = ({ item, isWishlisted, onToggleWishlist, linkPrefix = "/rent
           {/* Price + Distance */}
           <div className="mt-3 flex items-center justify-between">
             <p className="text-lg font-bold text-bright">
-              ₹{item.dailyPrice ?? item.pricing?.daily}
+              ₹{typeof item.dailyPrice === "object" ? item.dailyPrice?.daily : (item.dailyPrice ?? (typeof item.price === "object" ? item.price?.daily : item.price) ?? item.pricing?.daily ?? 0)}
               <span className="ml-1 text-[11px] font-medium text-text-secondary">
                 /day
               </span>

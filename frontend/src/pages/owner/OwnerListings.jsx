@@ -199,12 +199,12 @@ export default function OwnerListings() {
                 <div className="space-y-4">
                     {filteredItems.map((item) => (
                         <InventoryCard
-                            key={item.id}
+                            key={item.id || item._id}
                             item={item}
                             onEdit={() => handleEditItem(item)}
-                            onPause={() => handlePauseItem(item.id)}
-                            onActivate={() => handleActivateItem(item.id)}
-                            onDelete={() => handleDeleteItem(item.id)}
+                            onPause={() => handlePauseItem(item.id || item._id)}
+                            onActivate={() => handleActivateItem(item.id || item._id)}
+                            onDelete={() => handleDeleteItem(item.id || item._id)}
                         />
                     ))}
                 </div>

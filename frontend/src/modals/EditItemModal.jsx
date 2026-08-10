@@ -19,13 +19,13 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
         if (item) {
             setFormData({
                 itemName: item.title || "",
-                category: item.category || "",
-                description: item.description || "Complete professional photography kit including Sony A7R IV, 24-70mm lens, 3 extra batteries, and 128GB SD card. Perfect for high-end production work.",
+                category: typeof item.category === "object" ? (item.category?.name || "") : (item.category || ""),
+                description: item.description || "",
                 images: item.images || (item.image ? [item.image] : []),
-                dailyPrice: item.price || "",
-                weeklyPrice: item.weeklyPrice || "0",
-                monthlyPrice: item.monthlyPrice || "0",
-                securityDeposit: item.securityDeposit || "0"
+                dailyPrice: typeof item.price === "object" ? (item.price?.daily ?? "") : (item.price ?? item.dailyPrice ?? ""),
+                weeklyPrice: typeof item.price === "object" ? (item.price?.weekly ?? "") : (item.weeklyPrice ?? "0"),
+                monthlyPrice: typeof item.price === "object" ? (item.price?.monthly ?? "") : (item.monthlyPrice ?? "0"),
+                securityDeposit: item.securityDeposit ?? "0"
             });
         }
     }, [item]);
@@ -91,7 +91,8 @@ export default function EditItemModal({ item, onClose, onSubmit }) {
             const { csrfToken } = await csrfRes.json();
 
             // 2. Submit Data
-            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items/${item.id}`, {
+            const itemId = item.id || item._id;
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items/${itemId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

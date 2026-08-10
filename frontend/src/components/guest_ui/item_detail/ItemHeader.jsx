@@ -11,7 +11,7 @@ export default function ItemHeader({ item }) {
           <div className="flex items-center gap-2 text-xs text-text-secondary font-medium">
              <span className="flex items-center gap-1 text-warning">
                 <span className="material-symbols-outlined !text-sm">star</span>
-                {item.rating || "New"}
+                {(typeof item.rating === "object" ? item.rating?.average : item.rating) || "New"}
              </span>
              <span className="opacity-40">·</span>
              <span>{item.location?.city || "Local"}, {item.location?.region || "Area"}</span>

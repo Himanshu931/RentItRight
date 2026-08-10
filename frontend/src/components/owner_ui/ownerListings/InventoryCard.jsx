@@ -16,7 +16,7 @@ export default function InventoryCard({
                 <div className="flex-1 p-4 flex items-center gap-4">
                     <div className="relative h-20 w-20 shrink-0 rounded-xl overflow-hidden border border-gray-800">
                         <img
-                            src={item.image}
+                            src={item.image || item.images?.[0] || ""}
                             alt={item.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
@@ -36,17 +36,21 @@ export default function InventoryCard({
                                 {item.status}
                             </span>
                             <div className="flex items-center gap-1 ml-auto md:ml-0">
-                                <span className="text-sm font-bold text-white">{item.rating}</span>
+                                <span className="text-sm font-bold text-white">
+                                    {typeof item.rating === "object" ? (item.rating?.average ?? 0) : (item.rating ?? 0)}
+                                </span>
                                 <Star className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
                             </div>
                         </div>
 
                         <div className="flex items-center gap-3">
                             <span className="px-2 py-0.5 bg-[#1E4E49] rounded text-[10px] font-bold text-[#99F6E4] uppercase tracking-wider">
-                                {item.category}
+                                {typeof item.category === "object" ? (item.category?.name || String(item.category)) : item.category}
                             </span>
                             <div className="flex items-baseline gap-1">
-                                <span className="text-sm font-black text-white">₹{item.price}</span>
+                                <span className="text-sm font-black text-white">
+                                    ₹{typeof item.price === "object" ? (item.price?.daily ?? 0) : (item.price ?? item.dailyPrice ?? 0)}
+                                </span>
                                 <span className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">/day</span>
                             </div>
                         </div>
@@ -59,27 +63,27 @@ export default function InventoryCard({
                         <ActionButton
                             icon={<Edit2 size={18} />}
                             label="EDIT"
-                            onClick={() => onEdit?.(item.id)}
+                            onClick={() => onEdit?.(item.id || item._id)}
                         />
                         {item.status !== "rented" && (
                             item.status === "paused" ? (
                                 <ActionButton
                                     icon={<PlayCircle size={18} />}
                                     label="ACTIVE"
-                                    onClick={() => onActivate?.(item.id)}
+                                    onClick={() => onActivate?.(item.id || item._id)}
                                 />
                             ) : (
                                 <ActionButton
                                     icon={<Pause size={18} />}
                                     label="PAUSE"
-                                    onClick={() => onPause?.(item.id)}
+                                    onClick={() => onPause?.(item.id || item._id)}
                                 />
                             )
                         )}
                         <ActionButton
                             icon={<Trash2 size={18} />}
                             label="DELETE"
-                            onClick={() => onDelete?.(item.id)}
+                            onClick={() => onDelete?.(item.id || item._id)}
                             variant="danger"
                         />
                     </div>
