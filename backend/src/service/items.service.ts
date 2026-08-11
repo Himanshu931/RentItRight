@@ -7,13 +7,6 @@ import z from "zod";
 import logger from "../config/logger";
 import { ROLE } from "../validatior/auth.schema";
 
-function ensureOwner(role: ROLE) {
-    if (role !== ROLE.OWNER) {
-        logger.warn("Unauthorized access attempt", { role });
-        throw new AppError("Unauthorized", 403);
-    }
-}
-
 export const getItemService = async (
     id: string,
     status?: string,
@@ -24,8 +17,6 @@ export const getItemService = async (
     const pageNum = (!page || isNaN(Number(page)) || Number(page) < 1) ? 1 : Number(page);
 
     logger.info("Fetching items", { userId: id, status, page: pageNum, q });
-
-    ensureOwner(role!);
 
     const query = {
         ownerId: new mongoose.Types.ObjectId(id),
@@ -94,8 +85,6 @@ export const addItemService = async (
         throw new AppError("User not found", 404);
     }
 
-    ensureOwner(user.roles as ROLE);
-
     const item = await Item.create({
         ownerId: userId,
         ...data,
@@ -117,8 +106,6 @@ export const updateItemService = async (
 ) => {
 
     logger.info("Updating item", { itemId, userId });
-
-    ensureOwner(role);
 
     const item = await Item.findOneAndUpdate(
         { _id: itemId, ownerId: userId, status: { $ne: "rented" } },
@@ -143,8 +130,6 @@ export const pauseItemService = async (
 ) => {
 
     logger.info("Pausing item", { itemId, userId });
-
-    ensureOwner(role);
 
     const item = await Item.findOne({ _id: itemId, ownerId: userId });
 
@@ -172,8 +157,6 @@ export const deleteItemService = async (
 
     logger.info("Deleting item", { itemId, userId });
 
-    ensureOwner(role);
-
     const item = await Item.findOne({ _id: itemId, ownerId: userId });
 
     if (!item) {
@@ -198,8 +181,6 @@ export const activateItemService = async (
 ) => {
 
     logger.info("Activating item", { itemId, userId });
-
-    ensureOwner(role);
 
     const item = await Item.findOne({ _id: itemId, ownerId: userId });
 

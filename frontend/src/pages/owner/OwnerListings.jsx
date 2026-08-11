@@ -197,16 +197,41 @@ export default function OwnerListings() {
 
                 {/* Inventory List */}
                 <div className="space-y-4">
-                    {filteredItems.map((item) => (
-                        <InventoryCard
-                            key={item.id || item._id}
-                            item={item}
-                            onEdit={() => handleEditItem(item)}
-                            onPause={() => handlePauseItem(item.id || item._id)}
-                            onActivate={() => handleActivateItem(item.id || item._id)}
-                            onDelete={() => handleDeleteItem(item.id || item._id)}
-                        />
-                    ))}
+                    {filteredItems.length > 0 ? (
+                        filteredItems.map((item) => (
+                            <InventoryCard
+                                key={item.id || item._id}
+                                item={item}
+                                onEdit={() => handleEditItem(item)}
+                                onPause={() => handlePauseItem(item.id || item._id)}
+                                onActivate={() => handleActivateItem(item.id || item._id)}
+                                onDelete={() => handleDeleteItem(item.id || item._id)}
+                            />
+                        ))
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 text-center bg-surface/30 rounded-3xl border border-white/5 mt-8">
+                            <div className="w-24 h-24 bg-surface rounded-full flex items-center justify-center mb-6 border-2 border-dashed border-text-secondary/30">
+                                <span className="material-symbols-outlined text-5xl text-text-secondary/50">
+                                    inventory_2
+                                </span>
+                            </div>
+                            <h2 className="text-2xl font-bold mb-2 text-white">No items found</h2>
+                            <p className="text-text-secondary mb-8 max-w-sm text-base">
+                                {items.length === 0 
+                                    ? "You haven't listed any equipment yet. Get started by adding your first item!"
+                                    : "No items match your current filter or search criteria."}
+                            </p>
+                            {items.length === 0 && (
+                                <button 
+                                    className="bg-bright hover:bg-bright/80 active:scale-95 text-app px-8 py-3 rounded-full font-bold transition-all hover:cursor-pointer flex items-center gap-2"
+                                    onClick={() => setIsAddModalOpen(true)}
+                                >
+                                    <Plus size={20} strokeWidth={3} />
+                                    List Your First Item
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
             </div>
