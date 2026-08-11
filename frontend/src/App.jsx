@@ -16,11 +16,13 @@ import RenterWishlist from "./pages/renter/RenterWishlist";
 import RentCheckout from "./pages/renter/RentCheckout";
 import RoleRedirect from "./pages/auth/roleBasedRedirection";
 import ProtectedRoute from "./components/ProtectedRoute";
+import WalletDashboard from "./components/renter_ui/WalletDashboard";
 
 import OwnerLayout from "./layouts/OwnerLayout";
 import OwnerDashboard from "./pages/owner/OwnerDashboard";
 import OwnerListings from "./pages/owner/OwnerListings";
 import OwnerBookings from "./pages/owner/OwnerBookings";
+import OwnerWalletDashboard from "./components/owner_ui/OwnerWalletDashboard";
 
 
 import AdminLayout from "./layouts/AdminLayout"
@@ -55,6 +57,7 @@ function App() {
             <Route path="/wishlist" element={<RenterWishlist />} />
             <Route path="/renter/rent/:id" element={<RentCheckout />} />
             <Route path="/renter/profile" element={<ProfileSettings />} />
+            <Route path="/wallet" element={<WalletDashboard />} />
           </Route>
         </Route>
 
@@ -64,6 +67,7 @@ function App() {
             <Route path="/owner" element={<OwnerDashboard />} />
             <Route path="/listings" element={<OwnerListings />} />
             <Route path="/bookings" element={<OwnerBookings />} />
+            <Route path="/earnings" element={<OwnerWalletDashboard />} />
             <Route path="/owner/profile" element={<ProfileSettings />} />
           </Route>
         </Route>

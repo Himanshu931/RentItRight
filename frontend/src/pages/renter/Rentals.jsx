@@ -34,6 +34,7 @@ export default function Rentals() {
           const mappedRentals = data.bookings.map(b => ({
             id: b.id,
             status: b.status,
+            paymentStatus: b.paymentStatus,
             title: b.item?.title || "Unknown Item",
             startDate: new Date(b.startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
             endDate: new Date(b.endDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),

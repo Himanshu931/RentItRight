@@ -1,7 +1,49 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import toast from "react-hot-toast";
+
 export default function RentalCard({ rental }) {
-  
-  console.log(rental.id)
+  const [isPaying, setIsPaying] = useState(false);
+
+  const handleWalletPay = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (isPaying) return;
+    setIsPaying(true);
+
+    try {
+      // Fetch CSRF token first
+      const csrfRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
+        method: "GET",
+        credentials: "include"
+      });
+      const csrfData = await csrfRes.json();
+
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/wallet/pay`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfData.csrfToken
+        },
+        body: JSON.stringify({ bookingId: rental.id }),
+        credentials: "include"
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        toast.success("Paid with wallet!");
+        window.location.reload();
+      } else {
+        toast.error(data.message || "Payment failed");
+      }
+    } catch (err) {
+      toast.error("Network error while processing payment");
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
   return (
     <Link to={`/rentals/${rental.id}`} className="block">
       <div className="bg-surface border-2 border-app/80 rounded-xl overflow-hidden hover:border-bright/40 transition-all">
@@ -28,7 +70,7 @@ export default function RentalCard({ rental }) {
               </p>
             </div>
 
-            <p className="text-bright font-bold">${rental.price}</p>
+            <p className="text-bright font-bold">₹{rental.price}</p>
           </div>
 
           <div className="flex justify-around border-t border-divider pt-4">
@@ -45,9 +87,23 @@ export default function RentalCard({ rental }) {
               </button>
             ))}
           </div>
+
+          {rental.paymentStatus === "pending" && (
+            <button 
+              onClick={handleWalletPay}
+              disabled={isPaying}
+              className={`mt-2 w-full py-2 rounded-lg font-bold transition-all ${
+                isPaying 
+                  ? 'bg-divider text-text-secondary cursor-not-allowed' 
+                  : 'bg-bright text-background-dark hover:bg-bright/90 active:scale-95'
+              }`}
+            >
+              {isPaying ? 'Processing...' : 'Pay with Wallet'}
+            </button>
+          )}
         </div>
       </div>
     </Link>
-
   );
 }
+
