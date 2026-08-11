@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import logger from "../config/logger";
 import { updateProfileSchema, updateAddressSchema, profileSchema, changePasswordSchema } from "../validatior/user.schema";
 import { updateProfileService, userProfileService, getUserProfileService, updateProfileImageService, deleteProfileService, updateAddressService, dashboardDataService, getWishlistService, toggleWishlistService, changePasswordService } from "../service/user.service";
@@ -11,7 +12,23 @@ export const createProfile = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(`Invalid Data ${validate.error.flatten()}`, 400)
     }
 
-    await userProfileService(req.userId!, validate.data);
+    const { user } = await userProfileService(req.userId!, validate.data);
+
+    // Generate a new JWT token with the updated role
+    const token = jwt.sign(
+        { userId: user._id, userRole: user.roles },
+        process.env.JWT_SECRET!,
+        { expiresIn: "24h" }
+    );
+
+    // Update the cookie with the new token
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+    });
+
     res.status(201).json({ success: true, message: "Profile created successfully" });
 })
 
@@ -83,4 +100,4 @@ export const changePassword = catchAsync(async (req: Request, res: Response) => 
 
     await changePasswordService(req.userId!, validate.data);
     res.status(200).json({ success: true, message: "Password changed successfully" });
-})
+})
