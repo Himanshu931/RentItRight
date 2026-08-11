@@ -55,6 +55,9 @@ export const getUserProfileService = async (userId: string) => {
             state: user.address?.state!,
         },
         profileImage: user.profileImage!,
+        createdAt: user.createdAt,
+        isVerified: user.isVerified,
+        roles: user.roles,
     };
 
     if (user.roles === "renter") {

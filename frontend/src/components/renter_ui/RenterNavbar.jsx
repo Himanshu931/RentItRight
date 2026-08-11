@@ -85,6 +85,9 @@ const RenterNavbar = () => {
                         <NavLink to="/renter_explore" className={navItemClass}>
                             Browse Items
                         </NavLink>
+                        <NavLink to="/wallet" className={navItemClass}>
+                            Wallet
+                        </NavLink>
                     </nav>
                 </div>
 
@@ -124,6 +127,13 @@ const RenterNavbar = () => {
                             >
                                 <span className="material-symbols-outlined text-lg">account_circle</span>
                                 <span className="font-medium">Profile</span>
+                            </Link>
+                            <Link
+                                to="/wallet"
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
+                                <span className="font-medium">Wallet</span>
                             </Link>
                             <button
                                 onClick={handleSignOut}

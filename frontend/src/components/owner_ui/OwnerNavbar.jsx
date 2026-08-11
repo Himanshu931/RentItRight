@@ -130,6 +130,13 @@ const OwnerNavbar = () => {
                                 <span className="material-symbols-outlined text-lg">account_circle</span>
                                 <span className="font-medium">Profile</span>
                             </Link>
+                            <Link
+                                to="/earnings"
+                                className="w-full flex items-center gap-3 px-4 py-3 text-sm text-text-secondary hover:text-text-primary hover:bg-white/5 transition-colors"
+                            >
+                                <span className="material-symbols-outlined text-lg">account_balance_wallet</span>
+                                <span className="font-medium">Wallet</span>
+                            </Link>
                             <button
                                 onClick={handleSignOut}
                                 className="w-full flex items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error/10 transition-colors"
