@@ -159,6 +159,7 @@ export const verifyRazorpayPayment = catchAsync(async (req: Request, res: Respon
           user_id: userId,
           amount: sanitizedAmount,
           type: "topup",
+          reference_id: null, // Could store razorpay order ID here if we change schema to string
           balance_before: balanceBefore,
           balance_after: updatedUser.walletBalance,
           description: `Wallet top-up via Razorpay (${razorpay_payment_id})`,
