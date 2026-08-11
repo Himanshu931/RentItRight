@@ -27,7 +27,7 @@ export const updateItem = catchAsync(async (req: Request, res: Response) => {
 
     const validate = updateItemSchema.safeParse(req.body);
     if (!validate.success) {
-        throw new AppError(`Invalid data ${validate.error.flatten().fieldErrors}`, 422);
+        throw new AppError(`Invalid data: ${JSON.stringify(validate.error.flatten().fieldErrors)}`, 422);
     }
 
     await updateItemService(itemId, req.userId!, validate.data, req.userRole! as ROLE);
@@ -42,7 +42,7 @@ export const addItem = catchAsync(async (req: Request, res: Response) => {
 
     const validate = itemValidationSchema.safeParse(req.body);
     if (!validate.success) {
-        throw new AppError(`Invalid data ${validate.error.flatten().fieldErrors}`, 422);
+        throw new AppError(`Invalid data: ${JSON.stringify(validate.error.flatten().fieldErrors)}`, 422);
     }
 
     await addItemService(req.userId!, validate.data);

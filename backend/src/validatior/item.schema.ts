@@ -6,11 +6,11 @@ export const itemValidationSchema = z.object({
     category: z.string().min(1, "Category is required"),
     price: z.object({
         daily: z.number().min(1, "Daily price is required"),
-        weekly: z.number().min(1, "Weekly price is required"),
-        monthly: z.number().min(1, "Monthly price is required"),
+        weekly: z.number().min(0, "Weekly price must be 0 or more").optional(),
+        monthly: z.number().min(0, "Monthly price must be 0 or more").optional(),
     }),
     securityDeposit: z.number().min(1, "Security deposit is required"),
-    images: z.array(z.string()).min(1, "Images are required").optional(),
+    images: z.array(z.string()).optional(),
 })
 
 export const updateItemSchema = z.object({

@@ -1,7 +1,17 @@
 import { useState } from "react";
-import { X, Package, ImagePlus, IndianRupee } from "lucide-react";
+import { X, Package, ImagePlus, IndianRupee, AlertCircle } from "lucide-react";
 import toast from "react-hot-toast";
 import CategoryInput from "../components/common/CategoryInput";
+
+function FieldError({ message }) {
+    if (!message) return null;
+    return (
+        <p className="flex items-center gap-1 text-xs text-red-400 mt-1.5 font-medium animate-[fadeIn_0.2s_ease-out]">
+            <AlertCircle size={12} className="shrink-0" />
+            {message}
+        </p>
+    );
+}
 
 export default function AddItemModal({ onClose, onSubmit }) {
     const [formData, setFormData] = useState({
@@ -14,24 +24,28 @@ export default function AddItemModal({ onClose, onSubmit }) {
         securityDeposit: "",
         images: []
     });
+    const [errors, setErrors] = useState({});
     const [isUploading, setIsUploading] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
+    const clearError = (field) => {
+        setErrors((prev) => {
+            const next = { ...prev };
+            delete next[field];
+            return next;
         });
+    };
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        clearError(name);
     };
 
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
-
         const updatedImages = [...formData.images, ...files].slice(0, 5);
-
-        setFormData({
-            ...formData,
-            images: updatedImages
-        });
+        setFormData((prev) => ({ ...prev, images: updatedImages }));
+        clearError("images");
     };
 
     const handleRemoveImage = (indexToRemove) => {
@@ -40,7 +54,6 @@ export default function AddItemModal({ onClose, onSubmit }) {
             images: prev.images.filter((_, index) => index !== indexToRemove)
         }));
     };
-
 
     const uploadImagesToCloudinary = async (files) => {
         const uploadUrl = import.meta.env.VITE_CLOUDINARY_URL;
@@ -69,13 +82,12 @@ export default function AddItemModal({ onClose, onSubmit }) {
 
     const addItemToBackend = async (data) => {
         try {
-            // 1. Get CSRF Token
             const csrfRes = await fetch(`${import.meta.env.VITE_BACKEND_URL}/csrf-token`, {
                 method: "GET",
                 credentials: "include"
             });
             const { csrfToken } = await csrfRes.json();
-            // 2. Submit Data
+
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/items`, {
                 method: "POST",
                 headers: {
@@ -96,56 +108,62 @@ export default function AddItemModal({ onClose, onSubmit }) {
         }
     };
 
+    const validate = () => {
+        const newErrors = {};
+        const { itemName, category, description, dailyPrice, weeklyPrice, monthlyPrice, securityDeposit } = formData;
+
+        // Title
+        if (!itemName.trim()) {
+            newErrors.itemName = "Item name is required";
+        } else if (itemName.trim().length < 4) {
+            newErrors.itemName = "Item name must be at least 4 characters";
+        }
+
+        // Category
+        if (!category.trim()) {
+            newErrors.category = "Category is required";
+        }
+
+        // Description
+        if (!description.trim()) {
+            newErrors.description = "Description is required";
+        } else if (description.trim().length < 10) {
+            newErrors.description = "Description must be at least 10 characters";
+        }
+
+        // Daily price
+        if (!dailyPrice) {
+            newErrors.dailyPrice = "Daily price is required";
+        } else if (isNaN(Number(dailyPrice)) || Number(dailyPrice) < 1) {
+            newErrors.dailyPrice = "Daily price must be at least ₹1";
+        }
+
+        // Weekly price (optional)
+        if (weeklyPrice && (isNaN(Number(weeklyPrice)) || Number(weeklyPrice) < 0)) {
+            newErrors.weeklyPrice = "Weekly price must be a valid number";
+        }
+
+        // Monthly price (optional)
+        if (monthlyPrice && (isNaN(Number(monthlyPrice)) || Number(monthlyPrice) < 0)) {
+            newErrors.monthlyPrice = "Monthly price must be a valid number";
+        }
+
+        // Security deposit
+        if (!securityDeposit) {
+            newErrors.securityDeposit = "Security deposit is required";
+        } else if (isNaN(Number(securityDeposit)) || Number(securityDeposit) < 1) {
+            newErrors.securityDeposit = "Security deposit must be at least ₹1";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const { dailyPrice, weeklyPrice, monthlyPrice, securityDeposit, itemName, category, description } = formData;
-
-        const isValidNumber = (value) =>
-            value === "" || /^[0-9]+(\.[0-9]+)?$/.test(value);
-
-        if (!isValidNumber(dailyPrice)) {
-            toast.error("Daily price must be a valid number");
-            return;
-        }
-
-        if (!isValidNumber(weeklyPrice)) {
-            toast.error("Weekly price must be a valid number");
-            return;
-        }
-
-        if (!isValidNumber(monthlyPrice)) {
-            toast.error("Monthly price must be a valid number");
-            return;
-        }
-
-        if (!isValidNumber(securityDeposit)) {
-            toast.error("Security deposit must be a valid number");
-            return;
-        }
-
-        // Required checks
-        if (!itemName) {
-            toast.error("Item name is required");
-            return;
-        }
-
-        if (!category) {
-            toast.error("Category is required");
-            return;
-        }
-
-        if (!description) {
-            toast.error("Description is required");
-            return;
-        }
-        if (!dailyPrice) {
-            toast.error("Daily price is required");
-            return;
-        }
-
-        if (!securityDeposit) {
-            toast.error("Security deposit is required");
+        if (!validate()) {
+            toast.error("Please fix the errors before submitting");
             return;
         }
 
@@ -153,9 +171,9 @@ export default function AddItemModal({ onClose, onSubmit }) {
         try {
             const imageUrls = await uploadImagesToCloudinary(formData.images);
             const finalData = {
-                title: formData.itemName,
-                description: formData.description,
-                category: formData.category,
+                title: formData.itemName.trim(),
+                description: formData.description.trim(),
+                category: formData.category.trim(),
                 price: {
                     daily: Number(formData.dailyPrice),
                     weekly: Number(formData.weeklyPrice) || 0,
@@ -165,8 +183,6 @@ export default function AddItemModal({ onClose, onSubmit }) {
                 images: imageUrls.filter(url => url !== null)
             };
 
-            // Call backend function
-            console.log(finalData)
             await addItemToBackend(finalData);
 
             toast.success("Item added successfully! 🚀");
@@ -182,8 +198,12 @@ export default function AddItemModal({ onClose, onSubmit }) {
         }
     };
 
-
-
+    const inputClass = (field) =>
+        `w-full bg-card border rounded-xl px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none transition-all ${
+            errors[field]
+                ? "border-red-500/60 focus:border-red-400 focus:ring-1 focus:ring-red-400/30"
+                : "border-divider focus:border-bright focus:ring-1 focus:ring-bright/30"
+        }`;
 
     return (
         <div
@@ -228,9 +248,9 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                 value={formData.itemName}
                                 onChange={handleChange}
                                 placeholder="e.g. Sony A7III Camera"
-                                className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
-                                required
+                                className={inputClass("itemName")}
                             />
+                            <FieldError message={errors.itemName} />
                         </div>
 
                         <div>
@@ -243,9 +263,9 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                 value={formData.category}
                                 onChange={handleChange}
                                 placeholder="Type or select category"
-                                className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
-                                required
+                                className={inputClass("category")}
                             />
+                            <FieldError message={errors.category} />
                         </div>
                     </div>
 
@@ -260,9 +280,14 @@ export default function AddItemModal({ onClose, onSubmit }) {
                             onChange={handleChange}
                             placeholder="Tell renters about your item, its condition, and what's included..."
                             rows="3"
-                            className="w-full bg-card border border-divider rounded-xl px-3.5 py-2.5 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all resize-none"
-                            required
+                            className={`${inputClass("description")} resize-none`}
                         />
+                        <div className="flex justify-between items-start">
+                            <FieldError message={errors.description} />
+                            <span className={`text-xs mt-1.5 ${formData.description.length < 10 ? "text-text-muted" : "text-bright/70"}`}>
+                                {formData.description.length}/10 min
+                            </span>
+                        </div>
                     </div>
 
                     {/* Image Upload */}
@@ -349,10 +374,11 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                         name="dailyPrice"
                                         value={formData.dailyPrice}
                                         onChange={handleChange}
-                                        className="w-full bg-card border border-divider rounded-xl pl-7 pr-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
-                                        required
+                                        placeholder="0"
+                                        className={`${inputClass("dailyPrice")} pl-7`}
                                     />
                                 </div>
+                                <FieldError message={errors.dailyPrice} />
                             </div>
 
                             <div>
@@ -366,9 +392,11 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                         name="weeklyPrice"
                                         value={formData.weeklyPrice}
                                         onChange={handleChange}
-                                        className="w-full bg-card border border-divider rounded-xl pl-7 pr-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
+                                        placeholder="0"
+                                        className={`${inputClass("weeklyPrice")} pl-7`}
                                     />
                                 </div>
+                                <FieldError message={errors.weeklyPrice} />
                             </div>
 
                             <div>
@@ -382,9 +410,11 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                         name="monthlyPrice"
                                         value={formData.monthlyPrice}
                                         onChange={handleChange}
-                                        className="w-full bg-card border border-divider rounded-xl pl-7 pr-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
+                                        placeholder="0"
+                                        className={`${inputClass("monthlyPrice")} pl-7`}
                                     />
                                 </div>
+                                <FieldError message={errors.monthlyPrice} />
                             </div>
 
                             <div>
@@ -398,10 +428,11 @@ export default function AddItemModal({ onClose, onSubmit }) {
                                         name="securityDeposit"
                                         value={formData.securityDeposit}
                                         onChange={handleChange}
-                                        className="w-full bg-card border border-divider rounded-xl pl-7 pr-3 py-2.5 text-sm text-text-primary focus:outline-none focus:border-bright focus:ring-1 focus:ring-bright/30 transition-all"
-                                        required
+                                        placeholder="0"
+                                        className={`${inputClass("securityDeposit")} pl-7`}
                                     />
                                 </div>
+                                <FieldError message={errors.securityDeposit} />
                             </div>
                         </div>
                     </div>
