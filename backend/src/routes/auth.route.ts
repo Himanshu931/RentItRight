@@ -7,6 +7,9 @@ import {
   sendOTP,
   verifyOTP,
   googleCallback,
+  forgotPasswordSendOTP,
+  forgotPasswordVerifyOTP,
+  resetPassword,
 } from "../controllers/auth.controller";
 import passport from "passport";
 import { VerifyUser } from "../middleware/verifyUser";
@@ -165,5 +168,31 @@ router.get(
   googleCallback
 );
 
+/**
+ * @swagger
+ * /auth/forgot-password/send-otp:
+ *   post:
+ *     summary: Request OTP for password reset
+ *     tags: [Auth]
+ */
+router.post("/forgot-password/send-otp", OTP_LIMITER, forgotPasswordSendOTP);
+
+/**
+ * @swagger
+ * /auth/forgot-password/verify-otp:
+ *   post:
+ *     summary: Verify OTP for password reset
+ *     tags: [Auth]
+ */
+router.post("/forgot-password/verify-otp", forgotPasswordVerifyOTP);
+
+/**
+ * @swagger
+ * /auth/forgot-password/reset:
+ *   post:
+ *     summary: Reset password with token
+ *     tags: [Auth]
+ */
+router.post("/forgot-password/reset", resetPassword);
 
 export default router;

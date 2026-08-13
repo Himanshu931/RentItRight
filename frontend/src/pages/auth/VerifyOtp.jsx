@@ -34,6 +34,31 @@ const VerifyOtp = ({ email, switchMode }) => {
     }
   };
 
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text/plain").trim();
+    if (!pastedData) return;
+
+    // Filter out non-numeric characters and take only up to 6 digits
+    const digits = pastedData.replace(/\D/g, "").slice(0, 6).split("");
+    if (digits.length === 0) return;
+
+    const newOtp = [...otp];
+    digits.forEach((digit, index) => {
+      newOtp[index] = digit;
+    });
+    setOtp(newOtp);
+
+    // Focus on the next empty input or the last one if full
+    const nextIndex = digits.length < 6 ? digits.length : 5;
+    inputRefs.current[nextIndex].focus();
+
+    // Auto-submit if all digits are entered
+    if (newOtp.every((digit) => digit !== "")) {
+      handleVerifyOtp(newOtp);
+    }
+  };
+
   const handleVerifyOtp = async (providedOtp) => {
     if (loading) return;
     
@@ -120,6 +145,7 @@ const VerifyOtp = ({ email, switchMode }) => {
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
+                onPaste={handlePaste}
                 className="w-full aspect-square text-center text-xl font-bold 
                            rounded-lg border border-text-secondary/40
                            bg-transparent text-text-primary 

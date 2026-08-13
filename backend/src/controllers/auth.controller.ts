@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { loginSchema, registerSchema } from "../validatior/auth.schema";
 import { OTPValidator } from "../validatior/OTP.validator";
-import { loginService, registerService, sendOTPService, verifyOTPService, MeService } from "../service/auth.service";
+import { loginService, registerService, sendOTPService, verifyOTPService, MeService, forgotPasswordSendOTPService, forgotPasswordVerifyOTPService, resetPasswordService } from "../service/auth.service";
 import logger from "../config/logger";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
@@ -132,4 +132,43 @@ export const googleCallback = catchAsync(async (req: Request, res: Response) => 
 
   // Otherwise, fallback to role based redirection
   res.redirect(`${frontendUrl}/role-redirect`);
+});
+
+export const forgotPasswordSendOTP = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new AppError("Email is required", 400);
+  }
+
+  await forgotPasswordSendOTPService(email);
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password reset OTP has been sent to your email" });
+});
+
+export const forgotPasswordVerifyOTP = catchAsync(async (req: Request, res: Response) => {
+  const validate = OTPValidator.safeParse(req.body);
+  if (!validate.success) {
+    throw new AppError(`Invalid data ${validate.error.flatten().fieldErrors}`, 400);
+  }
+
+  const resetToken = await forgotPasswordVerifyOTPService(validate.data);
+
+  res
+    .status(200)
+    .json({ success: true, message: "OTP verified successfully", resetToken });
+});
+
+export const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const { resetToken, newPassword } = req.body;
+  if (!resetToken || !newPassword) {
+    throw new AppError("Reset token and new password are required", 400);
+  }
+
+  await resetPasswordService(resetToken, newPassword);
+
+  res
+    .status(200)
+    .json({ success: true, message: "Password has been reset successfully" });
 });

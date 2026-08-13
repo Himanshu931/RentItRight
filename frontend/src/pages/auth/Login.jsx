@@ -114,6 +114,7 @@ const Login = ({ switchMode, onClose }) => {
               </label>
               <button
                 type="button"
+                onClick={() => switchMode("forgotPassword")}
                 className="text-bright text-xs font-semibold hover:underline"
               >
                 Forgot?
