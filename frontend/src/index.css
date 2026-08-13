@@ -23,9 +23,9 @@
   --color-text-disabled: #4b5260;
 
   /* Accent */
-  --color-accent: #222e63;
-  --color-accent-hover: #222e63cc;
-  --color-accent-soft: #1c3a3a;
+  --color-accent: #2fb7a4;
+  --color-accent-hover: #2fb7a4cc;
+  --color-accent-soft: rgba(47, 183, 164, 0.1);
 
   /* Status */
   --color-success: #22c55e;

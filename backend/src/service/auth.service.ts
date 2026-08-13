@@ -24,6 +24,7 @@ export const registerService = async (userData: {
 
   await User.create({
     email: userData.email,
+    name : userData.email.split("@")[0],
     password: hashedPassword,
   });
 

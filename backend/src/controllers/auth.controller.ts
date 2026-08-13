@@ -124,9 +124,9 @@ export const googleCallback = catchAsync(async (req: Request, res: Response) => 
   });
 
   const frontendUrl = process.env.FRONTEND_URL;
+  const flow = req.query.state as string;
   
-  // If user doesn't have a phone, they haven't completed their profile
-  if (!user.phone) {
+  if (flow === "register" && !user.phone) {
     return res.redirect(`${frontendUrl}/?auth=success&mode=completeProfile`);
   }
 

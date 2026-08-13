@@ -15,12 +15,6 @@ export default function RoleRedirect() {
             return;
         }
 
-        // If profile is incomplete, redirect to home to open the modal
-        if (!user.phone) {
-            navigate("/?auth=success&mode=completeProfile", { replace: true });
-            return;
-        }
-
         const roleValue = user.role ?? user.roles ?? [];
         const roles = Array.isArray(roleValue) ? roleValue : [roleValue];
 

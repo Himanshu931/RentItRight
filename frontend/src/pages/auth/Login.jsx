@@ -51,7 +51,7 @@ const Login = ({ switchMode, onClose }) => {
         throw new Error("Invalid credentials");
       }
 
-      toast.success("Welcome back! 🚀");
+      toast.success("Welcome back!");
       navigate("/role-redirect");
       onClose();
 

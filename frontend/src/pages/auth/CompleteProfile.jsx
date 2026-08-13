@@ -287,14 +287,24 @@ export default function CompleteProfile({ switchMode }) {
 
 
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-2xl bg-bright hover:bg-bright/80 py-4 font-bold text-app shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2 mt-10"
-          >
-            <span>{loading ? "Processing..." : "Complete Setup"}</span>
-            <ArrowRight className="w-5 h-5" />
-          </button>
+          <div className="space-y-3 mt-10">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-2xl bg-bright hover:bg-bright/80 py-4 font-bold text-app shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              <span>{loading ? "Processing..." : "Complete Setup"}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+
+            <button
+              type="button"
+              onClick={() => switchMode("success")}
+              className="w-full rounded-2xl bg-transparent border-none text-text-secondary hover:text-white py-3 font-semibold transition-all active:scale-[0.98]"
+            >
+              Skip for now
+            </button>
+          </div>
 
         </div>
       </div>
