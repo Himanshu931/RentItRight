@@ -5,6 +5,7 @@ import {
   createRazorpayOrder,
   verifyRazorpayPayment,
   payWithWallet,
+  withdrawFromWallet,
 } from "../controllers/wallet.controller";
 import { VerifyUser } from "../middleware/verifyUser";
 import rateLimit from "express-rate-limit";
@@ -29,5 +30,6 @@ router.get("/transactions", getWalletTransactions);
 router.post("/create-razorpay-order", financialLimiter, createRazorpayOrder);
 router.post("/verify-razorpay-payment", financialLimiter, verifyRazorpayPayment);
 router.post("/pay", financialLimiter, payWithWallet);
+router.post("/withdraw", financialLimiter, withdrawFromWallet);
 
 export default router;

@@ -16,7 +16,9 @@ const WalletDashboard = () => {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [topupAmount, setTopupAmount] = useState('');
+    const [withdrawAmount, setWithdrawAmount] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [activeTab, setActiveTab] = useState('topup'); // 'topup' or 'withdraw'
 
     useEffect(() => {
         fetchWalletData();
@@ -154,6 +156,47 @@ const WalletDashboard = () => {
         }
     };
 
+    const handleWithdraw = async (e) => {
+        e.preventDefault();
+        const amount = Number(withdrawAmount);
+        if (!withdrawAmount || isNaN(amount) || amount <= 0) {
+            toast.error("Enter a valid amount");
+            return;
+        }
+
+        if (amount > balance) {
+            toast.error("Insufficient wallet balance");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const csrfToken = await getCsrfToken();
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/wallet/withdraw`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken
+                },
+                body: JSON.stringify({ amount }),
+                credentials: "include"
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success(`Successfully withdrew ₹${amount}!`);
+                setWithdrawAmount('');
+                fetchWalletData();
+            } else {
+                toast.error(data.message || "Withdrawal failed");
+            }
+        } catch (error) {
+            toast.error("Network error. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -183,29 +226,67 @@ const WalletDashboard = () => {
                     </div>
 
                     <div className="bg-surface border border-divider rounded-3xl p-6 shadow-sm">
-                        <h4 className="text-lg font-bold text-text-primary mb-4">Add Funds</h4>
-                        <form onSubmit={handleTopup} className="space-y-4">
-                            <div>
-                                <label className="block text-xs font-medium text-text-secondary mb-1">Amount (₹)</label>
-                                <input 
-                                    type="number" 
-                                    value={topupAmount}
-                                    onChange={(e) => setTopupAmount(e.target.value)}
-                                    placeholder="e.g. 5000" 
-                                    className="w-full bg-app border border-divider rounded-xl px-4 py-3 text-text-primary outline-none focus:border-bright transition-colors"
-                                    min="1"
-                                    max="100000"
-                                    required
-                                />
-                            </div>
-                            <button 
-                                type="submit" 
-                                disabled={isSubmitting}
-                                className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-sm transition-all ${isSubmitting ? 'bg-divider text-text-secondary cursor-not-allowed' : 'bg-bright text-background-dark hover:shadow-[0_0_20px_rgba(var(--color-bright),0.4)] hover:scale-[1.02]'}`}
+                        <div className="flex border-b border-divider mb-4">
+                            <button
+                                className={`flex-1 pb-2 text-center text-sm font-bold tracking-wide transition-colors ${activeTab === 'topup' ? 'text-bright border-b-2 border-bright' : 'text-text-secondary hover:text-text-primary'}`}
+                                onClick={() => setActiveTab('topup')}
                             >
-                                {isSubmitting ? 'Processing...' : 'Top Up Wallet'}
+                                Top Up
                             </button>
-                        </form>
+                            <button
+                                className={`flex-1 pb-2 text-center text-sm font-bold tracking-wide transition-colors ${activeTab === 'withdraw' ? 'text-bright border-b-2 border-bright' : 'text-text-secondary hover:text-text-primary'}`}
+                                onClick={() => setActiveTab('withdraw')}
+                            >
+                                Withdraw
+                            </button>
+                        </div>
+                        
+                        {activeTab === 'topup' ? (
+                            <form onSubmit={handleTopup} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-text-secondary mb-1">Amount (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        value={topupAmount}
+                                        onChange={(e) => setTopupAmount(e.target.value)}
+                                        placeholder="e.g. 5000" 
+                                        className="w-full bg-app border border-divider rounded-xl px-4 py-3 text-text-primary outline-none focus:border-bright transition-colors"
+                                        min="1"
+                                        max="100000"
+                                        required
+                                    />
+                                </div>
+                                <button 
+                                    type="submit" 
+                                    disabled={isSubmitting}
+                                    className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-sm transition-all ${isSubmitting ? 'bg-divider text-text-secondary cursor-not-allowed' : 'bg-bright text-background-dark hover:shadow-[0_0_20px_rgba(var(--color-bright),0.4)] hover:scale-[1.02]'}`}
+                                >
+                                    {isSubmitting ? 'Processing...' : 'Top Up Wallet'}
+                                </button>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleWithdraw} className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-medium text-text-secondary mb-1">Amount (₹)</label>
+                                    <input 
+                                        type="number" 
+                                        value={withdrawAmount}
+                                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                                        placeholder="e.g. 1000" 
+                                        className="w-full bg-app border border-divider rounded-xl px-4 py-3 text-text-primary outline-none focus:border-bright transition-colors"
+                                        min="1"
+                                        required
+                                    />
+                                </div>
+                                <button 
+                                    type="submit" 
+                                    disabled={isSubmitting || balance <= 0}
+                                    className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-sm transition-all ${isSubmitting || balance <= 0 ? 'bg-divider text-text-secondary cursor-not-allowed' : 'bg-bright text-background-dark hover:shadow-[0_0_20px_rgba(var(--color-bright),0.4)] hover:scale-[1.02]'}`}
+                                >
+                                    {isSubmitting ? 'Processing...' : 'Withdraw Funds'}
+                                </button>
+                            </form>
+                        )}
                     </div>
                 </div>
 
@@ -229,7 +310,7 @@ const WalletDashboard = () => {
                             <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                 {transactions.map(tx => {
                                     const isPositive = tx.amount > 0;
-                                    const icon = tx.type === 'topup' ? 'account_balance_wallet' : tx.type === 'refund' ? 'undo' : 'shopping_bag';
+                                    const icon = tx.type === 'topup' ? 'account_balance_wallet' : tx.type === 'withdrawal' ? 'money_off' : tx.type === 'refund' ? 'undo' : 'shopping_bag';
                                     
                                     return (
                                         <div key={tx._id} className="flex justify-between items-center p-4 bg-app/50 border border-divider/50 rounded-2xl hover:border-bright/30 transition-colors">

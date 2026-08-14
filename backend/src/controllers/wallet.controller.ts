@@ -316,3 +316,70 @@ export const payWithWallet = catchAsync(async (req: Request, res: Response) => {
     session.endSession();
   }
 });
+
+export const withdrawFromWallet = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.userId;
+  if (!userId) {
+    throw new AppError("Unauthorized", 401);
+  }
+
+  const { amount } = req.body;
+  const numericAmount = Number(amount);
+
+  if (!amount || isNaN(numericAmount) || numericAmount <= 0) {
+    throw new AppError("Invalid amount. Must be a positive number.", 400);
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const userBefore = await User.findById(userId).select("walletBalance").session(session);
+    if (!userBefore) {
+      throw new AppError("User not found", 404);
+    }
+
+    if (userBefore.walletBalance < numericAmount) {
+      throw new AppError("Insufficient wallet balance", 400);
+    }
+
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, walletBalance: { $gte: numericAmount } },
+      { $inc: { walletBalance: -numericAmount } },
+      { new: true, session }
+    );
+
+    if (!updatedUser) {
+      throw new AppError("Insufficient wallet balance", 400);
+    }
+
+    await WalletTransaction.create(
+      [
+        {
+          user_id: userId,
+          amount: -numericAmount,
+          type: "withdrawal",
+          reference_id: null,
+          balance_before: userBefore.walletBalance,
+          balance_after: updatedUser.walletBalance,
+          description: `Wallet withdrawal`,
+          status: "completed",
+        },
+      ],
+      { session }
+    );
+
+    await session.commitTransaction();
+
+    res.status(200).json({
+      success: true,
+      message: "Withdrawal successful",
+      balance: updatedUser.walletBalance,
+    });
+  } catch (error) {
+    await session.abortTransaction();
+    throw error;
+  } finally {
+    session.endSession();
+  }
+});

@@ -15,6 +15,8 @@ const OwnerWalletDashboard = () => {
     const [balance, setBalance] = useState(0);
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [withdrawAmount, setWithdrawAmount] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         fetchWalletData();
@@ -47,6 +49,47 @@ const OwnerWalletDashboard = () => {
             toast.error("Failed to load wallet data");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleWithdraw = async (e) => {
+        e.preventDefault();
+        const amount = Number(withdrawAmount);
+        if (!withdrawAmount || isNaN(amount) || amount <= 0) {
+            toast.error("Enter a valid amount");
+            return;
+        }
+
+        if (amount > balance) {
+            toast.error("Insufficient wallet balance");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const csrfToken = await getCsrfToken();
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/wallet/withdraw`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": csrfToken
+                },
+                body: JSON.stringify({ amount }),
+                credentials: "include"
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success(`Successfully withdrew ₹${amount}!`);
+                setWithdrawAmount('');
+                fetchWalletData();
+            } else {
+                toast.error(data.message || "Withdrawal failed");
+            }
+        } catch (error) {
+            toast.error("Network error. Please try again.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -95,6 +138,32 @@ const OwnerWalletDashboard = () => {
                             <span className="font-bold text-text-primary">{transactions.length}</span>
                         </div>
                     </div>
+
+                    {/* Withdraw Funds */}
+                    <div className="bg-surface border border-divider rounded-3xl p-6 shadow-sm">
+                        <h4 className="text-lg font-bold text-text-primary mb-4">Withdraw Earnings</h4>
+                        <form onSubmit={handleWithdraw} className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-medium text-text-secondary mb-1">Amount (₹)</label>
+                                <input 
+                                    type="number" 
+                                    value={withdrawAmount}
+                                    onChange={(e) => setWithdrawAmount(e.target.value)}
+                                    placeholder="e.g. 1000" 
+                                    className="w-full bg-app border border-divider rounded-xl px-4 py-3 text-text-primary outline-none focus:border-bright transition-colors"
+                                    min="1"
+                                    required
+                                />
+                            </div>
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting || balance <= 0}
+                                className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-sm transition-all ${isSubmitting || balance <= 0 ? 'bg-divider text-text-secondary cursor-not-allowed' : 'bg-bright text-background-dark hover:shadow-[0_0_20px_rgba(var(--color-bright),0.4)] hover:scale-[1.02]'}`}
+                            >
+                                {isSubmitting ? 'Processing...' : 'Withdraw to Bank'}
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
                 {/* Right Side: Transactions History */}
@@ -117,7 +186,7 @@ const OwnerWalletDashboard = () => {
                             <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                 {transactions.map(tx => {
                                     const isPositive = tx.amount > 0;
-                                    const icon = isPositive ? 'trending_up' : 'trending_down';
+                                    const icon = tx.type === 'withdrawal' ? 'money_off' : isPositive ? 'trending_up' : 'trending_down';
                                     
                                     return (
                                         <div key={tx._id} className="flex justify-between items-center p-4 bg-app/50 border border-divider/50 rounded-2xl hover:border-bright/30 transition-colors">
