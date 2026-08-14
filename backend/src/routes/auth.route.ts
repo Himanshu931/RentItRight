@@ -164,7 +164,21 @@ router.get(
  */
 router.get(
   "/google/callback",
-  passport.authenticate("google", { session: false }),
+  (req, res, next) => {
+    passport.authenticate("google", { session: false }, (err: any, user: any, info: any) => {
+      if (err) {
+        if (err.message === "Account is Suspended") {
+          return res.redirect(`${process.env.FRONTEND_URL}/?auth=suspended`);
+        }
+        return next(err);
+      }
+      if (!user) {
+        return res.redirect(`${process.env.FRONTEND_URL}/?auth=failed`);
+      }
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
   googleCallback
 );
 

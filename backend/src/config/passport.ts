@@ -31,11 +31,16 @@ passport.use(
             profileImage: profile.photos?.[0].value || "",
             isVerified: true, // Google accounts are verified
           });
-        } else if (!user.googleId) {
-          // If user exists but wasn't linked to Google, link it
-          user.googleId = profile.id;
-          if (!user.profileImage) user.profileImage = profile.photos?.[0].value || "";
-          await user.save();
+        } else {
+          if (user.isSuspended) {
+            return done(new Error("Account is Suspended"), undefined);
+          }
+          if (!user.googleId) {
+            // If user exists but wasn't linked to Google, link it
+            user.googleId = profile.id;
+            if (!user.profileImage) user.profileImage = profile.photos?.[0].value || "";
+            await user.save();
+          }
         }
 
         return done(null, user);

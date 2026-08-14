@@ -110,6 +110,11 @@ export const loginService = async (userData: {
     throw new AppError("User Not Found", 400);
   }
 
+  if (user && user.isSuspended) {
+    logger.warn("User account suspended", { email: userData.email });
+    throw new AppError("Account is Suspended", 403);
+  }
+
   if (user && !user.isVerified) {
     logger.warn("User not verified", { email: userData.email });
     throw new AppError("User Not Verified", 403);

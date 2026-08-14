@@ -7,6 +7,7 @@ import VerifyOtp from "../../pages/auth/VerifyOtp";
 import Success from "../../pages/auth/Success";
 import CompleteProfile from "../../pages/auth/CompleteProfile";
 import ForgotPassword from "../../pages/auth/ForgotPassword";
+import Suspended from "../../pages/auth/Suspended";
 
 export default function AuthController({ open, onClose, defaultMode = "login" }) {
   const [mode, setMode] = useState(defaultMode);
@@ -23,7 +24,8 @@ export default function AuthController({ open, onClose, defaultMode = "login" })
     otp: <VerifyOtp switchMode={switchMode} email={email} onClose={onClose} />,
     success: <Success onClose={onClose} />,
     completeProfile: <CompleteProfile switchMode={switchMode} onClose={onClose} />,
-    forgotPassword: <ForgotPassword switchMode={switchMode} onClose={onClose} />
+    forgotPassword: <ForgotPassword switchMode={switchMode} onClose={onClose} />,
+    suspended: <Suspended switchMode={switchMode} onClose={onClose} />
   };
 
   return (

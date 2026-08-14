@@ -16,6 +16,9 @@ const Navbar = () => {
     if (authStatus === "success" && mode) {
       setAuthMode(mode);
       setAuthOpen(true);
+    } else if (authStatus === "suspended") {
+      setAuthMode("suspended");
+      setAuthOpen(true);
     }
   }, [searchParams]);
 

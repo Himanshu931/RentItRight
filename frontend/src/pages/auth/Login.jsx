@@ -48,7 +48,11 @@ const Login = ({ switchMode, onClose }) => {
       })
       const data = await res.json();
       if (!data.success) {
-        throw new Error("Invalid credentials");
+        if (data.message === "Account is Suspended") {
+          switchMode("suspended");
+          return;
+        }
+        throw new Error(data.message || "Invalid credentials");
       }
 
       toast.success("Welcome back!");
