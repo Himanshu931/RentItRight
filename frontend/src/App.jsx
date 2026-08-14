@@ -30,6 +30,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminListings from "./pages/admin/AdminListings";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminUserDetail from "./pages/admin/AdminUserDetail";
+import AdminBookings from "./pages/admin/AdminBookings";
 import ProfileSettings from "./pages/shared/ProfileSettings";
 import { NotFound } from "./pages/NotFound";
 function App() {
@@ -78,6 +79,7 @@ function App() {
           <Route element={<AdminLayout/>}>
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/adminlisting" element={<AdminListings />} />
+            <Route path="/adminbookings" element={<AdminBookings />} />
             <Route path="/adminusers" element={<AdminUsers />} />
             <Route path="/adminuserdetail/:id" element={<AdminUserDetail />} />
             <Route path="/admin/profile" element={<ProfileSettings />} />

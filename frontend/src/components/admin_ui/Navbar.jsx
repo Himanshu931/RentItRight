@@ -4,6 +4,7 @@ import logo from "../../assets/logo.png";
 
 const links = [
   { label: "Dashboard", to: "/admin", icon: "dashboard" },
+  { label: "Bookings", to: "/adminbookings", icon: "book_online" },
   { label: "Users", to: "/adminusers", icon: "group" },
   { label: "Listings", to: "/adminlisting", icon: "inventory_2" },
 ];

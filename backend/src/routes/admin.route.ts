@@ -9,6 +9,7 @@ import {
     unsuspendUser,
     getListings,
     toggleListingActive,
+    getBookings,
 } from "../controllers/admin.controller";
 
 const router = Router();
@@ -202,5 +203,44 @@ router.get("/listings", getListings);
  */
 router.patch("/listings/:id/toggle-active", toggleListingActive);
 
+
+/**
+ * @swagger
+ * /admin/bookings:
+ *   get:
+ *     summary: List all bookings with pagination and filters
+ *     tags: [Admin]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, confirmed, ongoing, completed, cancelled, all]
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search by item title, user name or email
+ *     responses:
+ *       200:
+ *         description: Paginated list of bookings
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden (requires admin role)
+ */
+router.get("/bookings", getBookings);
 
 export default router;

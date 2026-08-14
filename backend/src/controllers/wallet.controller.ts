@@ -159,7 +159,7 @@ export const verifyRazorpayPayment = catchAsync(async (req: Request, res: Respon
           user_id: userId,
           amount: sanitizedAmount,
           type: "topup",
-          reference_id: null, // Could store razorpay order ID here if we change schema to string
+          reference_id: undefined, // Could store razorpay order ID here if we change schema to string
           balance_before: balanceBefore,
           balance_after: updatedUser.walletBalance,
           description: `Wallet top-up via Razorpay (${razorpay_payment_id})`,
@@ -359,7 +359,7 @@ export const withdrawFromWallet = catchAsync(async (req: Request, res: Response)
           user_id: userId,
           amount: -numericAmount,
           type: "withdrawal",
-          reference_id: null,
+          reference_id: undefined,
           balance_before: userBefore.walletBalance,
           balance_after: updatedUser.walletBalance,
           description: `Wallet withdrawal`,

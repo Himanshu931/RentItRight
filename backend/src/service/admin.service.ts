@@ -520,3 +520,91 @@ export const toggleListingActiveService = async (listingId: string) => {
         isActive: newStatus,
     };
 };
+
+// ─────────────────────────────────────────────────────────
+//  BOOKINGS — List with Filters + Pagination
+// ─────────────────────────────────────────────────────────
+
+interface GetBookingsParams {
+    page: number;
+    limit: number;
+    status?: string;
+    search?: string;
+}
+
+export const getBookingsService = async ({ page, limit, status, search }: GetBookingsParams) => {
+    const filter: any = {};
+
+    // Status filter
+    if (status && status !== "all") {
+        filter.booking_status = status;
+    }
+
+    const skip = (page - 1) * limit;
+
+    // We can't directly search by populated fields in find().
+    // For a robust search across item titles or user names/emails,
+    // we would ideally use aggregation. For now, we will perform a simple match.
+    
+    // If search is provided, we can find matching Items, Renters, and Owners first
+    if (search) {
+        const [matchingItems, matchingUsers] = await Promise.all([
+            Item.find({ title: { $regex: search, $options: "i" } }).select("_id").lean(),
+            User.find({
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } }
+                ]
+            }).select("_id").lean()
+        ]);
+
+        const itemIds = matchingItems.map(i => i._id);
+        const userIds = matchingUsers.map(u => u._id);
+
+        filter.$or = [
+            { item_id: { $in: itemIds } },
+            { renter_id: { $in: userIds } },
+            { owner_id: { $in: userIds } },
+            // If the search happens to be a valid ObjectId, we can search by booking ID
+            ...(mongoose.Types.ObjectId.isValid(search) ? [{ _id: search }] : [])
+        ];
+    }
+
+    const [bookings, total] = await Promise.all([
+        Booking.find(filter)
+            .populate("item_id", "title images")
+            .populate("renter_id", "name email profileImage")
+            .populate("owner_id", "name email profileImage")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+        Booking.countDocuments(filter),
+    ]);
+
+    const formattedBookings = bookings.map((booking) => {
+        return {
+            _id: booking._id,
+            item: booking.item_id || {},
+            renter: booking.renter_id || {},
+            owner: booking.owner_id || {},
+            startDate: booking.start_date,
+            endDate: booking.end_date,
+            totalDays: booking.total_days,
+            totalAmount: booking.pricing?.totalAmount || 0,
+            status: booking.booking_status,
+            paymentStatus: booking.payment_status,
+            createdAt: booking.createdAt,
+        };
+    });
+
+    return {
+        bookings: formattedBookings,
+        pagination: {
+            total,
+            page,
+            limit,
+            totalPages: Math.ceil(total / limit),
+        },
+    };
+};

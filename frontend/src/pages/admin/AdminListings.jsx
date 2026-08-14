@@ -140,22 +140,6 @@ export default function Listings() {
             onPageChange={setPage} 
           />
         )}
-
-        {/* Bulk Action Bar */}
-        <div className="mt-6 bg-surface border border-divider rounded-2xl p-4 flex items-center justify-between">
-          <span className="text-sm text-text-secondary font-medium">
-            3 listings selected
-          </span>
-          <div className="flex items-center gap-2">
-            <Button icon="download">Export</Button>
-            <Button icon="block" warning>
-              Disable
-            </Button>
-            <Button icon="delete" danger>
-              Remove
-            </Button>
-          </div>
-        </div>
       </div>
     </main>
   );
