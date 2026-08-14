@@ -1,5 +1,5 @@
 import { Worker } from "bullmq"
-import { redisConnection } from "../config/redis";
+import { createRedisConnection } from "../config/redis";
 import { Booking } from "../models/booking.model";
 import logger from "../config/logger";
 import { BookingStatus } from "../validatior/booking.validator";
@@ -31,6 +31,6 @@ export const bookingStatusWorker = new Worker(
         }
     },
     {
-        connection: redisConnection as any,
+        connection: createRedisConnection() as any,
     }
 )

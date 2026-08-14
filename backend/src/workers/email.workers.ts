@@ -1,5 +1,5 @@
 import { Worker } from "bullmq";
-import { redisConnection } from "../config/redis";
+import { createRedisConnection } from "../config/redis";
 import { cancellationEmail, acceptedBookingEmail, bookingRequestedEmail, paymentSuccessfulEmailToOwner, bookingConfirmedEmailToRenter } from "../utils/sendEmails";
 import { User } from "../models/user.model";
 import { Booking } from "../models/booking.model";
@@ -43,7 +43,7 @@ export const emailWorker = new Worker(
         }
     },
     {
-        connection: redisConnection as any,
+        connection: createRedisConnection() as any,
     }
 );
 
