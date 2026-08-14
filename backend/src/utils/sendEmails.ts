@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 export const sendOTP = async (email: string, otp: string) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `${otp} is your RentItRight verification code`,
             html: `
@@ -47,7 +47,7 @@ export const sendOTP = async (email: string, otp: string) => {
 export const cancellationEmail = async (email: string, itemName: string) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `Booking Cancelled Notification`,
             html: `
@@ -81,7 +81,7 @@ export const cancellationEmail = async (email: string, itemName: string) => {
 export const acceptedBookingEmail = async (email: string, itemName: string) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `Booking Accepted Notification`,
             html: `
@@ -118,7 +118,7 @@ export const acceptedBookingEmail = async (email: string, itemName: string) => {
 export const bookingRequestedEmail = async (email: string, itemName: string) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `New Booking Request Notification`,
             html: `
@@ -155,7 +155,7 @@ export const bookingRequestedEmail = async (email: string, itemName: string) => 
 export const sendPasswordResetOTP = async (email: string, otp: string) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `${otp} is your RentItRight password reset code`,
             html: `
@@ -187,7 +187,7 @@ export const sendPasswordResetOTP = async (email: string, otp: string) => {
 export const paymentSuccessfulEmailToOwner = async (email: string, itemName: string, amount: number, days: number) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `Payment Received - Booking Confirmed!`,
             html: `
@@ -229,7 +229,7 @@ export const paymentSuccessfulEmailToOwner = async (email: string, itemName: str
 export const bookingConfirmedEmailToRenter = async (email: string, itemName: string, amount: number, days: number) => {
     try {
         await transporter.sendMail({
-            from: `"RentItRight" <${process.env.MAIL_USER}>`,
+            from: `"RentItRight" <${process.env.SMTP_USER}>`,
             to: email,
             subject: `Booking Confirmed!`,
             html: `
