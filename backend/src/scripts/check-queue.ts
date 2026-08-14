@@ -1,8 +1,8 @@
 import { Queue } from "bullmq";
-import { redisConnection } from "../config/redis";
+import { createRedisConnection } from "../config/redis";
 
 const emailQueue = new Queue("emailQueue", {
-    connection: redisConnection as any,
+    connection: createRedisConnection() as any,
 });
 
 async function run() {
