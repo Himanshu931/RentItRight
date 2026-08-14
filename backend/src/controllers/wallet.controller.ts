@@ -6,6 +6,7 @@ import { Booking } from "../models/booking.model";
 import { Payment } from "../models/payment.model";
 import { catchAsync } from "../utils/catchAsync";
 import { AppError } from "../utils/AppError";
+import { emailQueue } from "../queues/email.queue";
 import Razorpay from "razorpay";
 import crypto from "crypto";
 
@@ -303,6 +304,21 @@ export const payWithWallet = catchAsync(async (req: Request, res: Response) => {
 
     // 7. Commit
     await session.commitTransaction();
+
+    // Queue emails for payment success
+    await emailQueue.add("sendPaymentSuccessfulEmail", {
+      owner_id: booking.owner_id,
+      bookingId: booking._id,
+      amount: ownerEarning,
+      days: booking.total_days
+    });
+
+    await emailQueue.add("sendBookingConfirmedEmail", {
+      renter_id: userId,
+      bookingId: booking._id,
+      amount: amountToPay,
+      days: booking.total_days
+    });
 
     res.status(200).json({
       success: true,

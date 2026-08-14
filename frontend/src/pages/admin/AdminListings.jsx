@@ -108,9 +108,9 @@ export default function Listings() {
           </select>
           <select className="bg-surface border border-divider rounded-xl px-4 py-2.5 text-sm text-text-secondary outline-none focus:border-bright/40 transition-colors appearance-none cursor-pointer">
             <option>Price Range</option>
-            <option>$0 - $50</option>
-            <option>$50 - $200</option>
-            <option>$200+</option>
+            <option>₹0 - ₹50</option>
+            <option>₹50 - ₹200</option>
+            <option>₹200+</option>
           </select>
           <select className="bg-surface border border-divider rounded-xl px-4 py-2.5 text-sm text-text-secondary outline-none focus:border-bright/40 transition-colors appearance-none cursor-pointer">
             <option>Location</option>

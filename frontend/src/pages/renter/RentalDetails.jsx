@@ -97,7 +97,7 @@ export default function RentalDetails() {
           policies: [
             {
               title: "Late Return Policy",
-              description: "$50/hr charge after 2 hours delay.",
+              description: "₹50/hr charge after 2 hours delay.",
               icon: "history",
             },
             {

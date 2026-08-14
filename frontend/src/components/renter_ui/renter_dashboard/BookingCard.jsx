@@ -27,7 +27,7 @@ export default function BookingCard({ booking }) {
       </div>
 
       <div className="text-right">
-        <p className="font-black text-lg">${booking.price}</p>
+        <p className="font-black text-lg">₹{booking.price}</p>
         <Link
           to={`/rentals/${booking.id || booking._id}`}
           className="mt-3 px-4 py-2 text-app text-xs font-bold rounded-xl flex items-center gap-2 hover:scale-104 bg-bright hover:cursor-pointer inline-flex"

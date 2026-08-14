@@ -84,7 +84,7 @@ export default function Footer() {
 
           <div className="flex gap-8 text-xs text-text-secondary">
             <a className="hover:text-accent" href="#">English (US)</a>
-            <a className="hover:text-accent" href="#">USD ($)</a>
+            <a className="hover:text-accent" href="#">INR (₹)</a>
           </div>
         </div>
 

@@ -140,6 +140,13 @@ export const createBookingService = async (userId: string, booking: any) => {
         itemId: booking.itemId
     });
 
+    await emailQueue.add("sendBookingRequestedEmail", {
+        owner_id: item.ownerId,
+        bookingId: newBooking._id,
+    });
+
+    logger.info("Requested booking email queued", { bookingId: newBooking._id });
+
     return true;
 };
 

@@ -88,7 +88,7 @@ export default function RentalCard({ rental }) {
             ))}
           </div>
 
-          {rental.paymentStatus === "pending" && (
+          {rental.paymentStatus === "pending" && rental.status === "confirmed" && (
             <button 
               onClick={handleWalletPay}
               disabled={isPaying}
