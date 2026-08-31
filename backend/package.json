@@ -30,6 +30,8 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@bull-board/api": "^9.4.0",
+    "@bull-board/express": "^9.4.0",
     "@elastic/elasticsearch": "^9.3.2",
     "@sentry/node": "^10.43.0",
     "@types/csurf": "^1.11.5",

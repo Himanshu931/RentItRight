@@ -148,6 +148,7 @@ export const bookingRequestedEmail = async (email: string, itemName: string) => 
             `
         })
     } catch (error) {
+        logger.error("Unable to send requested email", { email, error });
         throw new AppError("Unable to send requested email", 500)
     }
 }

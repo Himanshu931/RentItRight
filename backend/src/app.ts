@@ -102,6 +102,25 @@ app.use("/api/v1/wallet", csrfProtection, walletRoute)
 // -------------------- API DOCUMENTATION--------------------
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// -------------------- BULL-BOARD (QUEUE UI) --------------------
+import { ExpressAdapter } from "@bull-board/express";
+import { createBullBoard } from "@bull-board/api";
+import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
+import { emailQueue, bookingStatusQueue } from "./queues/email.queue";
+
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath("/admin/queues");
+
+createBullBoard({
+    queues: [
+        new BullMQAdapter(emailQueue),
+        new BullMQAdapter(bookingStatusQueue)
+    ],
+    serverAdapter: serverAdapter,
+});
+
+app.use("/admin/queues", serverAdapter.getRouter());
+
 // -------------------- SENTRY ERROR HANDLER --------------------
 Sentry.setupExpressErrorHandler(app)
 

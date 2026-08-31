@@ -77,7 +77,7 @@ export const createBookingService = async (userId: string, booking: any) => {
         throw new AppError("Invalid booking dates", 400);
     }
 
-    if (endDate <= startDate) {
+    if (endDate < startDate) {
         logger.warn("End date before start date", { startDate, endDate });
         throw new AppError("End date must be after start date", 400);
     }
